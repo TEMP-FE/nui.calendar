@@ -1,26 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import MonthlyCalendar from "./components/MonthlyCalendar";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <div className="App" style={{ padding: "50px" }}>
+            <MonthlyCalendar />
+            <MonthlyCalendar year={2020} month={10} />
+            <MonthlyCalendar year={2020} month={11} />
+            <MonthlyCalendar year={2021} month={0} />
+        </div>
+    );
 }
 
 export default App;

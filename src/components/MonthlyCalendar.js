@@ -5,13 +5,15 @@ import { getMonthInfo, getDateInfo, calcWeekCount } from "../utils/calendar";
 
 const cx = classNames.bind(styles);
 
+// 달력 헤더
 const CalendarHeader = () => {
     const dayOfWeekList = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     return (
         <div className={cx("calendar_header")}>
-            {dayOfWeekList.map(dayOfWeekItem => (
+            {dayOfWeekList.map((dayOfWeekItem, i) => (
                 <div
+                    key={`calendar_header-${i}`}
                     className={cx("calendar_header_item", {
                         "-holiday": dayOfWeekItem === "Sun"
                     })}
@@ -23,6 +25,7 @@ const CalendarHeader = () => {
     );
 };
 
+// 달력 셀
 const CalendarCell = ({ dateTime, isHoliday, isDimmed }) => {
     const { year, month, date } = getDateInfo(dateTime);
 
@@ -37,8 +40,8 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed }) => {
     );
 };
 
+// 월 달력
 const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().month }) => {
-    const [currentMonth, setCurrentMonth] = useState();
     const currentMonthInfo = getMonthInfo({ year, month });
     const lastMonthInfo = getMonthInfo({ year, month: month - 1 });
     const weekCount = calcWeekCount({ year, month });
@@ -76,7 +79,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
                 }
             }
         }
-        // console.log(tempDateInfoList);
         setDateInfoList(tempDateInfoList);
     };
 
@@ -91,10 +93,10 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
             <div className={cx("calendar_area")}>
                 <CalendarHeader />
                 <div className={cx("calendar_content")}>
-                    {dateInfoList?.map(dateInfoRow => (
-                        <div className={cx("calendar_row")}>
+                    {dateInfoList?.map((dateInfoRow, i) => (
+                        <div key={`row-${i}`} className={cx("calendar_row")}>
                             {dateInfoRow?.map(dateInfoItem => {
-                                return <CalendarCell dateTime={dateInfoItem.dateTime} isDimmed={dateInfoItem.dateTime.getMonth() !== month} isHoliday={dateInfoItem.isHoliday} />;
+                                return <CalendarCell key={dateInfoItem.dateTime.getTime()} dateTime={dateInfoItem.dateTime} isDimmed={dateInfoItem.dateTime.getMonth() !== month} isHoliday={dateInfoItem.isHoliday} />;
                             })}
                         </div>
                     ))}

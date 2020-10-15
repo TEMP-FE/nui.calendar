@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import classNames from 'classnames/bind'
 import styles from './MonthlyCalendar.module.scss'
-import { getMonthInfo, getDateInfo, calcWeekCount } from '../utils/calendar'
+import { getMonthInfo, getDateInfo, calcWeekCount } from '../../utils/calendar'
+import CalendarItem from '../CalendarItem/CalendarItem'
 
 const cx = classNames.bind(styles)
 
@@ -33,9 +34,34 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed }) => {
 		console.log(year, month, date)
 	}
 
+	const calendarItemA = {
+		title: '테스트',
+		startAt: '0606',
+		endAt: '0606',
+		location: '',
+		category: '',
+		isAllDay: false,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	}
+	const calendarItemB = {
+		title: '테스트',
+		startAt: '0606',
+		endAt: '0606',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	}
+
 	return (
 		<div className={cx('calendar_cell')} onClick={onClickCell}>
 			<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
+			{/*<CalendarItem {...calendarItemA} />*/}
+			{/*<CalendarItem {...calendarItemB} />*/}
 		</div>
 	)
 }

@@ -4,6 +4,7 @@ import classNames from 'classnames/bind'
 
 import { ReactComponent as IconPrev } from '../../assets/images/svg/arrow_prev.svg'
 import { ReactComponent as IconNext } from '../../assets/images/svg/arrow_next.svg'
+import CalendarItem from '../CalendarItem/CalendarItem'
 
 const cx = classNames.bind(styles)
 const moment = require('moment')
@@ -64,6 +65,29 @@ const WeeklyCalendar = () => {
 		getThisWeek()
 	}, [])
 
+	const calendarItemA = {
+		title: '테스트',
+		startAt: '0606',
+		endAt: '0606',
+		location: '',
+		category: '',
+		isAllDay: false,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	}
+	const calendarItemB = {
+		title: '테스트',
+		startAt: '0606',
+		endAt: '0606',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	}
+
 	return (
 		<>
 			<div className={cx('menu')}>
@@ -111,8 +135,12 @@ const WeeklyCalendar = () => {
 								<div className={cx('view_cell')} key={index} onClick={() => log(info)}>
 									{timeLine.map((time) => (
 										<div className={cx('detail_wrap')} key={time}>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 0)}></div>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 30)}></div>
+											<div className={cx('detail_cell')} onClick={() => timelog(time, 0)}>
+												{/*<CalendarItem {...calendarItemA} />*/}
+											</div>
+											<div className={cx('detail_cell')} onClick={() => timelog(time, 30)}>
+												{/*<CalendarItem {...calendarItemB} />*/}
+											</div>
 										</div>
 									))}
 								</div>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { ReactComponent as IconRepeat } from './icon-repeat.svg'
-import { ReactComponent as IconLocation } from './icon-location.svg'
-import { ReactComponent as IconBlock } from './icon-block.svg'
-import { ReactComponent as IconLock } from './icon-lock.svg'
-import { ReactComponent as IconPerson } from './icon-person.svg'
+import { ReactComponent as IconRepeat } from '../../assets/images/svg/icon-repeat.svg'
+import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
+import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
+import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
+import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
 
 import classNames from 'classnames/bind'
 
@@ -103,7 +103,7 @@ const DayType = ({ ...item }) => {
 					</span>
 				</span>
 			</button>
-			<div id="wa-popup" className={cx('popup')} role="dialog" hidden={isPopup}>
+			<div id="wa-popup" className={cx('popup')} role="dialog" hidden={true}>
 				<div className={cx('box')} style={{ backgroundColor: getCategoryColor(category) }}>
 					<div className={cx('inner')}>팝업 테스트</div>
 				</div>
@@ -155,7 +155,7 @@ const TimeType = ({ ...item }) => {
 					</span>
 				</span>
 			</button>
-			<div id="wa-popup" className={cx('popup')} role="dialog" hidden={isPopup}>
+			<div id="wa-popup" className={cx('popup')} role="dialog" hidden={true}>
 				<div className={cx('box')} style={{ backgroundColor: getCategoryColor(category) }}>
 					<div className={cx('inner')}>팝업 테스트</div>
 				</div>

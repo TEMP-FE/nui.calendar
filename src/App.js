@@ -1,12 +1,16 @@
-import React from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import React from 'react'
+import logo from './logo.svg'
+import './App.css'
+import MonthlyCalendar from './components/MonthlyCalendar/MonthlyCalendar'
+import WeeklyPage from './pages/weekly'
 
 function App() {
-    return (
-        <div className="App">
-        </div>
-    );
+	return (
+		<div className="App">
+			<MonthlyCalendar month={10} year={20} />
+			<WeeklyPage />
+		</div>
+	)
 }
 
-export default App;
+export default App

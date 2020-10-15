@@ -1,9 +1,9 @@
 import React from "react";
-import Weekly from "../components/Weekly/Weekly";
+import WeeklyCalendar from "../components/WeeklyCalendar/WeeklyCalendar";
 
 const WeeklyPage = () => (
   <>
-    <Weekly />
+    <WeeklyCalendar />
   </>
 );
 

@@ -11,29 +11,22 @@ import styles from './CalendarItem.module.scss'
 
 const cx = classNames.bind(styles)
 
-const DEMO_ITEM_A = {
-    title: '캘린더 내 일정 항목 컴포넌트 만들기 캘린더 내 일정 항목 컴포넌트 만들기',
-    location: '',
-    range: '',
-    group: 'A',
-    startAt: '06:30',
-    endAt: '10:30',
-    isAllDay: false,
-    isBlocked: true
-}
-const DEMO_ITEM_B = {
-    title: '캘린더 내 일정 항목 컴포넌트 만들기 캘린더 내 일정 항목 컴포넌트 만들기',
-    location: '',
-    range: '',
-    group: 'B',
-    startAt: '0630',
-    endAt: '1030',
-    isAllDay: true,
-    isBlocked: false
-}
+/*
+    const calendarItem = {
+        title: '',
+        startAt: new Date(),
+        endAt: new Date(),
+        location: '',
+        category: '',
+        isAllDay: false,
+        isBlocked: false,
+        isPrivate: false,
+        isRepeatable: false,
+    }
+*/
 
 // 일정 그룹 별 색상
-const getGroupColor = (group) => {
+const getCategoryColor = (group) => {
     switch(group) {
         case 'A':
             return '#009ac7'
@@ -46,8 +39,7 @@ const getGroupColor = (group) => {
     }
 }
 
-// TODO: 더 좋은 방법(?)
-const getIcon = ({members, hasLocation, isBlocked, isRepeatable}) => {
+const getIcon = ({isPrivate, hasLocation, isBlocked, isRepeatable}) => {
     // 반복 일정
     if (isRepeatable) {
         return <IconRepeat width={10} height={10} />
@@ -64,7 +56,7 @@ const getIcon = ({members, hasLocation, isBlocked, isRepeatable}) => {
     }
 
     // if 개인 일정 else 공개 일정
-    if (members === 'private') {
+    if (isPrivate === 'private') {
         return <IconLock width={10} height={10} />
     } else {
         return <IconPerson width={10} height={10} />
@@ -81,7 +73,17 @@ const getIcon = ({members, hasLocation, isBlocked, isRepeatable}) => {
 const DayType = ({...item}) => {
     const [isPopup, setIsPopup] = useState(true)
 
-    const {title, startAt, endAt, location, range, group, isBlocked} = item
+    const {
+        title,
+        startAt,
+        endAt,
+        location,
+        category,
+        isAllDay,
+        isBlocked,
+        isPrivate,
+        isRepeatable,
+    } = item
 
     const handlePopup = () => {
         setIsPopup(!isPopup)
@@ -92,13 +94,13 @@ const DayType = ({...item}) => {
             <button
                 type='button'
                 className={cx('item', 'type-day')}
-                style={{backgroundColor: getGroupColor(group)}}
+                style={{backgroundColor: getCategoryColor(category)}}
                 aria-haspopup='dialog'
                 aria-controls='wa-popup'
                 aria-expanded={isPopup}
                 onClick={handlePopup}
             >
-                <span className='blind'>{group}</span>
+                <span className='blind'>{category}</span>
                 <span className='blind'>
                     <span className={cx('period')}>{startAt}</span>
                     <span className={cx('period')}>{endAt}</span>
@@ -120,7 +122,7 @@ const DayType = ({...item}) => {
                 role='dialog'
                 hidden={isPopup}
             >
-                <div className={cx('box')} style={{backgroundColor: getGroupColor(group)}}>
+                <div className={cx('box')} style={{backgroundColor: getCategoryColor(category)}}>
                     <div className={cx('inner')}>
                         팝업 테스트
                     </div>
@@ -139,7 +141,17 @@ const DayType = ({...item}) => {
 const TimeType = ({...item}) => {
     const [isPopup, setIsPopup] = useState(true)
 
-    const {title, startAt, endAt, location, range, group, isBlocked} = item
+    const {
+        title,
+        startAt,
+        endAt,
+        location,
+        category,
+        isAllDay,
+        isBlocked,
+        isPrivate,
+        isRepeatable,
+    } = item
 
     const handlePopup = () => {
         setIsPopup(!isPopup)
@@ -156,8 +168,8 @@ const TimeType = ({...item}) => {
                 onClick={handlePopup}
             >
                 <span className={cx('cell', 'type-group')}>
-                    <span className={cx('group')} style={{backgroundColor: getGroupColor(group)}}>
-                        <span className='blind'>{group}</span>
+                    <span className={cx('group')} style={{backgroundColor: getCategoryColor(category)}}>
+                        <span className='blind'>{category}</span>
                     </span>
                 </span>
                 <span className={cx('cell', 'type-period')}>
@@ -181,7 +193,7 @@ const TimeType = ({...item}) => {
                 role='dialog'
                 hidden={isPopup}
             >
-                <div className={cx('box')} style={{backgroundColor: getGroupColor(group)}}>
+                <div className={cx('box')} style={{backgroundColor: getCategoryColor(category)}}>
                     <div className={cx('inner')}>
                         팝업 테스트
                     </div>

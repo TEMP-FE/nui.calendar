@@ -1,6 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import CalendarItem from './CalendarItem/CalendarItem'
 
 function App() {
   return (

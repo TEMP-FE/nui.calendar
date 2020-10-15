@@ -36,3 +36,20 @@
     transform: rotate(360deg);
   }
 }
+
+.month {
+  border-top: 1px solid black;
+  border-left: 1px solid black;
+}
+
+.week {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.day {
+  flex-grow: 1;
+  border-right: 1px solid black;
+  border-bottom: 1px solid black;
+  min-height: 40px;
+}

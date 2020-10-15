@@ -5,11 +5,9 @@ import MonthlyCalendar from "./components/MonthlyCalendar";
 
 function App() {
     return (
-        <div className="App" style={{ padding: "50px" }}>
+        <div className="App">
             <MonthlyCalendar />
             <MonthlyCalendar year={2020} month={10} />
-            <MonthlyCalendar year={2020} month={11} />
-            <MonthlyCalendar year={2021} month={0} />
         </div>
     );
 }

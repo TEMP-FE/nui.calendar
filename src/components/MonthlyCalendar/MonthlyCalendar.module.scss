@@ -1,64 +1,71 @@
 .calendar_wrap {
-    width: 1124px;
-    height: 600px;
-    display: flex;
-    flex-direction: column;
+	width: 1124px;
+	display: flex;
+	flex-direction: column;
 }
 
 .calendar_title {
 }
 
 .calendar_area {
-    margin-top: 6px;
-    flex: 1;
+	flex: 1;
+	margin-top: 6px;
 }
 
 .calendar_header {
-    width: 100%;
-    display: flex;
-    border-top: 1px solid #e5e5e5;
-    height: 31px;
-    font-size: 12px;
-    text-align: left;
-    align-items: center;
+	width: 100%;
+	display: flex;
+	border-top: 1px solid #e5e5e5;
+	height: 31px;
+	font-size: 12px;
+	text-align: left;
+	align-items: center;
 }
 
 .calendar_header_item {
-    flex: 1;
-    padding-left: 10px;
+	flex: 1;
+	padding-left: 10px;
 
-    &.-holiday {
-        color: #ff4040;
-    }
+	&.-holiday {
+		color: #ff4040;
+	}
 }
 
 .calendar_content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid #e5e5e5;
+	height: 600px;
+	display: flex;
+	flex-direction: column;
+	border-top: 1px solid #e5e5e5;
 }
 
 .calendar_row {
-    display: flex;
-    flex: 1;
+	display: flex;
+	flex: 1;
+	border-top: 1px solid #e5e5e5;
 }
 
 .calendar_cell {
-    flex: 1;
-    padding: 3px 3px 3px 10px;
-    font-size: 14px;
+	position: relative;
+	flex: 1;
+	padding: 3px 3px 3px 10px;
+	font-size: 14px;
+	border-right: 1px solid #e5e5e5;
 }
 
 .date {
-    display: block;
-    text-align: left;
+	display: block;
+	text-align: left;
 
-    &.-holiday {
-        color: #ff4040;
-    }
+	&.-holiday {
+		color: #ff4040;
+	}
 
-    &.is_dimmed {
-        opacity: 0.4;
-    }
+	&.is_dimmed {
+		opacity: 0.4;
+	}
+}
+
+.schedule_item {
+	position: absolute;
+	z-index: 100;
 }

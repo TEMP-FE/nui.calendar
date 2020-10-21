@@ -4,8 +4,11 @@ import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-loc
 import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
 import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
+import CalendarItemPopupInfo from './CalendarItemPopupInfo'
+import CalendarItemPopupEditor from './CalendarItemPopupEditor'
 
 import classNames from 'classnames/bind'
+import { getCategoryColor } from './commonState'
 
 import styles from './CalendarItem.module.scss'
 
@@ -24,20 +27,6 @@ const cx = classNames.bind(styles)
         isRepeatable: false,
     }
 */
-
-// 일정 그룹 별 색상
-const getCategoryColor = (group) => {
-	switch (group) {
-		case 'A':
-			return '#009ac7'
-		case 'B':
-			return '#09b65a'
-		case 'C':
-			return '#ff5252'
-		default:
-			return '#fdae2e'
-	}
-}
 
 const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	// 반복 일정
@@ -69,13 +58,13 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DayType = ({ ...item }) => {
-	const [isPopup, setIsPopup] = useState(true)
-
+const DayType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) => {
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
 
-	const handlePopup = () => {
-		setIsPopup(!isPopup)
+	const [isShown, setIsShown] = useState(false)
+
+	const handleIsShown = () => {
+		setIsShown(!isShown)
 	}
 
 	return (
@@ -85,9 +74,9 @@ const DayType = ({ ...item }) => {
 				className={cx('item', 'type-day')}
 				style={{ backgroundColor: getCategoryColor(category) }}
 				aria-haspopup="dialog"
-				aria-controls="wa-popup"
-				aria-expanded={isPopup}
-				onClick={handlePopup}
+				aria-controls={'wa-popup'}
+				aria-expanded={isShown}
+				onClick={handleIsShown}
 			>
 				<span className="blind">{category}</span>
 				<span className="blind">
@@ -103,11 +92,13 @@ const DayType = ({ ...item }) => {
 					</span>
 				</span>
 			</button>
-			<div id="wa-popup" className={cx('popup')} role="dialog" hidden={true}>
-				<div className={cx('box')} style={{ backgroundColor: getCategoryColor(category) }}>
-					<div className={cx('inner')}>팝업 테스트</div>
-				</div>
-			</div>
+			<CalendarItemPopupInfo
+				id={'wa-popup'}
+				isShown={isShown}
+				handleEdit={handleEdit}
+				handleDelete={handleDelete}
+				{...item}
+			/>
 		</div>
 	)
 }
@@ -118,13 +109,19 @@ const DayType = ({ ...item }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const TimeType = ({ ...item }) => {
-	const [isPopup, setIsPopup] = useState(true)
-
+const TimeType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) => {
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
 
-	const handlePopup = () => {
-		setIsPopup(!isPopup)
+	const [isShown, setIsShown] = useState(false)
+
+	const handleIsShown = () => {
+		setIsShown(!isShown)
+	}
+
+	const handleEditInPopup = () => {
+		handleEdit()
+
+		setIsShown(!isShown)
 	}
 
 	return (
@@ -134,8 +131,8 @@ const TimeType = ({ ...item }) => {
 				className={cx('item')}
 				aria-haspopup="dialog"
 				aria-controls="wa-popup"
-				aria-expanded={isPopup}
-				onClick={handlePopup}
+				aria-expanded={isShown}
+				onClick={handleIsShown}
 			>
 				<span className={cx('cell', 'type-group')}>
 					<span className={cx('group')} style={{ backgroundColor: getCategoryColor(category) }}>
@@ -155,11 +152,13 @@ const TimeType = ({ ...item }) => {
 					</span>
 				</span>
 			</button>
-			<div id="wa-popup" className={cx('popup')} role="dialog" hidden={true}>
-				<div className={cx('box')} style={{ backgroundColor: getCategoryColor(category) }}>
-					<div className={cx('inner')}>팝업 테스트</div>
-				</div>
-			</div>
+			<CalendarItemPopupInfo
+				id={'wa-popup'}
+				isShown={isShown}
+				handleEdit={handleEditInPopup}
+				handleDelete={handleDelete}
+				{...item}
+			/>
 		</div>
 	)
 }

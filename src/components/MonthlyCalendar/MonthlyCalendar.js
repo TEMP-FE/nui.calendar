@@ -74,17 +74,6 @@ const DEMO_PROPS = {
 			isPrivate: false,
 			isRepeatable: false,
 		},
-		{
-			title: '일정 7',
-			startAt: new Date(2020, 9, 15),
-			endAt: new Date(2020, 9, 15),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
 	],
 }
 

@@ -3,6 +3,7 @@ import classNames from 'classnames/bind'
 import styles from './MonthlyCalendar.module.scss'
 import { getMonthInfo, getDateInfo, calcWeekCount } from '../../utils/calendar'
 import CalendarItem from '../CalendarItem/CalendarItem'
+import ButtonArea from '../ButtonArea/ButtonArea'
 
 const cx = classNames.bind(styles)
 
@@ -67,7 +68,7 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed }) => {
 }
 
 // 월 달력
-const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().month }) => {
+const MonthlyCalendar = ({ year , month }) => {
 	const currentMonthInfo = getMonthInfo({ year, month })
 	const lastMonthInfo = getMonthInfo({ year, month: month - 1 })
 	const weekCount = calcWeekCount({ year, month })

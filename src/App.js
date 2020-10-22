@@ -1,14 +1,14 @@
 import React from 'react'
 import logo from './logo.svg'
 import './App.css'
-import MonthlyCalendar from './components/MonthlyCalendar/MonthlyCalendar'
-import WeeklyPage from './pages/weekly'
+import Monthly from './components/MonthlyCalendar/Monthly'
+import WeeklyCalendar from './components/WeeklyCalendar/WeeklyCalendar'
 
 function App() {
 	return (
 		<div className="App">
-			<MonthlyCalendar month={10} year={20} />
-			<WeeklyPage />
+			<Monthly />
+			<WeeklyCalendar />
 		</div>
 	)
 }

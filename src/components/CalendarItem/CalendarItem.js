@@ -69,7 +69,7 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DayType = ({ ...item }) => {
+const DayType = ({ style, ...item }) => {
 	const [isPopup, setIsPopup] = useState(true)
 
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
@@ -79,7 +79,7 @@ const DayType = ({ ...item }) => {
 	}
 
 	return (
-		<div className={cx('component')} draggable={!isBlocked}>
+		<div className={cx('component')} draggable={!isBlocked} style={style}>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}

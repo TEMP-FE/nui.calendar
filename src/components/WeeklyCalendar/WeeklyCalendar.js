@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 import styles from './WeeklyCalendar.module.scss'
 import classNames from 'classnames/bind'
 
-import { ReactComponent as IconPrev } from '../../assets/images/svg/arrow_prev.svg'
-import { ReactComponent as IconNext } from '../../assets/images/svg/arrow_next.svg'
 import CalendarItem from '../CalendarItem/CalendarItem'
+import ButtonArea from '../ButtonArea/ButtonArea'
 
 const cx = classNames.bind(styles)
 const moment = require('moment')
@@ -33,24 +32,14 @@ const WeeklyCalendar = () => {
 		setWeek(thisWeek)
 	}
 
-	const getPrevWeek = () => {
-		const prevWeek = []
+	const changeWeek = (state) => {
+		const tempWeek = []
 		for (let i = 0; i < 7; i++) {
 			var temp = new Date(week[i])
-			temp.setDate(temp.getDate() - 7)
-			prevWeek.push(temp)
+			temp.setDate(temp.getDate() + (state ? 7 : -7))
+			tempWeek.push(temp)
 		}
-		setWeek(prevWeek)
-	}
-
-	const getNextWeek = () => {
-		const nextWeek = []
-		for (let i = 0; i < 7; i++) {
-			var temp = new Date(week[i])
-			temp.setDate(temp.getDate() + 7)
-			nextWeek.push(temp)
-		}
-		setWeek(nextWeek)
+		setWeek(tempWeek)
 	}
 
 	const log = (info) => {
@@ -65,21 +54,46 @@ const WeeklyCalendar = () => {
 		getThisWeek()
 	}, [])
 
-	const calendarItemA = {
-		title: '테스트',
-		startAt: '0606',
-		endAt: '0606',
-		location: '',
-		category: '',
-		isAllDay: false,
-		isBlocked: false,
-		isPrivate: false,
-		isRepeatable: false,
-	}
+	const calendarItemList = [
+		{
+			title: '테스트',
+			startAt: '2020-10-22 12:30',
+			endAt: '2020-10-22 15:00',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+		{
+			title: '테스트',
+			startAt: '2020-10-18 04:20',
+			endAt: '2020-10-18 07:35',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+		{
+			title: '테스트',
+			startAt: '2020-10-27 06:40',
+			endAt: '2020-10-27 11:20',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+	]
+
 	const calendarItemB = {
 		title: '테스트',
-		startAt: '0606',
-		endAt: '0606',
+		startAt: '2020-10-22 12:30',
+		endAt: '2020-10-22 15:00',
 		location: '',
 		category: '',
 		isAllDay: true,
@@ -88,19 +102,18 @@ const WeeklyCalendar = () => {
 		isRepeatable: false,
 	}
 
+	const calcStartPoint = (startDate) => {
+		return (new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30)
+	}
+
+	const calcCalendarItemHeight = (startDate, endDate) => {
+		console.log()
+		return ((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60)) * (26 / 30)
+	}
+
 	return (
 		<>
-			<div className={cx('menu')}>
-				<button type="button" className={cx('btn', 'today')} onClick={() => getThisWeek()}>
-					Today
-				</button>
-				<button type="button" className={cx('btn', 'prev')} onClick={() => getPrevWeek()}>
-					<IconPrev width="14" height="14" />
-				</button>
-				<button type="button" className={cx('btn', 'next')} onClick={() => getNextWeek()}>
-					<IconNext width="14" height="14" />
-				</button>
-			</div>
+			<ButtonArea data={week} getThis={getThisWeek} getChange={changeWeek} />
 			<strong className={cx('range')}>
 				{moment(week[0]).format('YYYY.MM.DD')} ~{moment(week[6]).format('YYYY.MM.DD')}
 			</strong>
@@ -135,17 +148,31 @@ const WeeklyCalendar = () => {
 								<div className={cx('view_cell')} key={index} onClick={() => log(info)}>
 									{timeLine.map((time) => (
 										<div className={cx('detail_wrap')} key={time}>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 0)}>
-												{/*<CalendarItem {...calendarItemA} />*/}
-											</div>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 30)}>
-												{/*<CalendarItem {...calendarItemB} />*/}
-											</div>
+											<div className={cx('detail_cell')} onClick={() => timelog(time, 0)}></div>
+											<div className={cx('detail_cell')} onClick={() => timelog(time, 30)}></div>
 										</div>
 									))}
+									{calendarItemList.map(
+										(calendarItem) =>
+											info.getDate() === new Date(calendarItem.startAt).getDate() && (
+												<CalendarItem
+													{...calendarItem}
+													style={{
+														top: calcStartPoint(calendarItem.startAt),
+														left: '0',
+														right: '5px',
+														height: calcCalendarItemHeight(
+															calendarItem.startAt,
+															calendarItem.endAt,
+														),
+													}}
+												/>
+											),
+									)}
 								</div>
 							))}
 						</div>
+						<div></div>
 					</div>
 				</div>
 			</div>

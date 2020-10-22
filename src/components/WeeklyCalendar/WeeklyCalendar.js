@@ -90,18 +90,6 @@ const WeeklyCalendar = () => {
 		},
 	]
 
-	const calendarItemB = {
-		title: '테스트',
-		startAt: '2020-10-22 12:30',
-		endAt: '2020-10-22 15:00',
-		location: '',
-		category: '',
-		isAllDay: true,
-		isBlocked: false,
-		isPrivate: false,
-		isRepeatable: false,
-	}
-
 	const calcStartPoint = (startDate) => {
 		return (new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30)
 	}

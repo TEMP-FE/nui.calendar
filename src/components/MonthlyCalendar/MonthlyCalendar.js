@@ -287,12 +287,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 
 	useEffect(() => {
 		makeDateInfoList()
-		// ascendingScheduleList()
 	}, [])
-
-	useEffect(() => {
-		// console.log(scheduleList)
-	}, [scheduleList])
 
 	return (
 		<div className={cx('calendar_wrap')}>

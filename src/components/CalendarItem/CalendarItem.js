@@ -12,17 +12,17 @@ import styles from './CalendarItem.module.scss'
 const cx = classNames.bind(styles)
 
 /*
-    const calendarItem = {
-        title: '',
-        startAt: new Date(),
-        endAt: new Date(),
-        location: '',
-        category: '',
-        isAllDay: false,
-        isBlocked: false,
-        isPrivate: false,
-        isRepeatable: false,
-    }
+	const calendarItem = {
+		title: '',
+		startAt: new Date(),
+		endAt: new Date(),
+		location: '',
+		category: '',
+		isAllDay: false,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	}
 */
 
 // 일정 그룹 별 색상
@@ -69,7 +69,7 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DayType = ({ ...item }) => {
+const DayType = ({ setDragging, resetDragging, ...item }) => {
 	const [isPopup, setIsPopup] = useState(true)
 
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
@@ -78,8 +78,19 @@ const DayType = ({ ...item }) => {
 		setIsPopup(!isPopup)
 	}
 
+	const handleDragStart = (e) => {
+		setDragging()
+	}
+
+	const handleDragEnd = (e) => {
+		resetDragging()
+	}
+
 	return (
-		<div className={cx('component')} draggable={!isBlocked}>
+		<div className={cx('component')} draggable={!isBlocked}
+			onDragStart={handleDragStart}
+			onDragEnd={handleDragEnd}
+		>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}

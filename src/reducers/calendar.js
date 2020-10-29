@@ -12,16 +12,17 @@ const ACTIONS = {
 	DELETE: 'nui.calendar/calendar/DELETE',
 }
 
-const reducer = ({ state = { list: [] }, actions = { type: '', calendar: {} } }) => {
+const reducer = (state, actions) => {
 	const calendar = actions.calendar
-	const { startAt } = calendar
-	const calendarList = state[startAt]
+	const { dateInfo } = calendar
+	const calendarList = state.datePicker[dateInfo] || []
 
 	switch (actions.type) {
 		case ACTIONS.CREATE:
+			console.log('testsetset')
 			return {
 				...state,
-				[startAt]: [...calendarList, calendar],
+				[dateInfo]: [...calendarList, calendar],
 			}
 		case ACTIONS.READ:
 			return {
@@ -32,14 +33,14 @@ const reducer = ({ state = { list: [] }, actions = { type: '', calendar: {} } })
 
 			return {
 				...state,
-				[startAt]: [...calendarList, newCalendar],
+				[dateInfo]: [...calendarList, newCalendar],
 			}
 		case ACTIONS.DELETE:
 			const newCalendarList = calendarList.filter((item) => item.id !== calendar.id)
 
 			return {
 				...state,
-				[startAt]: newCalendarList,
+				[dateInfo]: newCalendarList,
 			}
 		default:
 			return state
@@ -53,7 +54,7 @@ export const createCalendar = (calendar) => {
 	}
 }
 
-export const removeCalendar = () => {
+export const readCalendar = () => {
 	return {
 		type: ACTIONS.READ,
 	}

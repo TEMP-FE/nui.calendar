@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+
 import CalendarItem from './CalendarItem'
 import CalendarItemPopupEditor from './CalendarItemPopupEditor'
 
@@ -9,15 +10,13 @@ const Index = (item) => {
 		setIsEdit(true)
 	}
 
-	const handleDelete = () => {}
-
 	const handleClose = () => {
 		setIsEdit(false)
 	}
 
 	return (
 		<>
-			<CalendarItem handleEdit={handleEdit} handleDelete={handleDelete} {...item} />
+			<CalendarItem handleEdit={handleEdit} {...item} />
 			<CalendarItemPopupEditor id={'wa-popup'} isShown={isEdit} handleClose={handleClose} {...item} />
 		</>
 	)

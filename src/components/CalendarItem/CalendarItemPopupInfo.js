@@ -5,14 +5,24 @@ import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-perso
 
 import classNames from 'classnames/bind'
 import { getCategoryColor } from './commonState'
+import { deleteCalendar } from '../../reducers/calendar'
 
 import styles from './CalendarItemPopupInfo.module.scss'
 import CalendarItemPopup from './CalendarItemPopup'
+import { useCalenderContext } from '../../contexts/calendar'
 
 const cx = classNames.bind(styles)
 
 const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleDelete, ...item }) => {
+	const { calendarDispatch } = useCalenderContext()
+
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
+
+	const onDelete = () => {
+		calendarDispatch(deleteCalendar(id))
+
+		handleDelete()
+	}
 
 	return (
 		<CalendarItemPopup id={id} backgroundColor={getCategoryColor(category)} isShown={isShown}>
@@ -52,7 +62,7 @@ const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleDelete, ...item 
 						</button>
 					</div>
 					<div className={cx('cell')}>
-						<button type="button" className={cx('button')} onClick={handleDelete}>
+						<button type="button" className={cx('button')} onClick={onDelete}>
 							Delete
 						</button>
 					</div>

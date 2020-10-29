@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react'
+
+import moment from 'moment'
 import classNames from 'classnames/bind'
-import styles from './MonthlyCalendar.module.scss'
 import { getMonthInfo, getDateInfo, calcWeekCount } from '../../utils/calendar'
+import { useCalenderContext } from '../../contexts/calendar'
+
 import CalendarItem from '../CalendarItem'
+
+import styles from './MonthlyCalendar.module.scss'
+import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
 
 const cx = classNames.bind(styles)
 
@@ -28,28 +34,32 @@ const CalendarHeader = () => {
 
 // 달력 셀
 const CalendarCell = ({ dateTime, isHoliday, isDimmed }) => {
-	const { year, month, date } = getDateInfo(dateTime)
+	const {
+		calendarStore: { datePicker },
+	} = useCalenderContext()
+	const [isShown, setIsShown] = useState(false)
 
-	const onClickCell = () => {
+	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
+	const { year, month, date } = getDateInfo(dateTime)
+	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
+	const calendarList = datePicker[dateInfo]
+
+	const onClickCell = (e) => {
+		e.stopPropagation()
+
 		console.log(year, month, date)
+		setIsShown(!isShown)
 	}
 
-	const calendarItemA = {
-		title: '테스트',
-		startAt: '0606',
-		endAt: '0606',
-		location: '',
-		category: 'A',
-		isAllDay: false,
-		isBlocked: false,
-		isPrivate: true,
-		isRepeatable: false,
+	const handleClose = () => {
+		setIsShown(!isShown)
 	}
 
 	return (
 		<div className={cx('calendar_cell')} onClick={onClickCell}>
 			<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
-			<CalendarItem {...calendarItemA} />
+			{calendarList && calendarList.map((item, key) => <CalendarItem key={key} {...item} />)}
+			{isShown && <CalendarItemPopupEditor isShown={isShown} dateInfo={dateInfo} handleClose={handleClose} />}
 		</div>
 	)
 }

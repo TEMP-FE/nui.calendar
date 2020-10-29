@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect } from 'react'
 import { ReactComponent as IconLabel } from '../../assets/images/svg/icon-label.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
 import { ReactComponent as IconLockOpen } from '../../assets/images/svg/icon-lock-open.svg'
@@ -8,8 +8,11 @@ import { ReactComponent as IconTime } from '../../assets/images/svg/icon-time.sv
 import { ReactComponent as IconClose } from '../../assets/images/svg/icon-close.svg'
 import CalendarItemPopup from './CalendarItemPopup'
 
+import moment from 'moment'
 import classNames from 'classnames/bind'
 import { getCategoryColor } from './commonState'
+import { useCalenderContext } from '../../contexts/calendar'
+import { createCalendar } from '../../reducers/calendar'
 import useInput from './useInput'
 import useToggle from './useToggle'
 
@@ -18,10 +21,12 @@ import styles from './CalendarItemPopupEditor.module.scss'
 const cx = classNames.bind(styles)
 
 const CalendarItemPopupEditor = ({ id, isShown, handleClose, ...item }) => {
+	const { calendarDispatch } = useCalenderContext()
+
 	const {
 		title = '',
-		startAt = new Date(),
-		endAt = new Date(),
+		dateInfo = moment().format('YYYY-MM-DD-HH:SS'),
+		dateRelative = 1,
 		location = '',
 		category = 'A',
 		isAllDay = false,
@@ -30,21 +35,38 @@ const CalendarItemPopupEditor = ({ id, isShown, handleClose, ...item }) => {
 		isRepeatable = false,
 	} = item
 
-	const handleSubmit = (e) => {
-		e.preventDefault()
-	}
+	const startDateAt = moment(dateInfo).format('YYYY-MM-DD')
+	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('YYYY-MM-DD')
 
 	const [titleState, setTitleState, handleTitleChange] = useInput({ initialValue: title })
-	const [startDateAtState, setStartDateAtState, handleStartDateAtChange] = useInput({ initialValue: startAt })
-	const [endDateAtState, setEndDateAtState, handleEndDateAtChange] = useInput({ initialValue: endAt })
+	const [startDateAtState, setStartDateAtState, handleStartDateAtChange] = useInput({ initialValue: startDateAt })
+	const [endDateAtState, setEndDateAtState, handleEndDateAtChange] = useInput({ initialValue: endDateAt })
 	const [locationState, setLocationState, handleLocationChange] = useInput({ initialValue: location })
 	const [categoryState, setCategoryState, handleCategoryChange] = useInput({ initialValue: category })
 	const [isAllDayState, setIsAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
 	const [isBlockedState, setIsBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
 	const [isPrivateState, setIsPrivateState, handleIsPrivateChange] = useToggle({ initialValue: isPrivate })
 
+	const handleSubmit = (e) => {
+		e.preventDefault()
+
+		const actions = createCalendar({
+			titleState,
+			dateInfo: moment(startDateAtState).format('YYYY-MM-DD'),
+			locationState,
+			categoryState,
+			isAllDayState,
+			isBlockedState,
+			isPrivateState,
+		})
+
+		calendarDispatch(actions)
+	}
+
+	useEffect(() => {}, [])
+
 	return (
-		<CalendarItemPopup id={id} isShown={isShown} width={474}>
+		<CalendarItemPopup id={id} isShown={isShown} handleClose={handleClose} width={474}>
 			<div className={cx('component')}>
 				<form className={cx('area-info')} onSubmit={handleSubmit}>
 					<div className={cx('row-info')}>
@@ -154,7 +176,7 @@ const CalendarItemPopupEditor = ({ id, isShown, handleClose, ...item }) => {
 							/>
 							<label htmlFor="f-allday">All day</label>
 						</div>
-						<button type="button" className={cx('button', 'submit')}>
+						<button type="submit" className={cx('button', 'submit')}>
 							Save
 						</button>
 					</div>

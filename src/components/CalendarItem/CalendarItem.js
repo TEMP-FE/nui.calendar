@@ -58,7 +58,7 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DayType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) => {
+const DayType = ({ handleEdit = () => {}, ...item }) => {
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
 
 	const [isShown, setIsShown] = useState(false)
@@ -66,6 +66,8 @@ const DayType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) =>
 	const handleIsShown = () => {
 		setIsShown(!isShown)
 	}
+
+	const handleDelete = () => {}
 
 	return (
 		<div className={cx('component')} draggable={!isBlocked}>
@@ -109,7 +111,7 @@ const DayType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) =>
  * @returns {JSX.Element}
  * @constructor
  */
-const TimeType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) => {
+const TimeType = ({ handleEdit = () => {}, ...item }) => {
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
 
 	const [isShown, setIsShown] = useState(false)
@@ -119,10 +121,12 @@ const TimeType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) =
 	}
 
 	const handleEditInPopup = () => {
-		handleEdit()
-
 		setIsShown(!isShown)
+
+		handleEdit()
 	}
+
+	const handleDelete = () => {}
 
 	return (
 		<div className={cx('component')} draggable={!isBlocked}>
@@ -155,6 +159,7 @@ const TimeType = ({ handleEdit = () => {}, handleDelete = () => {}, ...item }) =
 			<CalendarItemPopupInfo
 				id={'wa-popup'}
 				isShown={isShown}
+				handleIsShown={handleIsShown}
 				handleEdit={handleEditInPopup}
 				handleDelete={handleDelete}
 				{...item}

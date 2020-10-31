@@ -5,9 +5,7 @@ const appContext = createContext(null)
 
 const { Provider } = appContext
 
-const initialState = {
-	datePicker: {},
-}
+const initialState = {}
 
 const initializer = () => {
 	return initialState

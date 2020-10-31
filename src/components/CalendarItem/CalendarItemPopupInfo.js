@@ -1,35 +1,51 @@
 import React from 'react'
-import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
-import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
-import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
 
 import classNames from 'classnames/bind'
 import { getCategoryColor } from './commonState'
 import { deleteCalendar } from '../../reducers/calendar'
 
-import styles from './CalendarItemPopupInfo.module.scss'
 import CalendarItemPopup from './CalendarItemPopup'
 import { useCalenderContext } from '../../contexts/calendar'
+import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
+import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
+import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
+
+import styles from './CalendarItemPopupInfo.module.scss'
+import moment from 'moment'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleDelete, ...item }) => {
+const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleClose, ...item }) => {
 	const { calendarDispatch } = useCalenderContext()
 
-	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
+	const {
+		calendarId,
+		title,
+		dateInfo,
+		dateRelative,
+		location,
+		category,
+		isAllDay,
+		isBlocked,
+		isPrivate,
+		// isRepeatable = false,
+	} = item
+
+	const startDateAt = moment(dateInfo).format('MM-DD')
+	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('MM-DD')
 
 	const onDelete = () => {
-		calendarDispatch(deleteCalendar(id))
+		calendarDispatch(deleteCalendar(item))
 
-		handleDelete()
+		handleClose()
 	}
 
 	return (
-		<CalendarItemPopup id={id} backgroundColor={getCategoryColor(category)} isShown={isShown}>
+		<CalendarItemPopup id={id} backgroundColor={getCategoryColor(category)} handleClose={handleClose}>
 			<div className={cx('component')}>
 				<strong className={cx('title')}>{title}</strong>
 				<div className={cx('period')}>
-					{startAt} ~ {endAt}
+					{startDateAt} ~ {endDateAt}
 				</div>
 				<dl className={cx('list-info')}>
 					{location && (

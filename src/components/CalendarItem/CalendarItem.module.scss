@@ -37,6 +37,7 @@
             overflow: hidden;
         }
         .period {
+            white-space: nowrap;
             ~ .period:before {
                 content: '~';
                 margin: 0 2px;

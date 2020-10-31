@@ -34,32 +34,30 @@ const CalendarHeader = () => {
 
 // 달력 셀
 const CalendarCell = ({ dateTime, isHoliday, isDimmed }) => {
-	const {
-		calendarStore: { datePicker },
-	} = useCalenderContext()
-	const [isShown, setIsShown] = useState(false)
+	const { calendarStore } = useCalenderContext()
+	const [isEditorShown, setIsEditorShown] = useState(false)
 
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
 	const { year, month, date } = getDateInfo(dateTime)
 	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
-	const calendarList = datePicker[dateInfo]
+	const calendarList = calendarStore[dateInfo]
 
 	const onClickCell = (e) => {
 		e.stopPropagation()
 
 		console.log(year, month, date)
-		setIsShown(!isShown)
+		setIsEditorShown(!isEditorShown)
 	}
 
-	const handleClose = () => {
-		setIsShown(!isShown)
+	const handleEditorClose = () => {
+		setIsEditorShown(!isEditorShown)
 	}
 
 	return (
 		<div className={cx('calendar_cell')} onClick={onClickCell}>
 			<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
-			{calendarList && calendarList.map((item, key) => <CalendarItem key={key} {...item} />)}
-			{isShown && <CalendarItemPopupEditor isShown={isShown} dateInfo={dateInfo} handleClose={handleClose} />}
+			{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
+			{isEditorShown && <CalendarItemPopupEditor handleClose={handleEditorClose} dateInfo={dateInfo} />}
 		</div>
 	)
 }

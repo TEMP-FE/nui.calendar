@@ -12,7 +12,7 @@ import moment from 'moment'
 import classNames from 'classnames/bind'
 import { getCategoryColor } from './commonState'
 import { useCalenderContext } from '../../contexts/calendar'
-import { createCalendar } from '../../reducers/calendar'
+import { createCalendar, updateCalendar } from '../../reducers/calendar'
 import useInput from './useInput'
 import useToggle from './useToggle'
 
@@ -20,10 +20,11 @@ import styles from './CalendarItemPopupEditor.module.scss'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopupEditor = ({ id, isShown, handleClose, ...item }) => {
+const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 	const { calendarDispatch } = useCalenderContext()
 
 	const {
+		calendarId = Math.random(),
 		title = '',
 		dateInfo = moment().format('YYYY-MM-DD-HH:SS'),
 		dateRelative = 1,
@@ -32,9 +33,10 @@ const CalendarItemPopupEditor = ({ id, isShown, handleClose, ...item }) => {
 		isAllDay = false,
 		isBlocked = false,
 		isPrivate = false,
-		isRepeatable = false,
+		// isRepeatable = false,
 	} = item
 
+	const isNewItem = !!!item.calendarId
 	const startDateAt = moment(dateInfo).format('YYYY-MM-DD')
 	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('YYYY-MM-DD')
 
@@ -47,26 +49,31 @@ const CalendarItemPopupEditor = ({ id, isShown, handleClose, ...item }) => {
 	const [isBlockedState, setIsBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
 	const [isPrivateState, setIsPrivateState, handleIsPrivateChange] = useToggle({ initialValue: isPrivate })
 
+	const getActionCreator = isNewItem ? createCalendar : updateCalendar
+
 	const handleSubmit = (e) => {
 		e.preventDefault()
 
-		const actions = createCalendar({
-			titleState,
+		const action = getActionCreator({
+			calendarId,
+			title: titleState,
 			dateInfo: moment(startDateAtState).format('YYYY-MM-DD'),
-			locationState,
-			categoryState,
-			isAllDayState,
-			isBlockedState,
-			isPrivateState,
+			location: locationState,
+			category: categoryState,
+			isAllDay: isAllDayState,
+			isBlocked: isBlockedState,
+			isPrivate: isPrivateState,
 		})
 
-		calendarDispatch(actions)
+		calendarDispatch(action)
+
+		handleClose()
 	}
 
 	useEffect(() => {}, [])
 
 	return (
-		<CalendarItemPopup id={id} isShown={isShown} handleClose={handleClose} width={474}>
+		<CalendarItemPopup id={id} handleClose={handleClose} width={474}>
 			<div className={cx('component')}>
 				<form className={cx('area-info')} onSubmit={handleSubmit}>
 					<div className={cx('row-info')}>
@@ -176,12 +183,12 @@ const CalendarItemPopupEditor = ({ id, isShown, handleClose, ...item }) => {
 							/>
 							<label htmlFor="f-allday">All day</label>
 						</div>
-						<button type="submit" className={cx('button', 'submit')}>
+						<button type="button" className={cx('button', 'submit')} onClick={handleSubmit}>
 							Save
 						</button>
 					</div>
 				</form>
-				<button type="submit" className={cx('button', 'close')} onClick={handleClose}>
+				<button type="button" className={cx('button', 'close')} onClick={handleClose}>
 					<span className="blind">닫기</span>
 					<IconClose width={15} height={15} />
 				</button>

@@ -4,20 +4,20 @@ import CalendarItem from './CalendarItem'
 import CalendarItemPopupEditor from './CalendarItemPopupEditor'
 
 const Index = (item) => {
-	const [isEdit, setIsEdit] = useState(false)
+	const [isEditShown, setIsEditShwon] = useState(false)
 
 	const handleEdit = () => {
-		setIsEdit(true)
+		setIsEditShwon(true)
 	}
 
 	const handleClose = () => {
-		setIsEdit(false)
+		setIsEditShwon(false)
 	}
 
 	return (
 		<>
 			<CalendarItem handleEdit={handleEdit} {...item} />
-			<CalendarItemPopupEditor id={'wa-popup'} isShown={isEdit} handleClose={handleClose} {...item} />
+			{isEditShown && <CalendarItemPopupEditor id={'wa-popup'} handleClose={handleClose} {...item} />}
 		</>
 	)
 }

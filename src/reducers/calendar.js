@@ -15,11 +15,10 @@ const ACTIONS = {
 const reducer = (state, actions) => {
 	const calendar = actions.calendar
 	const { dateInfo } = calendar
-	const calendarList = state.datePicker[dateInfo] || []
+	const calendarList = state[dateInfo] || []
 
 	switch (actions.type) {
 		case ACTIONS.CREATE:
-			console.log('testsetset')
 			return {
 				...state,
 				[dateInfo]: [...calendarList, calendar],
@@ -29,14 +28,16 @@ const reducer = (state, actions) => {
 				list: [...state],
 			}
 		case ACTIONS.UPDATE:
-			const newCalendar = calendarList.find((item) => item.id === calendar.id)
+			const updatedCalendarList = calendarList.map((item) =>
+				item.calendarId === calendar.calendarId ? calendar : item,
+			)
 
 			return {
 				...state,
-				[dateInfo]: [...calendarList, newCalendar],
+				[dateInfo]: [...updatedCalendarList],
 			}
 		case ACTIONS.DELETE:
-			const newCalendarList = calendarList.filter((item) => item.id !== calendar.id)
+			const newCalendarList = calendarList.filter((item) => item.calendarId !== calendar.calendarId)
 
 			return {
 				...state,

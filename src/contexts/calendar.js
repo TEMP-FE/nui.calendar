@@ -5,11 +5,11 @@ const appContext = createContext(null)
 
 const { Provider } = appContext
 
-const initialState = {
-	list: [],
-}
+const initialState = {}
 
-const initializer = () => {}
+const initializer = () => {
+	return initialState
+}
 
 export const AppContext = ({ children }) => {
 	const [calendarStore, calendarDispatch] = useReducer(calendarReducer, initialState, initializer)

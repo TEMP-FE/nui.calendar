@@ -11,8 +11,8 @@ function App() {
 	return (
 		<AppContext>
 			<div className="App">
-				<MonthlyCalendar month={10} year={20} />
-				<WeeklyPage />
+        <MonthlyCalendar month={10} year={2020} />
+  			<WeeklyPage />
 			</div>
 		</AppContext>
 	)

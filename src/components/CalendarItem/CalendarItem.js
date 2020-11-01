@@ -127,7 +127,7 @@ const TimeType = ({ handleEdit, ...item }) => {
 	const handleIsInfoShown = () => {
 		setIsInfoShown(!isInfoShown)
 	}
-
+	console.log(handleEdit)
 	const handleEditInPopup = () => {
 		setIsInfoShown(!isInfoShown)
 

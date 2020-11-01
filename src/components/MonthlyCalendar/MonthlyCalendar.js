@@ -5,7 +5,7 @@ import classNames from 'classnames/bind'
 import { useCalenderContext } from '../../contexts/calendar'
 import { getMonthInfo, getDateInfo, calcWeekCount, isSameDate, calcScheduleDay } from '../../utils/calendar'
 
-import CalendarItem from '../CalendarItem/CalendarItem'
+import CalendarItem from '../CalendarItem'
 import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
 
 import styles from './MonthlyCalendar.module.scss'
@@ -152,23 +152,24 @@ const CalendarHeader = () => {
 const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const { calendarStore } = useCalenderContext()
 	const [moreList, setMoreList] = useState()
-  const [isEditorShown, setIsEditorShown] = useState(false)
+	const [isEditorShown, setIsEditorShown] = useState(false)
 
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
-  const { year, month, date } = getDateInfo(dateTime)
+	const { year, month, date } = getDateInfo(dateTime)
 	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
 	const calendarList = calendarStore[dateInfo]
 
 	// 셀 클릭 이벤트
-	const onCellClick = () => {
+	const onCellClick = (e) => {
 		e.stopPropagation()
+
 		console.log(year, month, date)
 		setIsEditorShown(!isEditorShown)
 	}
 
 	const handleEditorClose = () => {
 		setIsEditorShown(!isEditorShown)
-  }
+	}
 
 	// 더보기 버튼 클릭 이벤트
 	const onMoreButtonClick = (e) => {
@@ -191,8 +192,8 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 						{moreList.length} more
 					</button>
 				)}
-			{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
-			{isEditorShown && <CalendarItemPopupEditor handleClose={handleEditorClose} dateInfo={dateInfo} />}
+				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
+				{isEditorShown && <CalendarItemPopupEditor handleClose={handleEditorClose} dateInfo={dateInfo} />}
 			</div>
 		</div>
 	)

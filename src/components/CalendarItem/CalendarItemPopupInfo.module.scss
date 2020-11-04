@@ -1,0 +1,48 @@
+.component {
+    padding: 15px 15px 0;
+    background-color: #fff;
+    .title {
+        font-size: 15px;
+    }
+    .period {
+        margin-top: 4px;
+        font-size: 13px;
+    }
+    .list-info {
+        margin-top: 10px;
+        .item-info {
+            display: flex;
+        }
+        .icon {
+            .category {
+                display: block;
+                width: 10px;
+                height: 10px;
+                margin-right: 8px;
+                border-radius: 10px;
+            }
+        }
+        .info {
+            flex: 1;
+        }
+    }
+    .area-button {
+        margin-top: 15px;
+        display: table;
+        table-layout: fixed;
+        width: 100%;
+        border-top: solid 1px #eeeef4;
+        .cell {
+            display: table-cell;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            border: 0;
+            background-color: transparent;
+            font-weight: 700;
+            line-height: 42px;
+            cursor: pointer;
+        }
+    }
+}

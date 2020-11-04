@@ -45,13 +45,7 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-<<<<<<< feature/12-WeeklyView
-const DayType = ({ style, ...item }) => {
-	const [isPopup, setIsPopup] = useState(true)
-
-=======
-const DayType = ({ handleClose, ...item }) => {
->>>>>>> develop
+const DayType = ({ handleClose, style, ...item }) => {
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
 
 	const [isShown, setIsShown] = useState(false)
@@ -65,11 +59,7 @@ const DayType = ({ handleClose, ...item }) => {
 	const handleDelete = () => {}
 
 	return (
-<<<<<<< feature/12-WeeklyView
-		<div className={cx('component')} draggable={!isBlocked} style={style}>
-=======
-		<div className={cx('component')} onClick={handleItemClick} draggable={!isBlocked}>
->>>>>>> develop
+		<div className={cx('component')} onClick={handleItemClick} draggable={!isBlocked} style={style}>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}

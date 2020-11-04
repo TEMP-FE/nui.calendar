@@ -2,7 +2,7 @@ import React from 'react'
 import { AppContext } from './contexts/calendar'
 
 import MonthlyCalendar from './components/MonthlyCalendar/MonthlyCalendar'
-import WeeklyPage from './pages/weekly'
+import WeeklyCalendar from './components/WeeklyCalendar/WeeklyCalendar'
 
 import './App.css'
 
@@ -11,7 +11,7 @@ function App() {
 		<AppContext>
 			<div className="App">
         <MonthlyCalendar month={10} year={2020} />
-  			<WeeklyPage />
+  			<WeeklyCalendar />
 			</div>
 		</AppContext>
 	)

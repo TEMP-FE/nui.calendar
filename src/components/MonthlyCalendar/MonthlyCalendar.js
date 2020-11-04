@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import moment from 'moment'
 import classNames from 'classnames/bind'
-import styles from './MonthlyCalendar.module.scss'
+
+import { useCalenderContext } from '../../contexts/calendar'
 import { getMonthInfo, getDateInfo, calcWeekCount, isSameDate, calcScheduleDay } from '../../utils/calendar'
-import CalendarItem from '../CalendarItem/CalendarItem'
+
+import CalendarItem from '../CalendarItem'
+import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
+
+import styles from './MonthlyCalendar.module.scss'
 
 const cx = classNames.bind(styles)
 const _MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -152,12 +158,26 @@ const CalendarHeader = () => {
 
 // 달력 셀
 const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList, changeSchedule, }) => {
-	const { year, month, date } = getDateInfo(dateTime)
 	const [moreList, setMoreList] = useState()
 	const [dragEnter, setDragEnter] = useState(false)
+	const { calendarStore } = useCalenderContext()
+	const [isEditorShown, setIsEditorShown] = useState(false)
+
+	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
+	const { year, month, date } = getDateInfo(dateTime)
+	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
+	const calendarList = calendarStore[dateInfo]
+
 	// 셀 클릭 이벤트
-	const onCellClick = () => {
+	const onCellClick = (e) => {
+		e.stopPropagation()
+
 		console.log(year, month, date)
+		setIsEditorShown(!isEditorShown)
+	}
+
+	const handleEditorClose = () => {
+		setIsEditorShown(!isEditorShown)
 	}
 
 	// 더보기 버튼 클릭 이벤트
@@ -206,6 +226,8 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList, changeSched
 						{moreList.length} more
 					</button>
 				)}
+				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
+				{isEditorShown && <CalendarItemPopupEditor handleClose={handleEditorClose} dateInfo={dateInfo} />}
 			</div>
 		</div>
 	)

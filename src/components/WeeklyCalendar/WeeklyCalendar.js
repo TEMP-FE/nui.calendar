@@ -18,7 +18,8 @@ const WeeklyCalendar = () => {
 	const [week, setWeek] = useState([])
 	const dayOfWeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 	const timeLine = new Array(24)
-
+	const [dragImg, setDragImg] = useState();
+	const [dragging, setDragging] = useState({ startAt: undefined, endAt: undefined })
 	for (var i = 0; i < timeLine.length; i++) {
 		timeLine[i] = i
 	}
@@ -50,11 +51,14 @@ const WeeklyCalendar = () => {
 	}
 
 	const timelog = (time, value) => {
-		console.log(value === 0 ? time + ':00 ~ ' + time + ':30' : time + ':30 ~ ' + (time + 1) + ':00')
+		console.log(value === '0' ? time + ':00 ~ ' + time + ':30' : time + ':30 ~ ' + (time + 1) + ':00')
 	}
 
 	useEffect(() => {
 		getThisWeek()
+		const img = new Image()
+		img.src = 'https://avatars1.githubusercontent.com/u/19828721?s=96&v=4'
+		img.onload = () => setDragImg(img)
 	}, [])
 
 	const calendarItemList = [
@@ -162,6 +166,38 @@ const WeeklyCalendar = () => {
 		calendarItemList.push(startItem, endItem)
 	}
 
+	const diffMinutes = (start, end) => (end - start) / 60000
+
+	const handleDragStart = (date, hour, e) => {
+		// let dragImg = new Image(0, 0)
+		// dragImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
+		e.dataTransfer.setDragImage(dragImg, -10, -10)
+		const startAt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, e.target.getAttribute('data-value'))
+		let endAt = new Date(startAt)
+		endAt.setMinutes(endAt.getMinutes() + 30)
+		setDragging({
+			startAt: startAt,
+			endAt: endAt
+		})
+	}
+
+	const handleDragEnd = () => { console.log(dragging); setDragging({ startAt: undefined, endAt: undefined }) }
+
+	const handleDragEnterOrDrop = (date, hour, minutes) => {
+		const endAt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minutes)
+		endAt.setMinutes(endAt.getMinutes() + 30)
+		if (diffMinutes(dragging.endAt, endAt) === 30) {
+			setDragging({
+				...dragging,
+				endAt: endAt
+			})
+		}
+	}
+
+	const handleDragOver = (e) => {
+		e.stopPropagation();
+		e.preventDefault();
+	}
 	checkItemDateEqual(testItem1)
 
 	return (
@@ -200,9 +236,16 @@ const WeeklyCalendar = () => {
 							{week.map((info, index) => (
 								<div className={cx('view_cell')} key={index} onClick={() => log(info)}>
 									{timeLine.map((time) => (
-										<div className={cx('detail_wrap')} key={time}>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 0)}></div>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 30)}></div>
+										<div className={cx('detail_wrap')} key={time}
+											draggable
+											onDragStart={(e) => handleDragStart(info, time, e)}
+											onDragEnd={handleDragEnd}
+											onDragEnter={(e) => handleDragEnterOrDrop(info, time, e.target.getAttribute('data-value'))}
+											onDrop={(e) => handleDragEnterOrDrop(info, time, e.target.getAttribute('data-value'))}
+											onDragOver={handleDragOver}
+										>
+											<div className={cx('detail_cell')} data-value="0"></div>
+											<div className={cx('detail_cell')} data-value="30"></div>
 										</div>
 									))}
 									{calendarItemList.map(
@@ -222,6 +265,22 @@ const WeeklyCalendar = () => {
 												/>
 											),
 									)}
+									{
+										dragging.startAt?.getDate() === info.getDate() &&
+										<div style={{
+											position: "absolute",
+											top: calcStartPoint(dragging.startAt),
+											left: '0',
+											right: '5px',
+											height: calcCalendarItemHeight(
+												dragging.startAt,
+												dragging.endAt,
+											),
+											backgroundColor: 'orange',
+											zIndex: '-5'
+										}}
+										/>
+									}
 								</div>
 							))}
 						</div>

@@ -15,6 +15,7 @@ import { useCalenderContext } from '../../contexts/calendar'
 
 const cx = classNames.bind(styles)
 
+
 const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	// 반복 일정
 	if (isRepeatable) {
@@ -45,7 +46,8 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DayType = ({ handleClose, style, ...item }) => {
+const DayType = ({ handleClose, setDragging, resetDragging, style, ...item }) => {
+	const [isPopup, setIsPopup] = useState(true)
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
 
 	const [isShown, setIsShown] = useState(false)
@@ -56,10 +58,20 @@ const DayType = ({ handleClose, style, ...item }) => {
 		setIsShown(!isShown)
 	}
 
-	const handleDelete = () => {}
+	const handleDragStart = (e) => {
+		setDragging()
+	}
 
+	const handleDragEnd = (e) => {
+		resetDragging()
+	}
+	const handleDelete = () => { }
 	return (
-		<div className={cx('component')} onClick={handleItemClick} draggable={!isBlocked} style={style}>
+		<div className={cx('component')} draggable={!isBlocked} style={style}
+			onClick={handleItemClick}
+			onDragStart={handleDragStart}
+			onDragEnd={handleDragEnd}
+		>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}

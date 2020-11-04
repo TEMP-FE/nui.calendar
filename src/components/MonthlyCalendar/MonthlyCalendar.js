@@ -11,6 +11,14 @@ import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
 import styles from './MonthlyCalendar.module.scss'
 
 const cx = classNames.bind(styles)
+const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+const dateDiffInDays = (a, b) => {
+	// Discard the time and time-zone information.
+	const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+	const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+	return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+}
 
 const DEMO_PROPS = {
 	scheduleList: [
@@ -149,9 +157,10 @@ const CalendarHeader = () => {
 }
 
 // 달력 셀
-const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
-	const { calendarStore } = useCalenderContext()
+const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList, changeSchedule, }) => {
 	const [moreList, setMoreList] = useState()
+	const [dragEnter, setDragEnter] = useState(false)
+	const { calendarStore } = useCalenderContext()
 	const [isEditorShown, setIsEditorShown] = useState(false)
 
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
@@ -177,6 +186,25 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 		console.log('moreList : ', moreList)
 	}
 
+	const handleDragEnter = (e) => {
+		setDragEnter(true)
+	}
+
+	const handleDragLeave = (e) => {
+		setDragEnter(false)
+	}
+
+	const handleDragOver = (e) => {
+		e.stopPropagation()
+		e.preventDefault();
+	}
+
+	const handleDrop = (e) => {
+		e.preventDefault();
+		changeSchedule()
+		e.currentTarget.style.backgroundColor = ''
+	}
+
 	const filterOverStackSchedule = () => scheduleList.filter((scheduleItem) => scheduleItem.stack > 3)
 
 	useEffect(() => {
@@ -184,8 +212,14 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	}, [scheduleList])
 
 	return (
-		<div className={cx('calendar_cell')} onClick={onCellClick}>
-			<div className={cx('cell_header')}>
+		<div className={cx('calendar_cell')} onClick={onCellClick}
+			onDragEnter={handleDragEnter}
+			onDragLeave={handleDragLeave}
+			onDragOver={handleDragOver}
+			onDrop={handleDrop}
+			style={{ backgroundColor: dragEnter && 'red' }}
+		>
+			<div className={cx('cell_header')} style={{ pointerEvents: dragEnter && 'none' }}>
 				<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
 				{moreList && moreList.length > 0 && (
 					<button className={cx('more_button')} type={'button'} onClick={onMoreButtonClick}>
@@ -201,12 +235,20 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 
 // 월 달력
 const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().month }) => {
+	const [dragging, setDragging] = useState(-1)
 	const [scheduleList, setScheduleList] = useState(DEMO_PROPS.scheduleList)
 	const [calendarScheduleList, setCalendarScheduleList] = useState()
 	const [dateInfoList, setDateInfoList] = useState()
 	const currentMonthInfo = getMonthInfo({ year, month })
 	const weekCount = calcWeekCount({ year, month })
-
+	const changeSchedule = (startAt) => {
+		if (dragging < 0) return;
+		const diffDays = dateDiffInDays(scheduleList[dragging].startAt, scheduleList[dragging].endAt);
+		const endAt = new Date(startAt)
+		endAt.setDate(startAt.getDate() + diffDays)
+		scheduleList[dragging] = { ...scheduleList[dragging], startAt: startAt, endAt: endAt }
+		setScheduleList([...scheduleList.slice(0, dragging), { ...scheduleList[dragging] }, ...scheduleList.slice(dragging + 1)])
+	}
 	// 달력 정보 만들기
 	const makeDateInfoList = () => {
 		const newDateInfoList = new Array(weekCount).fill(null).map((_) => [])
@@ -226,7 +268,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			}
 		}
 
-		const newScheduleList = ascendingScheduleList(scheduleList).map((scheduleItem) => {
+		const newScheduleList = ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
 
@@ -270,7 +312,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 								}
 
 								const width = `calc(${14.29 * (7 - j)}% - 20px)`
-								renderList.push({ top, left, width, stack })
+								renderList.push(Object.assign({ top, left, width, stack, scheduleIndex }, (scheduleIndex === dragging && { opacity: 0.5 })))
 								period = period - (7 - j)
 							} else {
 								// 스택 업데이트
@@ -280,7 +322,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 								}
 
 								const width = `calc(${period * 14.29}% - 20px)`
-								renderList.push({ top, left, width, stack })
+								renderList.push(Object.assign({ top, left, width, stack, scheduleIndex }, (scheduleIndex === dragging && { opacity: 0.5 })))
 								period = 0
 							}
 
@@ -308,7 +350,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 
 	useEffect(() => {
 		makeDateInfoList()
-	}, [])
+	}, [scheduleList, dragging])
 
 	return (
 		<div className={cx('calendar_wrap')}>
@@ -330,6 +372,8 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 											isDimmed={dateInfoItem.dateTime.getMonth() !== month - 1}
 											isHoliday={dateInfoItem.isHoliday}
 											scheduleList={dateInfoItem.scheduleList}
+											setDragging={setDragging}
+											changeSchedule={() => changeSchedule(dateInfoItem.dateTime)}
 										/>
 									)
 								})}
@@ -343,11 +387,11 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 						const startAtString = `${startAt.year}/${startAt.month}/${startAt.date}`
 						const endAtString = `${endAt.year}/${endAt.month}/${endAt.date}`
 						return scheduleItem?.renderList?.map((renderItem) => {
-							const { top, left, width, stack } = renderItem
+							const { top, left, width, stack, opacity, scheduleIndex } = renderItem
 							if (stack < 4) {
 								return (
-									<div className={cx('schedule_item')} style={{ top, left, width }}>
-										<CalendarItem {...scheduleItem} startAt={startAtString} endAt={endAtString} />
+									<div className={cx('schedule_item')} style={{ top, left, width, opacity }}>
+										<CalendarItem {...scheduleItem} startAt={startAtString} endAt={endAtString} setDragging={() => setDragging(scheduleIndex)} resetDragging={() => setDragging(-1)} />
 									</div>
 								)
 							}

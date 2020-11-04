@@ -36,11 +36,13 @@ const WeeklyCalendar = () => {
 
 	const changeWeek = (state) => {
 		const tempWeek = []
+
 		for (let i = 0; i < 7; i++) {
 			var temp = new Date(week[i])
 			temp.setDate(temp.getDate() + (state ? 7 : -7))
 			tempWeek.push(temp)
 		}
+
 		setWeek(tempWeek)
 	}
 
@@ -62,8 +64,8 @@ const WeeklyCalendar = () => {
 	const calendarItemList = [
 		{
 			title: '테스트',
-			startAt: '2020-10-22 12:30',
-			endAt: '2020-10-22 15:00',
+			startAt: '2020-11-02 12:30',
+			endAt: '2020-11-02 16:30',
 			location: '',
 			category: '',
 			isAllDay: true,
@@ -73,8 +75,8 @@ const WeeklyCalendar = () => {
 		},
 		{
 			title: '테스트',
-			startAt: '2020-10-18 04:20',
-			endAt: '2020-10-18 07:35',
+			startAt: '2020-11-05 06:20',
+			endAt: '2020-11-05 09:57',
 			location: '',
 			category: '',
 			isAllDay: true,
@@ -84,8 +86,19 @@ const WeeklyCalendar = () => {
 		},
 		{
 			title: '테스트',
-			startAt: '2020-10-27 06:40',
-			endAt: '2020-10-27 11:20',
+			startAt: '2020-11-05 11:20',
+			endAt: '2020-11-05 13:57',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+		{
+			title: '테스트',
+			startAt: '2020-11-11 06:40',
+			endAt: '2020-11-11 11:20',
 			location: '',
 			category: '',
 			isAllDay: true,
@@ -96,12 +109,63 @@ const WeeklyCalendar = () => {
 	]
 
 	const calcStartPoint = (startDate) => {
-		return (new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30)
+		return Math.round((new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30))
 	}
 
 	const calcCalendarItemHeight = (startDate, endDate) => {
-		return ((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60)) * (26 / 30)
+		return Math.round(((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60)) * (26 / 30))
 	}
+
+	const testItem1 = {
+		title: '테스트',
+		startAt: '2020-11-03 12:30',
+		endAt: '2020-11-04 03:31',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	}
+	const testItem2 = {
+		title: '테스트',
+		startAt: '2020-11-03 12:30',
+		endAt: '2020-11-04 16:40',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	}
+
+	const checkItemDateEqual = (Item) => {
+		const startAt = new Date(Item.startAt)
+		const endAt = new Date(Item.endAt)
+
+		if (endAt.getDate() !== startAt.getDate()) {
+			isAllday(startAt, endAt) ? pushAlldayItem(Item) : pushSeparatedItem(Item, startAt, endAt)
+		}
+	}
+
+	const isAllday = (startAt, endAt) => {
+		return endAt.getTime() - startAt.getTime() > 86400000 ? true : false
+	}
+
+	const pushAlldayItem = () => {
+		console.log('allDay아이템입니다.')
+	}
+
+	const pushSeparatedItem = (Item, startAt, endAt) => {
+		const endTime = '24:00'
+		const startTime = '00:00'
+
+		const startItem = { ...Item, endAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime }
+		const endItem = { ...Item, startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime }
+
+		calendarItemList.push(startItem, endItem)
+	}
+
 	const diffMinutes = (start, end) => (end - start) / 60000
 
 	const handleDragStart = (date, hour, e) => {
@@ -134,6 +198,7 @@ const WeeklyCalendar = () => {
 		e.stopPropagation();
 		e.preventDefault();
 	}
+	checkItemDateEqual(testItem1)
 
 	return (
 		<>

@@ -1,15 +1,19 @@
 import React from 'react'
-import logo from './logo.svg'
-import './App.css'
-import Monthly from './components/MonthlyCalendar/Monthly'
+import { AppContext } from './contexts/calendar'
+
+import MonthlyCalendar from './components/MonthlyCalendar/MonthlyCalendar'
 import WeeklyCalendar from './components/WeeklyCalendar/WeeklyCalendar'
+
+import './App.css'
 
 function App() {
 	return (
-		<div className="App">
-			<Monthly />
-			<WeeklyCalendar />
-		</div>
+		<AppContext>
+			<div className="App">
+        <MonthlyCalendar month={10} year={2020} />
+  			<WeeklyCalendar />
+			</div>
+		</AppContext>
 	)
 }
 

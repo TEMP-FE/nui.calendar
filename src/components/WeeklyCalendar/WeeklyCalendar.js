@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 import styles from './WeeklyCalendar.module.scss'
 import classNames from 'classnames/bind'
 
-import { ReactComponent as IconPrev } from '../../assets/images/svg/arrow_prev.svg'
-import { ReactComponent as IconNext } from '../../assets/images/svg/arrow_next.svg'
 import CalendarItem from '../CalendarItem/CalendarItem'
+import ButtonArea from '../ButtonArea/ButtonArea'
 
 const cx = classNames.bind(styles)
 const moment = require('moment')
@@ -19,6 +18,7 @@ const WeeklyCalendar = () => {
 	const [week, setWeek] = useState([])
 	const dayOfWeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 	const timeLine = new Array(24)
+
 	for (var i = 0; i < timeLine.length; i++) {
 		timeLine[i] = i
 	}
@@ -33,24 +33,16 @@ const WeeklyCalendar = () => {
 		setWeek(thisWeek)
 	}
 
-	const getPrevWeek = () => {
-		const prevWeek = []
-		for (let i = 0; i < 7; i++) {
-			var temp = new Date(week[i])
-			temp.setDate(temp.getDate() - 7)
-			prevWeek.push(temp)
-		}
-		setWeek(prevWeek)
-	}
+	const changeWeek = (state) => {
+		const tempWeek = []
 
-	const getNextWeek = () => {
-		const nextWeek = []
 		for (let i = 0; i < 7; i++) {
 			var temp = new Date(week[i])
-			temp.setDate(temp.getDate() + 7)
-			nextWeek.push(temp)
+			temp.setDate(temp.getDate() + (state ? 7 : -7))
+			tempWeek.push(temp)
 		}
-		setWeek(nextWeek)
+
+		setWeek(tempWeek)
 	}
 
 	const log = (info) => {
@@ -65,21 +57,76 @@ const WeeklyCalendar = () => {
 		getThisWeek()
 	}, [])
 
-	const calendarItemA = {
+	const calendarItemList = [
+		{
+			title: '테스트',
+			startAt: '2020-11-02 12:30',
+			endAt: '2020-11-02 16:30',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+		{
+			title: '테스트',
+			startAt: '2020-11-05 06:20',
+			endAt: '2020-11-05 09:57',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+		{
+			title: '테스트',
+			startAt: '2020-11-05 11:20',
+			endAt: '2020-11-05 13:57',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+		{
+			title: '테스트',
+			startAt: '2020-11-11 06:40',
+			endAt: '2020-11-11 11:20',
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+	]
+
+	const calcStartPoint = (startDate) => {
+		return Math.round((new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30))
+	}
+
+	const calcCalendarItemHeight = (startDate, endDate) => {
+		return Math.round(((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60)) * (26 / 30))
+	}
+
+	const testItem1 = {
 		title: '테스트',
-		startAt: '0606',
-		endAt: '0606',
+		startAt: '2020-11-03 12:30',
+		endAt: '2020-11-04 03:31',
 		location: '',
 		category: '',
-		isAllDay: false,
+		isAllDay: true,
 		isBlocked: false,
 		isPrivate: false,
 		isRepeatable: false,
 	}
-	const calendarItemB = {
+	const testItem2 = {
 		title: '테스트',
-		startAt: '0606',
-		endAt: '0606',
+		startAt: '2020-11-03 12:30',
+		endAt: '2020-11-04 16:40',
 		location: '',
 		category: '',
 		isAllDay: true,
@@ -88,19 +135,38 @@ const WeeklyCalendar = () => {
 		isRepeatable: false,
 	}
 
+	const checkItemDateEqual = (Item) => {
+		const startAt = new Date(Item.startAt)
+		const endAt = new Date(Item.endAt)
+
+		if (endAt.getDate() !== startAt.getDate()) {
+			isAllday(startAt, endAt) ? pushAlldayItem(Item) : pushSeparatedItem(Item, startAt, endAt)
+		}
+	}
+
+	const isAllday = (startAt, endAt) => {
+		return endAt.getTime() - startAt.getTime() > 86400000 ? true : false
+	}
+
+	const pushAlldayItem = () => {
+		console.log('allDay아이템입니다.')
+	}
+
+	const pushSeparatedItem = (Item, startAt, endAt) => {
+		const endTime = '24:00'
+		const startTime = '00:00'
+
+		const startItem = { ...Item, endAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime }
+		const endItem = { ...Item, startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime }
+
+		calendarItemList.push(startItem, endItem)
+	}
+
+	checkItemDateEqual(testItem1)
+
 	return (
 		<>
-			<div className={cx('menu')}>
-				<button type="button" className={cx('btn', 'today')} onClick={() => getThisWeek()}>
-					Today
-				</button>
-				<button type="button" className={cx('btn', 'prev')} onClick={() => getPrevWeek()}>
-					<IconPrev width="14" height="14" />
-				</button>
-				<button type="button" className={cx('btn', 'next')} onClick={() => getNextWeek()}>
-					<IconNext width="14" height="14" />
-				</button>
-			</div>
+			<ButtonArea data={week} getThis={getThisWeek} getChange={changeWeek} />
 			<strong className={cx('range')}>
 				{moment(week[0]).format('YYYY.MM.DD')} ~{moment(week[6]).format('YYYY.MM.DD')}
 			</strong>
@@ -135,17 +201,31 @@ const WeeklyCalendar = () => {
 								<div className={cx('view_cell')} key={index} onClick={() => log(info)}>
 									{timeLine.map((time) => (
 										<div className={cx('detail_wrap')} key={time}>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 0)}>
-												{/*<CalendarItem {...calendarItemA} />*/}
-											</div>
-											<div className={cx('detail_cell')} onClick={() => timelog(time, 30)}>
-												{/*<CalendarItem {...calendarItemB} />*/}
-											</div>
+											<div className={cx('detail_cell')} onClick={() => timelog(time, 0)}></div>
+											<div className={cx('detail_cell')} onClick={() => timelog(time, 30)}></div>
 										</div>
 									))}
+									{calendarItemList.map(
+										(calendarItem) =>
+											info.getDate() === new Date(calendarItem.startAt).getDate() && (
+												<CalendarItem
+													{...calendarItem}
+													style={{
+														top: calcStartPoint(calendarItem.startAt),
+														left: '0',
+														right: '5px',
+														height: calcCalendarItemHeight(
+															calendarItem.startAt,
+															calendarItem.endAt,
+														),
+													}}
+												/>
+											),
+									)}
 								</div>
 							))}
 						</div>
+						<div></div>
 					</div>
 				</div>
 			</div>

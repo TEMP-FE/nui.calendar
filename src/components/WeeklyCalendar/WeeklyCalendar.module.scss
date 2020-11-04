@@ -1,117 +1,97 @@
-.menu {
-  display: inline-block;
-}
-.btn {
-  margin-right: 5px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 16px;
-  vertical-align: top;
-  cursor: pointer;
-  &.today {
-    line-height: 30px;
-    padding: 0 16px;
-  }
-  &.prev,
-  &.next {
-    height: 32px;
-    padding: 8px;
-  }
-}
 .range {
-  display: inline-block;
-  margin-left: 5px;
-  font-size: 19px;
-  line-height: 32px;
-  vertical-align: top;
+	display: inline-block;
+	margin-left: 5px;
+	font-size: 19px;
+	line-height: 32px;
+	vertical-align: top;
 }
-
 .table {
-  width: 1124px;
-  margin-top: 16px;
+	width: 1124px;
+	margin-top: 16px;
 }
 .header {
-  display: flex;
-  padding-left: 72px;
-  border-top: 1px solid rgb(229, 229, 229);
-  border-bottom: 1px solid rgb(229, 229, 229);
-  overflow-y: scroll;
+	display: flex;
+	padding-left: 72px;
+	border-top: 1px solid rgb(229, 229, 229);
+	border-bottom: 1px solid rgb(229, 229, 229);
+	overflow-y: scroll;
 }
 .date {
-  flex: 1;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 42px;
-  em {
-    font-size: 12px;
-  }
-  &.dimmed {
-    color: #bbbbbb;
-  }
-  &:first-child {
-    color: #ff4040;
-  }
+	flex: 1;
+	font-size: 24px;
+	font-weight: bold;
+	line-height: 42px;
+	em {
+		font-size: 12px;
+	}
+	&.dimmed {
+		color: #bbbbbb;
+	}
+	&:first-child {
+		color: #ff4040;
+	}
 }
 .allday {
-  display: block;
-  clear: both;
-  border-bottom: 1px solid rgb(229, 229, 229);
-  overflow-y: scroll;
-  content: "";
+	display: block;
+	clear: both;
+	border-bottom: 1px solid rgb(229, 229, 229);
+	overflow-y: scroll;
+	content: '';
 }
 .allday_cell {
-  flex: 1;
-  border-left: 1px solid rgb(229, 229, 229);
-  min-height: 30px;
+	flex: 1;
+	border-left: 1px solid rgb(229, 229, 229);
+	min-height: 30px;
 }
 .schedule {
-  display: block;
-  clear: both;
-  height: 500px;
-  margin-top: 2px;
-  border-top: 1px solid rgb(229, 229, 229);
-  overflow-y: scroll;
-  content: "";
+	display: block;
+	clear: both;
+	height: 500px;
+	margin-top: 2px;
+	border-top: 1px solid rgb(229, 229, 229);
+	overflow-y: scroll;
+	content: '';
 }
 .time {
-  float: left;
-  width: 64px;
-  padding-right: 8px;
-  font-size: 11px;
-  line-height: 100%;
-  text-align: right;
+	float: left;
+	width: 64px;
+	padding-right: 8px;
+	font-size: 11px;
+	line-height: 100%;
+	text-align: right;
 }
 .time_cell {
-  position: relative;
-  height: 52px;
-  color: #bbb;
-  &:first-child .time_stamp {
-    display: none;
-  }
+	position: relative;
+	height: 52px;
+	color: #bbb;
+	&:first-child .time_stamp {
+		display: none;
+	}
 }
 .time_stamp {
-  position: absolute;
-  top: -13px;
-  left: 0;
-  right: 5px;
-  text-align: right;
-  line-height: 25px;
+	position: absolute;
+	top: -13px;
+	left: 0;
+	right: 5px;
+	text-align: right;
+	line-height: 25px;
 }
 .view {
-  display: flex;
-  overflow: hidden;
+	display: flex;
+	overflow: hidden;
 }
 .view_cell {
-  flex: 1;
-  border-left: 1px solid rgb(229, 229, 229);
+	position: relative;
+	flex: 1;
+	border-left: 1px solid rgb(229, 229, 229);
 }
 .detail_wrap {
-  height: 52px;
-  box-sizing: border-box;
-  &:not(:first-child) {
-    border-top: 1px solid rgb(229, 229, 229);
-  }
+	height: 52px;
+	box-sizing: border-box;
+	&:not(:first-child) {
+		border-top: 1px solid rgb(229, 229, 229);
+	}
 }
 .detail_cell {
-  height: 26px;
+	height: 26px;
 }

@@ -1,0 +1,20 @@
+.menu {
+	display: inline-block;
+}
+.btn {
+	margin-right: 5px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 16px;
+	vertical-align: top;
+	cursor: pointer;
+	&.today {
+		line-height: 30px;
+		padding: 0 16px;
+	}
+	&.prev,
+	&.next {
+		height: 32px;
+		padding: 8px;
+	}
+}

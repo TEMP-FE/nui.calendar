@@ -1,65 +1,68 @@
 .component {
-    position: relative;
-    .item {
-        appearance: none;
-        display: table;
-        width: 100%;
-        box-sizing: border-box;
-        padding: 5px;
-        border: 0;
-        border-radius: 4px;
-        background-color: transparent;
-        font-size: 13px;
-        line-height: 16px;
-        color: #222;
-        text-align: left;
-        &.type-day {
-            color: #fff;
-            svg {
-                fill: #fff;
-            }
-        }
-        .cell {
-            display: table-cell;
-            &.type-group, &.type-period, &.type-icon {
-                padding-right: 2px;
-                vertical-align: middle;
-            }
-        }
-        .fixed {
-            display: table;
-            table-layout: fixed;
-            width: 100%;
-        }
-        .ellipsis {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-        }
-        .period {
-            white-space: nowrap;
-            ~ .period:before {
-                content: '~';
-                margin: 0 2px;
-            }
-        }
-        .group {
-            display: block;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background-color: #444;
-            line-height: 0;
-        }
-    }
+	position: absolute;
+	.item {
+		appearance: none;
+		display: table;
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
+		padding: 5px;
+		border: 0;
+		border-radius: 4px;
+		background-color: transparent;
+		font-size: 13px;
+		line-height: 16px;
+		color: #222;
+		text-align: left;
+		&.type-day {
+			color: #fff;
+			svg {
+				fill: #fff;
+			}
+		}
+		.cell {
+			display: table-cell;
+			&.type-group,
+			&.type-period,
+			&.type-icon {
+				padding-right: 2px;
+				vertical-align: middle;
+			}
+		}
+		.fixed {
+			display: table;
+			table-layout: fixed;
+			width: 100%;
+		}
+		.ellipsis {
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+		.period {
+			white-space: nowrap;
+			~ .period:before {
+				content: '~';
+				margin: 0 2px;
+			}
+		}
+		.group {
+			display: block;
+			width: 5px;
+			height: 5px;
+			border-radius: 50%;
+			background-color: #444;
+			line-height: 0;
+		}
+	}
 }
 :global {
-    .blind {
-        position: absolute;
-        clip: rect(0, 0, 0, 0);
-        width: 1px;
-        height: 1px;
-        margin: -1px;
-        overflow: hidden;
-    }
+	.blind {
+		position: absolute;
+		clip: rect(0, 0, 0, 0);
+		width: 1px;
+		height: 1px;
+		margin: -1px;
+		overflow: hidden;
+	}
 }

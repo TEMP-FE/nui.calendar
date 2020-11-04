@@ -46,7 +46,7 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DayType = ({ handleClose, setDragging, resetDragging, ...item }) => {
+const DayType = ({ handleClose, setDragging, resetDragging, style, ...item }) => {
 	const [isPopup, setIsPopup] = useState(true)
 	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
 
@@ -67,7 +67,7 @@ const DayType = ({ handleClose, setDragging, resetDragging, ...item }) => {
 	}
 	const handleDelete = () => { }
 	return (
-		<div className={cx('component')} draggable={!isBlocked}
+		<div className={cx('component')} draggable={!isBlocked} style={style}
 			onClick={handleItemClick}
 			onDragStart={handleDragStart}
 			onDragEnd={handleDragEnd}

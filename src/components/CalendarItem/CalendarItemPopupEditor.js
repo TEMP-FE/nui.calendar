@@ -11,7 +11,7 @@ import CalendarItemPopup from './CalendarItemPopup'
 import moment from 'moment'
 import classNames from 'classnames/bind'
 import { getCategoryColor } from './commonState'
-import { useCalenderContext } from '../../contexts/calendar'
+import { useCalendarContext } from '../../contexts/calendar'
 import { createCalendar, updateCalendar } from '../../reducers/calendar'
 import useInput from './useInput'
 import useToggle from './useToggle'
@@ -21,13 +21,13 @@ import styles from './CalendarItemPopupEditor.module.scss'
 const cx = classNames.bind(styles)
 
 const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
-	const { calendarDispatch } = useCalenderContext()
+	const { calendarDispatch } = useCalendarContext()
 
 	const {
 		calendarId = Math.random(),
 		title = '',
-		dateInfo = moment().format('YYYY-MM-DD-HH:SS'),
-		dateRelative = 1,
+		startAt = new Date(),
+		endAt = new Date(),
 		location = '',
 		category = 'A',
 		isAllDay = false,
@@ -37,17 +37,23 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 	} = item
 
 	const isNewItem = !!!item.calendarId
-	const startDateAt = moment(dateInfo).format('YYYY-MM-DD')
-	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('YYYY-MM-DD')
 
-	const [titleState, setTitleState, handleTitleChange] = useInput({ initialValue: title })
-	const [startDateAtState, setStartDateAtState, handleStartDateAtChange] = useInput({ initialValue: startDateAt })
-	const [endDateAtState, setEndDateAtState, handleEndDateAtChange] = useInput({ initialValue: endDateAt })
-	const [locationState, setLocationState, handleLocationChange] = useInput({ initialValue: location })
-	const [categoryState, setCategoryState, handleCategoryChange] = useInput({ initialValue: category })
-	const [isAllDayState, setIsAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
-	const [isBlockedState, setIsBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
-	const [isPrivateState, setIsPrivateState, handleIsPrivateChange] = useToggle({ initialValue: isPrivate })
+	const handleInputDate = (e) => {
+		const year = parseInt(moment(e.target.value).format('YY'))
+		const month = parseInt(moment(e.target.value).format('MM'))
+		const date = parseInt(moment(e.target.value).format('DD'))
+
+		return new Date(year, month, date)
+	}
+
+	const [titleState, handleTitleChange] = useInput({ initialValue: title })
+	const [startAtState, handleStartDateAtChange] = useInput({ initialValue: startAt, handleChange: handleInputDate })
+	const [endAtState, handleEndDateAtChange] = useInput({ initialValue: endAt, handleChange: handleInputDate })
+	const [locationState, handleLocationChange] = useInput({ initialValue: location })
+	const [categoryState] = useInput({ initialValue: category })
+	const [isAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
+	const [isBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
+	const [isPrivateState] = useToggle({ initialValue: isPrivate })
 
 	const getActionCreator = isNewItem ? createCalendar : updateCalendar
 
@@ -57,7 +63,8 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 		const action = getActionCreator({
 			calendarId,
 			title: titleState,
-			dateInfo: moment(startDateAtState).format('YYYY-MM-DD'),
+			startAt: startAtState,
+			endAt: endAtState,
 			location: locationState,
 			category: categoryState,
 			isAllDay: isAllDayState,
@@ -138,7 +145,7 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 								id="f-date-start"
 								type="date"
 								placeholder="location"
-								defaultValue={startDateAtState}
+								defaultValue={startAtState.toISOString().substr(0, 10)}
 								onChange={handleStartDateAtChange}
 							/>
 						</div>
@@ -151,7 +158,7 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 								id="f-date-end"
 								type="date"
 								placeholder="location"
-								defaultValue={endDateAtState}
+								defaultValue={endAtState.toISOString().substr(0, 10)}
 								onChange={handleEndDateAtChange}
 							/>
 						</div>

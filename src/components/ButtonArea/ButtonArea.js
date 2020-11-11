@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import styles from './ButtonArea.module.scss'
 import classNames from 'classnames/bind'
 
@@ -7,10 +7,10 @@ import { ReactComponent as IconNext } from '../../assets/images/svg/arrow_next.s
 
 const cx = classNames.bind(styles)
 
-const ButtonArea = ({data, getThis, getChange}) => {
+const ButtonArea = ({ data, getThis, getChange }) => {
 	return (
 		<>
-      <div className={cx('menu')}>
+			<div className={cx('menu')}>
 				<button type="button" className={cx('btn', 'today')} onClick={() => getThis()}>
 					Today
 				</button>

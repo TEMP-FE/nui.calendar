@@ -90,12 +90,6 @@
             &::placeholder {
                color: #999;
             }
-            &[type='date']::-webkit-calendar-picker-indicator {
-                display: none;
-            }
-            &[type='time']::-webkit-calendar-picker-indicator {
-                display: none;
-            }
             &[type='text']::-ms-clear {
                 display: none;
             }

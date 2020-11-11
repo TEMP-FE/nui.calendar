@@ -11,10 +11,8 @@ import { getCategoryColor } from './commonState'
 
 import styles from './CalendarItem.module.scss'
 import moment from 'moment'
-import { useCalenderContext } from '../../contexts/calendar'
 
 const cx = classNames.bind(styles)
-
 
 const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	// 반복 일정
@@ -46,9 +44,8 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
  * @returns {JSX.Element}
  * @constructor
  */
-const DayType = ({ handleClose, setDragging, resetDragging, style, ...item }) => {
-	const [isPopup, setIsPopup] = useState(true)
-	const { title, startAt, endAt, location, category, isAllDay, isBlocked, isPrivate, isRepeatable } = item
+const DayType = ({ handleClose = () => {}, setDragging = () => {}, resetDragging = () => {}, style, ...item }) => {
+	const { title, startAt, endAt, category, isBlocked } = item
 
 	const [isShown, setIsShown] = useState(false)
 
@@ -58,16 +55,21 @@ const DayType = ({ handleClose, setDragging, resetDragging, style, ...item }) =>
 		setIsShown(!isShown)
 	}
 
-	const handleDragStart = (e) => {
+	const handleDragStart = () => {
 		setDragging()
 	}
 
-	const handleDragEnd = (e) => {
+	const handleDragEnd = () => {
 		resetDragging()
 	}
-	const handleDelete = () => { }
+
+	const handleDelete = () => {}
+
 	return (
-		<div className={cx('component')} draggable={!isBlocked} style={style}
+		<div
+			className={cx('component')}
+			draggable={!isBlocked}
+			style={style}
 			onClick={handleItemClick}
 			onDragStart={handleDragStart}
 			onDragEnd={handleDragEnd}
@@ -83,8 +85,8 @@ const DayType = ({ handleClose, setDragging, resetDragging, style, ...item }) =>
 			>
 				<span className="blind">{category}</span>
 				<span className="blind">
-					<span className={cx('period')}>{startAt}</span>
-					<span className={cx('period')}>{endAt}</span>
+					<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
+					<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
 				</span>
 				<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
 				<span className={cx('cell')}>
@@ -115,31 +117,23 @@ const DayType = ({ handleClose, setDragging, resetDragging, style, ...item }) =>
  * @constructor
  */
 const TimeType = ({ handleEdit, ...item }) => {
-	const { calendarDispatch } = useCalenderContext()
 	const [isInfoShown, setIsInfoShown] = useState(false)
 
 	const {
-		calendarId,
 		title,
-		dateInfo,
-		dateRelative,
-		location,
+		startAt,
+		endAt,
 		category,
-		isAllDay,
 		isBlocked,
-		isPrivate,
 		// isRepeatable = false,
 	} = item
-
-	const startDateAt = moment(dateInfo).format('MM-DD')
-	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('MM-DD')
 
 	const handleItemClick = (e) => e.stopPropagation()
 
 	const handleIsInfoShown = () => {
 		setIsInfoShown(!isInfoShown)
 	}
-	console.log(handleEdit)
+
 	const handleEditInPopup = () => {
 		setIsInfoShown(!isInfoShown)
 
@@ -162,8 +156,8 @@ const TimeType = ({ handleEdit, ...item }) => {
 					</span>
 				</span>
 				<span className={cx('cell', 'type-period')}>
-					<span className={cx('period')}>{startDateAt}</span>
-					<span className={cx('period')}>{endDateAt}</span>
+					<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
+					<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
 				</span>
 				<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
 				<span className={cx('cell')}>

@@ -1,5 +1,3 @@
-import { useReducer } from 'react'
-
 /**
  * Ducks Patterns
  *
@@ -14,34 +12,33 @@ const ACTIONS = {
 
 const reducer = (state, actions) => {
 	const calendar = actions.calendar
-	const { dateInfo } = calendar
-	const calendarList = state[dateInfo] || []
+	const scheduleList = state.scheduleList || []
 
 	switch (actions.type) {
 		case ACTIONS.CREATE:
 			return {
 				...state,
-				[dateInfo]: [...calendarList, calendar],
+				scheduleList: [...scheduleList, calendar],
 			}
 		case ACTIONS.READ:
 			return {
 				list: [...state],
 			}
 		case ACTIONS.UPDATE:
-			const updatedCalendarList = calendarList.map((item) =>
+			const updatedCalendarList = scheduleList.map((item) =>
 				item.calendarId === calendar.calendarId ? calendar : item,
 			)
 
 			return {
 				...state,
-				[dateInfo]: [...updatedCalendarList],
+				scheduleList: [...updatedCalendarList],
 			}
 		case ACTIONS.DELETE:
-			const newCalendarList = calendarList.filter((item) => item.calendarId !== calendar.calendarId)
+			const newCalendarList = scheduleList.filter((item) => item.calendarId !== calendar.calendarId)
 
 			return {
 				...state,
-				[dateInfo]: newCalendarList,
+				scheduleList: newCalendarList,
 			}
 		default:
 			return state

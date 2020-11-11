@@ -9,6 +9,7 @@ export const dayOfWeekList = [
 	},
 ]
 
+// 초기 Date 객체
 export const getDateInfo = (date = new Date()) => {
 	return { year: date.getFullYear(), month: date.getMonth(), date: date.getDate() }
 }

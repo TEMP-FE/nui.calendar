@@ -110,7 +110,6 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList, changeSched
 						{moreList.length} more
 					</button>
 				)}
-				{scheduleList && scheduleList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
 				{isEditorShown && (
 					<CalendarItemPopupEditor handleClose={handleEditorClose} startAt={startAt} endAt={endAt} />
 				)}

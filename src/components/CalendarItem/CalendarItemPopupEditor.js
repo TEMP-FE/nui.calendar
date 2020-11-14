@@ -17,6 +17,7 @@ import useInput from './useInput'
 import useToggle from './useToggle'
 
 import styles from './CalendarItemPopupEditor.module.scss'
+import { parseDateToString } from '../../utils/calendar'
 
 const cx = classNames.bind(styles)
 
@@ -39,10 +40,9 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 	const isNewItem = !!!item.calendarId
 
 	const handleInputDate = (e) => {
-		const year = parseInt(moment(e.target.value).format('YY'))
-		const month = parseInt(moment(e.target.value).format('MM'))
+		const year = parseInt(moment(e.target.value).format('YYYY'))
+		const month = parseInt(moment(e.target.value).format('MM')) - 1
 		const date = parseInt(moment(e.target.value).format('DD'))
-
 		return new Date(year, month, date)
 	}
 
@@ -59,7 +59,6 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault()
-
 		const action = getActionCreator({
 			calendarId,
 			title: titleState,
@@ -145,7 +144,7 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 								id="f-date-start"
 								type="date"
 								placeholder="location"
-								defaultValue={startAtState.toISOString().substr(0, 10)}
+								defaultValue={parseDateToString(startAtState)}
 								onChange={handleStartDateAtChange}
 							/>
 						</div>
@@ -158,7 +157,7 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 								id="f-date-end"
 								type="date"
 								placeholder="location"
-								defaultValue={endAtState.toISOString().substr(0, 10)}
+								defaultValue={parseDateToString(endAtState)}
 								onChange={handleEndDateAtChange}
 							/>
 						</div>

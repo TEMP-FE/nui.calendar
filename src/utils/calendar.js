@@ -1,3 +1,5 @@
+import { padStart } from './common'
+
 export const dayOfWeekList = [
 	{
 		lang: 'en',
@@ -48,4 +50,10 @@ export const isSameDate = (date1, date2) => {
 export const calcScheduleDay = (schedule) => {
 	const time = schedule.endAt.getTime() - schedule.startAt.getTime()
 	return Math.floor(time / 86400000 + 1)
+}
+
+// DateTime 객체 -> YYYY-MM-DD string 형태로 변환
+export const parseDateToString = (dateTime) => {
+	const { year, month, date } = getDateInfo(dateTime)
+	return `${year}-${padStart(month + 1, 2)}-${padStart(date, 2)}`
 }

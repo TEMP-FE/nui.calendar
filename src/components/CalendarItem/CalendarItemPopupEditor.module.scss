@@ -7,26 +7,9 @@
         -webkit-appearance: none;
         appearance: none;
         cursor: pointer;
-        &.category {
-            position: relative;
-            display: block;
-            width: 100%;
-            height: 100%;
-            text-align: left;
-            &:after {
-                content: '';
-                position: absolute;
-                top: 50%;
-                right: 10px;
-                transform: translateY(-50%);
-                border-style: solid;
-                border-width: 4px;
-                border-color: #222 transparent transparent;
-            }
-        }
         &.lock {
             margin-left: 4px;
-            padding: 10px;
+            padding: 6px;
             border: solid 1px #999;
             // TODO: 아이콘 변경
             line-height: 10px;
@@ -46,75 +29,21 @@
             position: absolute;
             top: 0;
             right: 0;
-            padding: 10px;
+            padding: 15px;
         }
     }
     .row-info {
         display: flex;
+        &:first-child {
+            padding-right: 33px;
+        }
         + .row-info {
             margin-top: 10px;
         }
     }
-    .item-input {
-        flex-basis: 35%;
-        position: relative;
-        height: 30px;
-        padding-left: 32px;
-        border: solid 1px #999;
-        &.full {
-            flex-basis: 100%;
-        }
-        .icon {
-            position: absolute;
-            top: 50%;
-            left: 12px;
-            // TODO: 아이콘 변경
-            width: 10px;
-            height: 10px;
-            overflow: hidden;
-            transform: translateY(-50%);
-            &.category {
-                border-radius: 50%;
-            }
-        }
-        input {
-            border: 0;
-            background-color: transparent;
-            -webkit-appearance: none;
-            appearance: none;
-            display: block;
-            width: 100%;
-            height: 100%;
-            font-size: 12px;
-            line-height: 17px;
-            &::placeholder {
-               color: #999;
-            }
-            &[type='text']::-ms-clear {
-                display: none;
-            }
-        }
-    }
     .delimiter {
         margin: 0 2px;
-    }
-    .item-checkbox {
-        position: relative;
-        margin-left: 4px;
-        padding-left: 14px;
-        label {
-            vertical-align: top;
-            font-size: 12px;
-            line-height: 32px;
-        }
-        input[type='checkbox'] {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 10px;
-            height: 10px;
-            transform: translateY(-50%);
-        }
+        line-height: 32px;
     }
     .area-button {
         display: flex;

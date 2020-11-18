@@ -1,16 +1,12 @@
 import React, { useEffect } from 'react'
-import { ReactComponent as IconLabel } from '../../assets/images/svg/icon-label.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
 import { ReactComponent as IconLockOpen } from '../../assets/images/svg/icon-lock-open.svg'
-import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
-import { ReactComponent as IconCalendar } from '../../assets/images/svg/icon-calendar.svg'
-import { ReactComponent as IconTime } from '../../assets/images/svg/icon-time.svg'
 import { ReactComponent as IconClose } from '../../assets/images/svg/icon-close.svg'
 import CalendarItemPopup from './CalendarItemPopup'
+import { InputCheckbox, InputDate, InputText, InputSelector } from './Input'
 
 import moment from 'moment'
 import classNames from 'classnames/bind'
-import { getCategoryColor } from './commonState'
 import { useCalendarContext } from '../../contexts/calendar'
 import { createCalendar, updateCalendar } from '../../reducers/calendar'
 import useInput from './useInput'
@@ -18,6 +14,7 @@ import useToggle from './useToggle'
 
 import styles from './CalendarItemPopupEditor.module.scss'
 import { parseDateToString } from '../../utils/calendar'
+import { getCategoryList } from './commonState'
 
 const cx = classNames.bind(styles)
 
@@ -83,30 +80,15 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 			<div className={cx('component')}>
 				<form className={cx('area-info')} onSubmit={handleSubmit}>
 					<div className={cx('row-info')}>
-						<div className={cx('item-input', 'category')}>
-							<span
-								className={cx('icon', 'category')}
-								style={{ backgroundColor: getCategoryColor(categoryState) }}
-							/>
-							<button type="button" className={cx('button', 'category')}>
-								{categoryState}
-							</button>
-							<div hidden={true}>그룹 레이어</div>
-						</div>
+						<InputSelector
+							id="category"
+							value={categoryState}
+							list={getCategoryList()}
+							handler={() => {}}
+						/>
 					</div>
 					<div className={cx('row-info')}>
-						<div className={cx('item-input', 'full')}>
-							<label htmlFor="f-title" className={cx('icon')}>
-								<IconLabel width={10} height={10} />
-							</label>
-							<input
-								id="f-title"
-								type="text"
-								placeholder="Title"
-								defaultValue={titleState}
-								onChange={handleTitleChange}
-							/>
-						</div>
+						<InputText id="title" placeholder="할 일" value={titleState} handler={handleTitleChange} />
 						<button type="button" className={cx('button', 'lock')} onClick={handleIsBlockedChange}>
 							{isBlockedState ? (
 								<>
@@ -122,73 +104,41 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 						</button>
 					</div>
 					<div className={cx('row-info')}>
-						<div className={cx('item-input', 'full')}>
-							<label htmlFor="f-location" className={cx('icon')}>
-								<IconLocation width={10} height={10} />
-							</label>
-							<input
-								id="f-location"
-								type="text"
-								placeholder="location"
-								defaultValue={locationState}
-								onChange={handleLocationChange}
-							/>
-						</div>
+						<InputText
+							id="location"
+							placeholder="위치 정보"
+							value={locationState}
+							handler={handleLocationChange}
+						/>
 					</div>
-					<div className={cx('row-info')}>
-						<div className={cx('item-input')}>
-							<label htmlFor="f-date-start" className={cx('icon')}>
-								<IconCalendar width={10} height={10} />
-							</label>
-							<input
-								id="f-date-start"
-								type="date"
-								placeholder="location"
-								defaultValue={parseDateToString(startAtState)}
-								onChange={handleStartDateAtChange}
-							/>
-						</div>
-						<span className={cx('delimiter')}>~</span>
-						<div className={cx('item-input')}>
-							<label htmlFor="f-date-end" className={cx('icon')}>
-								<IconCalendar width={10} height={10} />
-							</label>
-							<input
-								id="f-date-end"
-								type="date"
-								placeholder="location"
-								defaultValue={parseDateToString(endAtState)}
-								onChange={handleEndDateAtChange}
-							/>
-						</div>
-					</div>
-					{!isAllDayState && (
+					{isAllDayState ? (
 						<div className={cx('row-info')}>
-							<div className={cx('item-input')}>
-								<label htmlFor="f-time-start" className={cx('icon')}>
-									<IconTime width={10} height={10} />
-								</label>
-								<input id="f-time-start" type="time" placeholder="location" />
-							</div>
+							<InputDate
+								id="date-start"
+								value={parseDateToString(startAtState)}
+								handler={handleStartDateAtChange}
+							/>
 							<span className={cx('delimiter')}>~</span>
-							<div className={cx('item-input')}>
-								<label htmlFor="f-time-end" className={cx('icon')}>
-									<IconTime width={10} height={10} />
-								</label>
-								<input id="f-time-end" type="time" placeholder="location" />
-							</div>
+							<InputDate
+								id="date-end"
+								value={parseDateToString(endAtState)}
+								handler={handleEndDateAtChange}
+							/>
+						</div>
+					) : (
+						<div className={cx('row-info')}>
+							<InputDate id="time-start" value="00 00:00" handler={() => {}} typeTime />
+							<span className={cx('delimiter')}>~</span>
+							<InputDate id="time-end" value="00 00:00" handler={() => {}} typeTime />
 						</div>
 					)}
 					<div className={cx('area-button')}>
-						<div className={cx('item-checkbox')}>
-							<input
-								id="f-allday"
-								type="checkbox"
-								defaultChecked={isAllDayState}
-								onChange={handleIsAllDayChange}
-							/>
-							<label htmlFor="f-allday">All day</label>
-						</div>
+						<InputCheckbox
+							id="all-day"
+							label="하루 종일"
+							value={isAllDayState}
+							handler={handleIsAllDayChange}
+						/>
 						<button type="button" className={cx('button', 'submit')} onClick={handleSubmit}>
 							Save
 						</button>

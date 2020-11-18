@@ -11,7 +11,7 @@ const useToggle = ({ initialValue = false, handleChange = () => {} }) => {
 		setState(!state)
 	}
 
-	return [state, setState, onChange]
+	return [state, onChange]
 }
 
 export default useToggle

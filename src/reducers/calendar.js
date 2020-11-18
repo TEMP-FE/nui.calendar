@@ -13,7 +13,7 @@ const ACTIONS = {
 const reducer = (state, actions) => {
 	const calendar = actions.calendar
 	const scheduleList = state.scheduleList || []
-
+	console.log(actions)
 	switch (actions.type) {
 		case ACTIONS.CREATE:
 			return {

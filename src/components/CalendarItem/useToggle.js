@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 const useToggle = ({ initialValue = false, handleChange = () => {} }) => {
 	const [state, setState] = useState(initialValue)
@@ -11,7 +11,7 @@ const useToggle = ({ initialValue = false, handleChange = () => {} }) => {
 		setState(!state)
 	}
 
-	return [state, setState, onChange]
+	return [state, onChange]
 }
 
 export default useToggle

@@ -5,7 +5,7 @@ import { getCategoryColor } from './commonState'
 import { deleteCalendar } from '../../reducers/calendar'
 
 import CalendarItemPopup from './CalendarItemPopup'
-import { useCalenderContext } from '../../contexts/calendar'
+import { useCalendarContext } from '../../contexts/calendar'
 import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
 import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
@@ -15,24 +15,25 @@ import moment from 'moment'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleClose, ...item }) => {
-	const { calendarDispatch } = useCalenderContext()
+const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
+	const { calendarDispatch } = useCalendarContext()
 
 	const {
-		calendarId,
 		title,
 		dateInfo,
 		dateRelative,
 		location,
 		category,
-		isAllDay,
-		isBlocked,
 		isPrivate,
 		// isRepeatable = false,
 	} = item
 
 	const startDateAt = moment(dateInfo).format('MM-DD')
 	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('MM-DD')
+
+	const onEdit = () => {
+		handleEdit()
+	}
 
 	const onDelete = () => {
 		calendarDispatch(deleteCalendar(item))
@@ -73,7 +74,7 @@ const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleClose, ...item }
 				</dl>
 				<div className={cx('area-button')}>
 					<div className={cx('cell')}>
-						<button type="button" className={cx('button')} onClick={handleEdit}>
+						<button type="button" className={cx('button')} onClick={onEdit}>
 							Edit
 						</button>
 					</div>

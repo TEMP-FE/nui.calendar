@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ReactComponent as IconRepeat } from '../../assets/images/svg/icon-repeat.svg'
 import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
 import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
 import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
-import CalendarItemPopupInfo from './CalendarItemPopupInfo'
 
 import classNames from 'classnames/bind'
 import { getCategoryColor } from './commonState'
@@ -38,22 +37,10 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	}
 }
 
-/**
- * 기간(종일) 일정 항목
- * @param item 일정 객체
- * @returns {JSX.Element}
- * @constructor
- */
-const DayType = ({ handleClose = () => {}, setDragging = () => {}, resetDragging = () => {}, style, ...item }) => {
-	const { title, startAt, endAt, category, isBlocked } = item
-
-	const [isShown, setIsShown] = useState(false)
+const DayType = ({ isShown, handleIsShown, setDragging = () => {}, resetDragging = () => {}, style, ...item }) => {
+	const { id, title, startAt, endAt, category, isBlocked } = item
 
 	const handleItemClick = (e) => e.stopPropagation()
-
-	const handleIsShown = () => {
-		setIsShown(!isShown)
-	}
 
 	const handleDragStart = () => {
 		setDragging()
@@ -62,8 +49,6 @@ const DayType = ({ handleClose = () => {}, setDragging = () => {}, resetDragging
 	const handleDragEnd = () => {
 		resetDragging()
 	}
-
-	const handleDelete = () => {}
 
 	return (
 		<div
@@ -79,7 +64,7 @@ const DayType = ({ handleClose = () => {}, setDragging = () => {}, resetDragging
 				className={cx('item', 'type-day')}
 				style={{ backgroundColor: getCategoryColor(category) }}
 				aria-haspopup="dialog"
-				aria-controls={'wa-popup'}
+				aria-controls={id}
 				aria-expanded={isShown}
 				onClick={handleIsShown}
 			>
@@ -97,29 +82,13 @@ const DayType = ({ handleClose = () => {}, setDragging = () => {}, resetDragging
 					</span>
 				</span>
 			</button>
-			{isShown && (
-				<CalendarItemPopupInfo
-					id={'wa-popup'}
-					isShown={isShown}
-					handleClose={handleClose}
-					handleDelete={handleDelete}
-					{...item}
-				/>
-			)}
 		</div>
 	)
 }
 
-/**
- * 기간(시간) 일정 항목
- * @param item 일정 객체
- * @returns {JSX.Element}
- * @constructor
- */
-const TimeType = ({ handleEdit, ...item }) => {
-	const [isInfoShown, setIsInfoShown] = useState(false)
-
+const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 	const {
+		id,
 		title,
 		startAt,
 		endAt,
@@ -130,25 +99,15 @@ const TimeType = ({ handleEdit, ...item }) => {
 
 	const handleItemClick = (e) => e.stopPropagation()
 
-	const handleIsInfoShown = () => {
-		setIsInfoShown(!isInfoShown)
-	}
-
-	const handleEditInPopup = () => {
-		setIsInfoShown(!isInfoShown)
-
-		handleEdit()
-	}
-
 	return (
 		<div className={cx('component')} onClick={handleItemClick} draggable={!isBlocked}>
 			<button
 				type="button"
 				className={cx('item')}
 				aria-haspopup="dialog"
-				aria-controls="wa-popup"
-				aria-expanded={isInfoShown}
-				onClick={handleIsInfoShown}
+				aria-controls={id}
+				aria-expanded={isShown}
+				onClick={handleIsShown}
 			>
 				<span className={cx('cell', 'type-group')}>
 					<span className={cx('group')} style={{ backgroundColor: getCategoryColor(category) }}>
@@ -168,15 +127,6 @@ const TimeType = ({ handleEdit, ...item }) => {
 					</span>
 				</span>
 			</button>
-			{isInfoShown && (
-				<CalendarItemPopupInfo
-					id={'wa-popup'}
-					handleIsShown={handleIsInfoShown}
-					handleEdit={handleEditInPopup}
-					handleClose={handleIsInfoShown}
-					{...item}
-				/>
-			)}
 		</div>
 	)
 }

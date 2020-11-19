@@ -15,7 +15,7 @@ import moment from 'moment'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleClose, ...item }) => {
+const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
 	const { calendarDispatch } = useCalendarContext()
 
 	const {
@@ -30,6 +30,10 @@ const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleClose, ...item }
 
 	const startDateAt = moment(dateInfo).format('MM-DD')
 	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('MM-DD')
+
+	const onEdit = () => {
+		handleEdit()
+	}
 
 	const onDelete = () => {
 		calendarDispatch(deleteCalendar(item))
@@ -70,7 +74,7 @@ const CalendarItemPopupInfo = ({ id, isShown, handleEdit, handleClose, ...item }
 				</dl>
 				<div className={cx('area-button')}>
 					<div className={cx('cell')}>
-						<button type="button" className={cx('button')} onClick={handleEdit}>
+						<button type="button" className={cx('button')} onClick={onEdit}>
 							Edit
 						</button>
 					</div>

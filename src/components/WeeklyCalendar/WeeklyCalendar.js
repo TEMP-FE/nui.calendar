@@ -195,14 +195,15 @@ const WeeklyCalendar = () => {
 		const startTime = '00:00'
 		const tempList = []
 		const dayDiff = endAt.getDay() - startAt.getDay()
+		console.log(dayDiff)
 		if (dayDiff > 0) {
-			tempList.push({ startAt: startAt, endAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime })
+			tempList.push({ startAt: startAt, endAt: new Date(moment(startAt).format('YYYY-MM-DD') + ' ' + endTime) })
 			for (let i = 1; i < dayDiff; ++i) {
-				const tempStart = moment(startAt).add(i, 'd').format('YYYY-MM-DD') + ' ' + startTime
-				const tempEnd = moment(startAt).add(i, 'd').format('YYYY-MM-DD') + ' ' + endTime
+				const tempStart = new Date(moment(startAt).add(i, 'd').format('YYYY-MM-DD') + ' ' + startTime)
+				const tempEnd = new Date(moment(startAt).add(i, 'd').format('YYYY-MM-DD') + ' ' + endTime)
 				tempList.push({ startAt: tempStart, endAt: tempEnd })
 			}
-			tempList.push({ startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime, endAt: endAt })
+			tempList.push({ startAt: new Date(moment(endAt).format('YYYY-MM-DD') + ' ' + startTime), endAt: endAt })
 		}
 		else {
 			tempList.push({ startAt: startAt, endAt: endAt })

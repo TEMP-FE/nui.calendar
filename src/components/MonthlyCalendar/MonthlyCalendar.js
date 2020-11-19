@@ -10,7 +10,6 @@ import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
 import styles from './MonthlyCalendar.module.scss'
 
 const cx = classNames.bind(styles)
-
 const _MS_PER_DAY = 1000 * 60 * 60 * 24
 const dateDiffInDays = (a, b) => {
 	// Discard the time and time-zone information.
@@ -147,8 +146,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			...scheduleList.slice(dragging + 1),
 		])
 	}
-
-	// 달력 정보 만들기
+	// 현재 선택된 '달' 달력 정보 만들기
 	const makeDateInfoList = () => {
 		const newDateInfoList = new Array(weekCount).fill(null).map((_) => [])
 
@@ -168,12 +166,18 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			}
 		}
 
-		const newScheduleList = ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
+		return newDateInfoList
+	}
+
+	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
+	const getNewScheduleList = (scheduleList, dateInfoList) =>
+		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
+
 			for (let i = 0; i < weekCount; i++) {
 				for (let j = 0; j < 7; j++) {
-					if (isSameDate(newDateInfoList[i][j].dateTime, scheduleItem.startAt)) {
+					if (isSameDate(dateInfoList[i][j].dateTime, scheduleItem.startAt)) {
 						// 일정을 넣을 수 있는 stack 값 찾기
 						let stack = 1
 						let isPossible = false
@@ -184,15 +188,20 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 								const iPos = Math.floor(num / 7)
 								const jPos = num % 7
 
-								if (
-									newDateInfoList[iPos][jPos].scheduleList.filter(
-										(scheduleItem) => scheduleItem.stack === stack,
-									).length
-								) {
-									stack++
-									break
-								}
-								if (p === period - 1) {
+								// 이번 달 일정만 계산
+								if (iPos < weekCount) {
+									if (
+										dateInfoList[iPos][jPos].scheduleList.filter(
+											(scheduleItem) => scheduleItem.stack === stack,
+										).length
+									) {
+										stack++
+										break
+									}
+									if (p === period - 1) {
+										isPossible = true
+									}
+								} else {
 									isPossible = true
 								}
 							}
@@ -203,35 +212,41 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							const top = `calc(${(100 / weekCount) * i}% + ${stack - 1}*28px + 25px )`
 							const left = `calc(${14.29 * j}% + 10px)`
 
-							if (7 - j < period) {
-								// 스택 업데이트
-								for (let k = j; k < 7; k++) {
-									newDateInfoList[i][k].scheduleList.push({ ...scheduleItem, stack })
-									newDateInfoList[i][k].stack = stack
-								}
+							// 현재 선택된 달 일정만 계산
+							if (i < weekCount) {
+								if (7 - j < period) {
+									// 스택 업데이트
+									for (let k = j; k < 7; k++) {
+										dateInfoList[i][k].scheduleList.push({ ...scheduleItem, stack })
+										dateInfoList[i][k].stack = stack
+									}
 
-								const width = `calc(${14.29 * (7 - j)}% - 20px)`
-								renderList.push(
-									Object.assign(
-										{ top, left, width, stack, scheduleIndex },
-										scheduleIndex === dragging && { opacity: 0.5 },
-									),
-								)
-								period = period - (7 - j)
+									const width = `calc(${14.29 * (7 - j)}% - 20px)`
+									renderList.push(
+										Object.assign(
+											{ top, left, width, stack, scheduleIndex },
+											scheduleIndex === dragging && { opacity: 0.5 },
+										),
+									)
+									period = period - (7 - j)
+								} else {
+									// 스택 업데이트
+									for (let k = j; k < j + period; k++) {
+										// 다음달 일정
+										dateInfoList[i][k].scheduleList.push({ ...scheduleItem, stack })
+										dateInfoList[i][k].stack = stack
+									}
+
+									const width = `calc(${period * 14.29}% - 20px)`
+									renderList.push(
+										Object.assign(
+											{ top, left, width, stack, scheduleIndex },
+											scheduleIndex === dragging && { opacity: 0.5 },
+										),
+									)
+									period = 0
+								}
 							} else {
-								// 스택 업데이트
-								for (let k = j; k < j + period; k++) {
-									newDateInfoList[i][k].scheduleList.push({ ...scheduleItem, stack })
-									newDateInfoList[i][k].stack = stack
-								}
-
-								const width = `calc(${period * 14.29}% - 20px)`
-								renderList.push(
-									Object.assign(
-										{ top, left, width, stack, scheduleIndex },
-										scheduleIndex === dragging && { opacity: 0.5 },
-									),
-								)
 								period = 0
 							}
 
@@ -248,16 +263,16 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			}
 		})
 
-		setCalendarScheduleList(newScheduleList)
-		setDateInfoList(newDateInfoList)
-	}
-
 	// 먼저 시작하는 일정 순서로 정렬
 	const ascendingScheduleList = (scheduleList) =>
 		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
 
 	useEffect(() => {
-		makeDateInfoList()
+		const newDateInfoList = makeDateInfoList() // 달력정보 만들기
+		const newScheduleList = getNewScheduleList(scheduleList, newDateInfoList) // scheduleList 만들기
+
+		setDateInfoList(newDateInfoList)
+		setCalendarScheduleList(newScheduleList)
 	}, [scheduleList, dragging])
 
 	return (
@@ -269,35 +284,41 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 				<CalendarHeader />
 				<div className={cx('calendar_content')}>
 					{/* 달력 그리기 */}
-					{calendarScheduleList &&
-						dateInfoList?.map((dateInfoRow, i) => (
-							<div key={`row-${i}`} className={cx('calendar_row')}>
-								{dateInfoRow?.map((dateInfoItem, j) => {
-									return (
-										<CalendarCell
-											key={dateInfoItem.dateTime.getTime()}
-											dateTime={dateInfoItem.dateTime}
-											isDimmed={dateInfoItem.dateTime.getMonth() !== month - 1}
-											isHoliday={dateInfoItem.isHoliday}
-											scheduleList={dateInfoItem.scheduleList}
-											setDragging={setDragging}
-											changeSchedule={() => changeSchedule(dateInfoItem.dateTime)}
-										/>
-									)
-								})}
-							</div>
-						))}
+					{dateInfoList?.map((dateInfoRow, i) => (
+						<div key={`row-${i}`} className={cx('calendar_row')}>
+							{dateInfoRow?.map((dateInfoItem, j) => {
+								return (
+									<CalendarCell
+										key={dateInfoItem.dateTime.getTime()}
+										dateTime={dateInfoItem.dateTime}
+										isDimmed={dateInfoItem.dateTime.getMonth() !== month - 1}
+										isHoliday={dateInfoItem.isHoliday}
+										scheduleList={dateInfoItem.scheduleList}
+										setDragging={setDragging}
+										changeSchedule={() => changeSchedule(dateInfoItem.dateTime)}
+									/>
+								)
+							})}
+						</div>
+					))}
 
 					{/* 일정 그리기  */}
 					{calendarScheduleList?.map((scheduleItem) => {
 						return scheduleItem?.renderList?.map((renderItem) => {
 							const { top, left, width, stack, opacity, scheduleIndex } = renderItem
 
+							const startAt = getDateInfo(scheduleItem.startAt)
+							const endAt = getDateInfo(scheduleItem.endAt)
+							const startAtString = `${startAt.year}/${startAt.month}/${startAt.date}`
+							const endAtString = `${endAt.year}/${endAt.month}/${endAt.date}`
+
 							if (stack < 4) {
 								return (
 									<div className={cx('schedule_item')} style={{ top, left, width, opacity }}>
 										<CalendarItem
 											{...scheduleItem}
+											startAt={startAtString}
+											endAt={endAtString}
 											setDragging={() => setDragging(scheduleIndex)}
 											resetDragging={() => setDragging(-1)}
 										/>

@@ -6,7 +6,30 @@ const appContext = createContext(null)
 const { Provider } = appContext
 
 const initialState = {
-	scheduleList: [],
+	scheduleList: [
+		{
+			title: '테스트',
+			startAt: new Date('2020-11-17 07:30'),
+			endAt: new Date('2020-11-17 08:31'),
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+		{
+			title: '테스트',
+			startAt: new Date('2020-11-17 07:30'),
+			endAt: new Date('2020-11-18 04:31'),
+			location: '',
+			category: '',
+			isAllDay: true,
+			isBlocked: false,
+			isPrivate: false,
+			isRepeatable: false,
+		},
+	],
 }
 
 const initializer = () => {

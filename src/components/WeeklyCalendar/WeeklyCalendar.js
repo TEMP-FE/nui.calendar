@@ -16,6 +16,55 @@ const month = curDay.getMonth()
 const date = curDay.getDate()
 const dayOfWeek = curDay.getDay()
 
+
+const tempItemList = [
+	{
+		title: '테스트',
+		startAt: '2020-11-19 12:30',
+		endAt: '2020-11-19 16:30',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	},
+	{
+		title: '테스트',
+		startAt: '2020-11-19 06:20',
+		endAt: '2020-11-19 09:57',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	},
+	{
+		title: '테스트',
+		startAt: '2020-11-05 11:20',
+		endAt: '2020-11-05 13:57',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	},
+	{
+		title: '테스트',
+		startAt: '2020-11-11 06:40',
+		endAt: '2020-11-11 11:20',
+		location: '',
+		category: '',
+		isAllDay: true,
+		isBlocked: false,
+		isPrivate: false,
+		isRepeatable: false,
+	},
+]
+
+
 const WeeklyCalendar = () => {
 	const [week, setWeek] = useState([])
 	const dayOfWeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -23,6 +72,7 @@ const WeeklyCalendar = () => {
 	const [dragSchedule, setDragSchedule] = useState(-1)
 	const [dragDate, setDragDate] = useState({ firstDate: undefined, secondDate: undefined })
 	const [newScheduleRenderList, setNewScheduleRenderList] = useState()
+	const [calendarItemList, setCalendarItemList] = useState(tempItemList)
 	const [currentDragType, setCurrentDragType] = useState(undefined)
 	for (var i = 0; i < timeLine.length; i++) {
 		timeLine[i] = i
@@ -83,52 +133,16 @@ const WeeklyCalendar = () => {
 		}
 	}, [dragDate, dragSchedule])
 
-	const calendarItemList = [
-		{
-			title: '테스트',
-			startAt: '2020-11-02 12:30',
-			endAt: '2020-11-02 16:30',
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '테스트',
-			startAt: '2020-11-05 06:20',
-			endAt: '2020-11-05 09:57',
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '테스트',
-			startAt: '2020-11-05 11:20',
-			endAt: '2020-11-05 13:57',
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '테스트',
-			startAt: '2020-11-11 06:40',
-			endAt: '2020-11-11 11:20',
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-	]
+	const getDiffMin = (start, end) => (end - start) / 60000
+
+	const changeSchedule = (startAt) => {
+		if (dragSchedule < 0) return;
+		const diffMin = getDiffMin(calendarItemList[dragSchedule].startAt, calendarItemList[dragSchedule].endAt);
+		const endAt = new Date(startAt)
+		endAt.setMinutes(startAt.getMinutes() + diffMin)
+		calendarItemList[dragSchedule] = { ...calendarItemList[dragSchedule], startAt: startAt, endAt: endAt }
+		setCalendarItemList([...calendarItemList.slice(0, dragSchedule), { ...calendarItemList[dragSchedule] }, ...calendarItemList.slice(dragSchedule + 1)])
+	}
 
 	const calcStartPoint = (startDate) => {
 		return Math.round((new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30))
@@ -261,6 +275,7 @@ const WeeklyCalendar = () => {
 												setDragDateEnter={() => setDragDate({ ...dragDate, secondDate: getNewDateWithMinutes(info, time, 0) })}
 												resetDragDate={() => setDragDate({ firstDate: undefined, secondDate: undefined })}
 												setDragDateDrop={() => console.log(dragDate)}
+												setDragScheduleDrop={() => changeSchedule(getNewDateWithMinutes(info, time, 30))}
 												type={currentDragType}
 											>
 												<div className={cx('detail_cell')} data-value="0"></div>
@@ -269,13 +284,14 @@ const WeeklyCalendar = () => {
 												setDragDateEnter={() => setDragDate({ ...dragDate, secondDate: getNewDateWithMinutes(info, time, 30) })}
 												resetDragDate={() => setDragDate({ firstDate: undefined, secondDate: undefined })}
 												setDragDateDrop={() => console.log(dragDate)}
+												setDragScheduleDrop={() => changeSchedule(getNewDateWithMinutes(info, time, 30))}
 												type={currentDragType}>
 												<div className={cx('detail_cell')} data-value="30"></div>
 											</DragDate>
 										</div>
 									))}
 									{calendarItemList.map(
-										(calendarItem) =>
+										(calendarItem, index) =>
 											info.getDate() === new Date(calendarItem.startAt).getDate() && (
 												<CalendarItem
 													{...calendarItem}
@@ -288,6 +304,8 @@ const WeeklyCalendar = () => {
 															calendarItem.endAt,
 														),
 													}}
+													setDragSchedule={() => setDragSchedule(index)}
+													resetDragSchedule={() => setDragSchedule(-1)}
 												/>
 											),
 									)}

@@ -5,7 +5,9 @@ const appContext = createContext(null)
 
 const { Provider } = appContext
 
-const initialState = {}
+const initialState = {
+	scheduleList: [],
+}
 
 const initializer = () => {
 	return initialState
@@ -28,4 +30,4 @@ export const AppContext = ({ children }) => {
 	)
 }
 
-export const useCalenderContext = () => useContext(appContext).CalendarContext
+export const useCalendarContext = () => useContext(appContext).CalendarContext

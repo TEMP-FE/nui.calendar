@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import moment from 'moment'
 import classNames from 'classnames/bind'
 
-import { useCalenderContext } from '../../contexts/calendar'
+import { useCalendarContext } from '../../contexts/calendar'
 import { getMonthInfo, getDateInfo, calcWeekCount, isSameDate, calcScheduleDay } from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
@@ -18,122 +17,6 @@ const dateDiffInDays = (a, b) => {
 	const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
 
 	return Math.floor((utc2 - utc1) / _MS_PER_DAY)
-}
-
-const DEMO_PROPS = {
-	scheduleList: [
-		{
-			title: '일정 1',
-			startAt: new Date(2020, 9, 1),
-			endAt: new Date(2020, 9, 5),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 2',
-			startAt: new Date(2020, 9, 19),
-			endAt: new Date(2020, 9, 20),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 3',
-			startAt: new Date(2020, 9, 30),
-			endAt: new Date(2020, 9, 31),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 4',
-			startAt: new Date(2020, 9, 12),
-			endAt: new Date(2020, 9, 22),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 5',
-			startAt: new Date(2020, 9, 13),
-			endAt: new Date(2020, 9, 14),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 6',
-			startAt: new Date(2020, 9, 14),
-			endAt: new Date(2020, 9, 18),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 7',
-			startAt: new Date(2020, 9, 15),
-			endAt: new Date(2020, 9, 19),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-
-		{
-			title: '일정 8',
-			startAt: new Date(2020, 9, 19),
-			endAt: new Date(2020, 9, 23),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 9',
-			startAt: new Date(2020, 9, 20),
-			endAt: new Date(2020, 9, 31),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-		{
-			title: '일정 10',
-			startAt: new Date(2020, 9, 15),
-			endAt: new Date(2020, 10, 1),
-			location: '',
-			category: '',
-			isAllDay: true,
-			isBlocked: false,
-			isPrivate: false,
-			isRepeatable: false,
-		},
-	],
 }
 
 // 달력 헤더
@@ -160,19 +43,17 @@ const CalendarHeader = () => {
 const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList, changeSchedule }) => {
 	const [moreList, setMoreList] = useState()
 	const [dragEnter, setDragEnter] = useState(false)
-	const { calendarStore } = useCalenderContext()
 	const [isEditorShown, setIsEditorShown] = useState(false)
 
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
 	const { year, month, date } = getDateInfo(dateTime)
-	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
-	const calendarList = calendarStore[dateInfo]
+	const startAt = new Date(year, month, date)
+	const endAt = new Date(year, month, date)
 
 	// 셀 클릭 이벤트
 	const onCellClick = (e) => {
 		e.stopPropagation()
 
-		console.log(year, month, date)
 		setIsEditorShown(!isEditorShown)
 	}
 
@@ -228,8 +109,9 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList, changeSched
 						{moreList.length} more
 					</button>
 				)}
-				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
-				{isEditorShown && <CalendarItemPopupEditor handleClose={handleEditorClose} dateInfo={dateInfo} />}
+				{isEditorShown && (
+					<CalendarItemPopupEditor handleClose={handleEditorClose} startAt={startAt} endAt={endAt} />
+				)}
 			</div>
 		</div>
 	)
@@ -237,12 +119,21 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList, changeSched
 
 // 월 달력
 const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().month }) => {
+	const { calendarStore } = useCalendarContext()
+	const [scheduleList, setScheduleList] = useState([])
+
+	useEffect(() => {
+		setScheduleList(calendarStore.scheduleList)
+	}, [calendarStore.scheduleList])
+
+	const [calendarScheduleList, setCalendarScheduleList] = useState([])
+	const [dateInfoList, setDateInfoList] = useState([])
+
 	const [dragging, setDragging] = useState(-1)
-	const [scheduleList, setScheduleList] = useState(DEMO_PROPS.scheduleList)
-	const [calendarScheduleList, setCalendarScheduleList] = useState()
-	const [dateInfoList, setDateInfoList] = useState()
+
 	const currentMonthInfo = getMonthInfo({ year, month })
 	const weekCount = calcWeekCount({ year, month })
+
 	const changeSchedule = (startAt) => {
 		if (dragging < 0) return
 		const diffDays = dateDiffInDays(scheduleList[dragging].startAt, scheduleList[dragging].endAt)
@@ -263,6 +154,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			for (let j = 0; j < 7; j++) {
 				const date = 1 - currentMonthInfo.firstDayOfWeek + j + i * 7
 				const dateTime = new Date(year, month - 1, date)
+
 				const dateInfo = {
 					dateTime,
 					isHoliday: j === 0,
@@ -412,12 +304,14 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 
 					{/* 일정 그리기  */}
 					{calendarScheduleList?.map((scheduleItem) => {
-						const startAt = getDateInfo(scheduleItem.startAt)
-						const endAt = getDateInfo(scheduleItem.endAt)
-						const startAtString = `${startAt.year}/${startAt.month}/${startAt.date}`
-						const endAtString = `${endAt.year}/${endAt.month}/${endAt.date}`
 						return scheduleItem?.renderList?.map((renderItem) => {
 							const { top, left, width, stack, opacity, scheduleIndex } = renderItem
+
+							const startAt = getDateInfo(scheduleItem.startAt)
+							const endAt = getDateInfo(scheduleItem.endAt)
+							const startAtString = `${startAt.year}/${startAt.month}/${startAt.date}`
+							const endAtString = `${endAt.year}/${endAt.month}/${endAt.date}`
+
 							if (stack < 4) {
 								return (
 									<div className={cx('schedule_item')} style={{ top, left, width, opacity }}>

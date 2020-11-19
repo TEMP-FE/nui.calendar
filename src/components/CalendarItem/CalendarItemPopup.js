@@ -18,7 +18,7 @@ const CalendarItemPopup = ({ id, width, backgroundColor, handleClose, children }
 		return () => {
 			window.removeEventListener('click', handleClose)
 		}
-	}, [])
+	}, [handleClose])
 
 	return (
 		<div id={id} className={cx('component')} onClick={clickHandler} role="dialog">

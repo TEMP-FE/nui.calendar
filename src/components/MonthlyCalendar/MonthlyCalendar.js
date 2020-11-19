@@ -133,7 +133,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	const { calendarStore } = useCalendarContext()
 
 	useEffect(() => {
-		console.log(calendarStore.scheduleList)
 		setScheduleList(calendarStore.scheduleList)
 	}, [calendarStore.scheduleList])
 

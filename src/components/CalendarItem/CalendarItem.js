@@ -4,6 +4,7 @@ import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-loc
 import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
 import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
+import DragSchedule from '../Drag/DragSchedule'
 
 import classNames from 'classnames/bind'
 import { getCategoryColor } from './commonState'
@@ -37,51 +38,38 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	}
 }
 
-const DayType = ({ isShown, handleIsShown, setDragging = () => {}, resetDragging = () => {}, style, ...item }) => {
+const DayType = ({ isShown, handleIsShown, setDragSchedule, resetDragSchedule, style, ...item }) => {
 	const { id, title, startAt, endAt, category, isBlocked } = item
 
 	const handleItemClick = (e) => e.stopPropagation()
 
-	const handleDragStart = () => {
-		setDragging()
-	}
-
-	const handleDragEnd = () => {
-		resetDragging()
-	}
-
 	return (
-		<div
-			className={cx('component')}
-			draggable={!isBlocked}
-			style={style}
-			onClick={handleItemClick}
-			onDragStart={handleDragStart}
-			onDragEnd={handleDragEnd}
-		>
-			<button
-				type="button"
-				className={cx('item', 'type-day')}
-				style={{ backgroundColor: getCategoryColor(category) }}
-				aria-haspopup="dialog"
-				aria-controls={id}
-				aria-expanded={isShown}
-				onClick={handleIsShown}
-			>
-				<span className="blind">{category}</span>
-				<span className="blind">
-					<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
-					<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
-				</span>
-				<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
-				<span className={cx('cell')}>
-					<span className={cx('fixed')}>
-						<span className={cx('cell', 'ellipsis')}>
-							<span className={cx('title')}>{title}</span>
+		<div className={cx('component')} draggable={!isBlocked} style={style} onClick={handleItemClick}>
+			<DragSchedule isBlocked={isBlocked} resetDragSchedule={resetDragSchedule} setDragSchedule={setDragSchedule}>
+				<button
+					type="button"
+					className={cx('item', 'type-day')}
+					style={{ backgroundColor: getCategoryColor(category) }}
+					aria-haspopup="dialog"
+					aria-controls={id}
+					aria-expanded={isShown}
+					onClick={handleIsShown}
+				>
+					<span className="blind">{category}</span>
+					<span className="blind">
+						<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
+						<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
+					</span>
+					<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
+					<span className={cx('cell')}>
+						<span className={cx('fixed')}>
+							<span className={cx('cell', 'ellipsis')}>
+								<span className={cx('title')}>{title}</span>
+							</span>
 						</span>
 					</span>
-				</span>
-			</button>
+				</button>
+			</DragSchedule>
 		</div>
 	)
 }

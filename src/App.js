@@ -1,18 +1,14 @@
 import React from 'react'
+
 import { AppContext } from './contexts/calendar'
 
-import MonthlyCalendar from './components/MonthlyCalendar/MonthlyCalendar'
-import WeeklyCalendar from './components/WeeklyCalendar/WeeklyCalendar'
-
 import './App.css'
+import CalendarApp from './pages/CalendarApp'
 
 function App() {
 	return (
 		<AppContext>
-			<div className="App">
-        <MonthlyCalendar month={10} year={2020} />
-  			<WeeklyCalendar />
-			</div>
+			<CalendarApp />
 		</AppContext>
 	)
 }

@@ -1,17 +1,21 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
-const useInput = ({ initialValue = '', handleChange = () => {} }) => {
+const useInput = ({ initialValue = '', handleChange }) => {
 	const [state, setState] = useState(initialValue)
 
 	const onChange = (e) => {
 		e.preventDefault()
 
-		handleChange()
+		if (handleChange) {
+			const handleResult = handleChange(e)
 
-		setState(e.target.value)
+			setState(handleResult)
+		} else {
+			setState(e.target.value)
+		}
 	}
 
-	return [state, setState, onChange]
+	return [state, onChange]
 }
 
 export default useInput

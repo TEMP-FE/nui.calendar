@@ -2,7 +2,14 @@ import React, { useState, useEffect } from 'react'
 import classNames from 'classnames/bind'
 
 import { useCalendarContext } from '../../contexts/calendar'
-import { getMonthInfo, getDateInfo, calcWeekCount, isSameDate, calcScheduleDay } from '../../utils/calendar'
+import {
+	getMonthInfo,
+	getDateInfo,
+	calcWeekCount,
+	isSameDate,
+	calcScheduleDay,
+	isDateTimeIncludeScheduleItem,
+} from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
 import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
@@ -228,13 +235,15 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
-
 			for (let i = 0; i < weekCount; i++) {
 				for (let j = 0; j < 7; j++) {
 					let day = j
 					let week = i
 
-					if (isSameDate(dateInfoList[i][j].dateTime, scheduleItem.startAt)) {
+					if (isDateTimeIncludeScheduleItem(dateInfoList[i][j].dateTime, scheduleItem)) {
+						// 전체 기간에서 이전달 달력에 그려지는 기간 빼기
+						period -= dateDiffInDays(scheduleItem.startAt, dateInfoList[i][j].dateTime)
+
 						// 일정을 넣을 수 있는 stack 값 찾기
 						let stack = 1
 						let isPossible = false

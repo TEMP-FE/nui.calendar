@@ -7,7 +7,6 @@ import styles from './CalendarItemPopup.module.scss'
 const cx = classNames.bind(styles)
 
 const CalendarItemPopup = ({ id, width, backgroundColor, handleClose, children }) => {
-	// TODO: 레이어 상하좌우 위치 조정 Func...
 	const clickHandler = (e) => {
 		e.stopPropagation()
 	}
@@ -21,9 +20,11 @@ const CalendarItemPopup = ({ id, width, backgroundColor, handleClose, children }
 	}, [handleClose])
 
 	return (
-		<div id={id} className={cx('component')} onClick={clickHandler} role="dialog">
-			<div className={cx('inner')} style={{ width, backgroundColor: backgroundColor }}>
-				{children}
+		<div id={id} className={cx('component')} role="dialog">
+			<div className={cx('layer')} onClick={clickHandler}>
+				<div className={cx('inner')} style={{ width, backgroundColor: backgroundColor }}>
+					{children}
+				</div>
 			</div>
 		</div>
 	)

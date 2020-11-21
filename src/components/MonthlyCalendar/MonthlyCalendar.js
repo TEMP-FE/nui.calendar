@@ -131,13 +131,12 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	const [calendarScheduleList, setCalendarScheduleList] = useState()
 	const [dateInfoList, setDateInfoList] = useState()
 	const { calendarStore } = useCalendarContext()
+	let currentMonthInfo = getMonthInfo({ year, month: month + 1 })
+	let weekCount = calcWeekCount({ year, month: month + 1 })
 
 	useEffect(() => {
 		setScheduleList(calendarStore.scheduleList)
 	}, [calendarStore.scheduleList])
-
-	const currentMonthInfo = getMonthInfo({ year, month })
-	const weekCount = calcWeekCount({ year, month })
 
 	const changeSchedule = (startAt) => {
 		if (dragSchedule < 0) return
@@ -164,11 +163,10 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	// 현재 선택된 '달' 달력 정보 만들기
 	const makeDateInfoList = () => {
 		const newDateInfoList = new Array(weekCount).fill(null).map((_) => [])
-
 		for (let i = 0; i < weekCount; i++) {
 			for (let j = 0; j < 7; j++) {
 				const date = 1 - currentMonthInfo.firstDayOfWeek + j + i * 7
-				const dateTime = new Date(year, month - 1, date)
+				const dateTime = new Date(year, month, date)
 
 				const dateInfo = {
 					dateTime,
@@ -332,12 +330,12 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		makeNewSchedule(newDateInfoList)
 		setDateInfoList(newDateInfoList)
 		setCalendarScheduleList(newScheduleList)
-	}, [scheduleList, dragSchedule, dragDate])
+	}, [scheduleList, dragSchedule, dragDate, year, month])
 
 	return (
 		<div className={cx('calendar_wrap')}>
 			<div className={cx('calendar_title')}>
-				<strong className={cx('calendar_info')}>{`${year} / ${month}`}</strong>
+				<strong className={cx('calendar_info')}>{`${year} / ${month + 1}`}</strong>
 			</div>
 			<div className={cx('calendar_area')}>
 				<CalendarHeader />
@@ -350,7 +348,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 									<CalendarCell
 										key={dateInfoItem.dateTime.getTime()}
 										dateTime={dateInfoItem.dateTime}
-										isDimmed={dateInfoItem.dateTime.getMonth() !== month - 1}
+										isDimmed={dateInfoItem.dateTime.getMonth() !== month}
 										isHoliday={dateInfoItem.isHoliday}
 										scheduleList={dateInfoItem.scheduleList}
 										changeSchedule={() => changeSchedule(dateInfoItem.dateTime)}

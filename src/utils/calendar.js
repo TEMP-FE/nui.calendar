@@ -59,7 +59,8 @@ export const parseDateToString = (dateTime) => {
 }
 
 // dateTime 이 scheduleItem 에 포함되어있는지 판단하는 함수
-export const isDateTimeIncludeScheduleItem = (dateTime, scheduleItem) =>
-	dateTime.getTime() >= scheduleItem.startAt.getTime() && dateTime.getTime() <= scheduleItem.endAt.getTime()
-		? true
-		: false
+export const isDateTimeIncludeScheduleItem = (dateTime, scheduleItem) => {
+	const scheduleStart = scheduleItem.startAt.getTime()
+	const scheduleEnd = scheduleItem.endAt.getTime()
+	return dateTime.getTime() >= scheduleStart && dateTime.getTime() <= scheduleEnd ? true : false
+}

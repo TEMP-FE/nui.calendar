@@ -131,7 +131,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 
 	useEffect(() => {
 		if (dragScheduleStore.isDropped) {
-			console.log(dragScheduleStore)
 			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			movedSchedule = {
 				...movedSchedule,
@@ -176,7 +175,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
 	const getNewScheduleList = (scheduleList, dateInfoList) =>
 		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
-			scheduleItem = { ...scheduleItem, index: scheduleIndex }
+			scheduleItem = { ...scheduleItem, index: scheduleIndex, scheduleStartAt: scheduleItem.startAt, scheduleEndAt: scheduleItem.endAt }
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
 			for (let i = 0; i < weekCount; i++) {
@@ -293,7 +292,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	}, [year, month])
 
 	useEffect(() => {
-		console.log(scheduleList)
 		const newDateInfoList = makeDateInfoList() // 달력정보 만들기
 		const newScheduleList = getNewScheduleList(scheduleList, newDateInfoList) // scheduleList 만들기
 		setDateInfoList(newDateInfoList)

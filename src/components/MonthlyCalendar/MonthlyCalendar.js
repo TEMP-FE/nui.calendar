@@ -229,7 +229,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 									const width = `calc(${14.29 * (7 - j)}% - 20px)`
 									renderList.push(
 										Object.assign(
-											{ top, left, width, stack, scheduleIndex },
+											{ top, left, width, stack },
 											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
 										),
 									)
@@ -245,7 +245,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 									const width = `calc(${period * 14.29}% - 20px)`
 									renderList.push(
 										Object.assign(
-											{ top, left, width, stack, scheduleIndex },
+											{ top, left, width, stack },
 											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
 										),
 									)
@@ -257,7 +257,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							i++
 							j = 0
 						}
-
+						renderList[renderList.length - 1] = { ...renderList[renderList.length - 1], isLast: true }
 						return {
 							...scheduleItem,
 							renderList,
@@ -327,7 +327,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 					{/* 일정 그리기  */}
 					{calendarScheduleList?.map((scheduleItem) => {
 						return scheduleItem?.renderList?.map((renderItem) => {
-							const { top, left, width, stack, opacity, scheduleIndex } = renderItem
+							const { top, left, width, stack, opacity, isLast } = renderItem
 
 							const startAt = getDateInfo(scheduleItem.startAt)
 							const endAt = getDateInfo(scheduleItem.endAt)
@@ -341,6 +341,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 											{...scheduleItem}
 											startAt={startAtString}
 											endAt={endAtString}
+											isLast={isLast}
 										/>
 									</div>
 								)

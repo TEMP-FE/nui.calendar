@@ -142,7 +142,7 @@ const WeeklyCalendar = () => {
 		const startTime = '00:00'
 
 		const startItem = { ...Item, endAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime }
-		const endItem = { ...Item, startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime }
+		const endItem = { ...Item, startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime, isLast: true }
 
 		return [startItem, endItem]
 	}

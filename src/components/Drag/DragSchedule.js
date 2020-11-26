@@ -3,7 +3,7 @@ import { startDrag, resetScheduleDrag, startReisze } from '../../reducers/dragSc
 import { useDragScheduleContext } from '../../contexts/calendar'
 import { calendarType } from '../../const/drag'
 
-const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, index, children }) => {
+const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, index, isLast, children }) => {
 	const [dragImg, setDragImg] = useState();
 	const { dragScheduleDispatch, dragScheduleStore } = useDragScheduleContext()
 	const monthReiszeStyle = {
@@ -53,11 +53,11 @@ const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, in
 			onDragEnd={handleDragEnd}
 		>
 			{children}
-			<span
+			{isLast && <span
 				style={resizeStyle}
 				draggable={!isBlocked}
 				onDragStart={handleResizeDragStart}
-			/>
+			/>}
 		</div>
 	)
 }

@@ -38,13 +38,13 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	}
 }
 
-const DayType = ({ isShown, handleIsShown, style, ...item }) => {
+const DayType = ({ isShown, handleIsShown, style, isLast, ...item }) => {
 	const { id, title, startAt, endAt, category, isBlocked, index, scheduleStartAt, scheduleEndAt } = item
 
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
-		<DragSchedule className={cx('component')} isBlocked={isBlocked} style={style} index={index} startAt={moment(scheduleStartAt)} endAt={moment(scheduleEndAt)} onClick={handleItemClick}>
+		<DragSchedule className={cx('component')} isBlocked={isBlocked} style={style} index={index} startAt={moment(scheduleStartAt)} endAt={moment(scheduleEndAt)} isLast={isLast} onClick={handleItemClick}>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}

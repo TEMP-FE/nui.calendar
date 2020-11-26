@@ -1,4 +1,5 @@
 import { padStart } from './common'
+import moment from 'moment'
 
 export const dayOfWeekList = [
 	{
@@ -59,6 +60,18 @@ export const parseDateToString = (dateTime) => {
 }
 
 // dateTime 이 scheduleItem 에 포함되어있는지 판단하는 함수
+export const getSaturdaysOfMonth = (year, month) => {
+	let saturdayList = []
+	let saturday = moment().year(year).month(month).startOf('month').day("Saturday");
+	if (saturday.date() > 7) saturday.add(7, 'd');
+	let currentMonth = saturday.month();
+	while (currentMonth === saturday.month()) {
+		saturdayList.push(saturday.clone())
+		saturday.add(7, 'd');
+	}
+	return saturdayList
+}
+
 export const isDateTimeIncludeScheduleItem = (dateTime, scheduleItem) => {
 	const scheduleStart = scheduleItem.startAt.getTime()
 	const scheduleEnd = scheduleItem.endAt.getTime()

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import classNames from 'classnames/bind'
-
-import { useCalendarContext } from '../../contexts/calendar'
+import { calendarType } from '../../const/drag'
+import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { setCalendar } from '../../reducers/dragDate'
+import { resetScheduleDrag } from '../../reducers/dragSchedule'
+import { updateCalendar } from '../../reducers/calendar'
 import {
 	getMonthInfo,
 	getDateInfo,
@@ -9,6 +12,7 @@ import {
 	isSameDate,
 	calcScheduleDay,
 	isDateTimeIncludeScheduleItem,
+	getSaturdaysOfMonth
 } from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
@@ -16,18 +20,8 @@ import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
 
 import styles from './MonthlyCalendar.module.scss'
 import DragDate from '../Drag/DragDate'
-import { dragType } from '../../const/dragType'
-import DragSchedule from '../Drag/DragSchedule'
 const moment = require('moment')
 const cx = classNames.bind(styles)
-const _MS_PER_DAY = 1000 * 60 * 60 * 24
-const dateDiffInDays = (a, b) => {
-	// Discard the time and time-zone information.
-	const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())
-	const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
-
-	return Math.floor((utc2 - utc1) / _MS_PER_DAY)
-}
 
 // 달력 헤더
 const CalendarHeader = () => {
@@ -55,12 +49,6 @@ const CalendarCell = ({
 	isHoliday,
 	isDimmed,
 	scheduleList,
-	changeSchedule,
-	getDragType,
-	setDragDateStart,
-	setDragDateEnter,
-	resetDragDate,
-	setDragDateDrop,
 }) => {
 	const [moreList, setMoreList] = useState()
 	const { calendarStore } = useCalendarContext()
@@ -70,7 +58,6 @@ const CalendarCell = ({
 	const { year, month, date } = getDateInfo(dateTime)
 	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
 	const calendarList = calendarStore[dateInfo]
-	const type = getDragType()
 	const startAt = new Date(year, month, date)
 	const endAt = new Date(year, month, date)
 
@@ -102,71 +89,67 @@ const CalendarCell = ({
 	}
 
 	return (
-		<div className={cx('calendar_cell')} onClick={onCellClick}>
-			<DragDate
-				setDragDateStart={setDragDateStart}
-				setDragDateEnter={setDragDateEnter}
-				resetDragDate={resetDragDate}
-				setDragDateDrop={setDragDateDrop}
-				setDragScheduleDrop={changeSchedule}
-				scheduleEnterStyle={scheduleEnterStyle}
-				type={type}
-			>
-				<div className={cx('cell_header')}>
-					<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
-					{moreList && moreList.length > 0 && (
-						<button className={cx('more_button')} type={'button'} onClick={onMoreButtonClick}>
-							{moreList.length} more
-						</button>
-					)}
-					{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
-				</div>
+		<DragDate className={cx('calendar_cell')} onClick={onCellClick} date={moment(dateTime)}>
+			<div className={cx('cell_header')}>
+				<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
+				{moreList && moreList.length > 0 && (
+					<button className={cx('more_button')} type={'button'} onClick={onMoreButtonClick}>
+						{moreList.length} more
+					</button>
+				)}
+				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
 				{isEditorShown && (
 					<CalendarItemPopupEditor handleClose={handleEditorClose} startAt={startAt} endAt={endAt} />
 				)}
-			</DragDate>
-		</div>
+			</div>
+		</DragDate>
 	)
 }
 
 // 월 달력
 const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().month }) => {
 	const [scheduleList, setScheduleList] = useState([])
-	const [dragSchedule, setDragSchedule] = useState(-1)
-	const [dragDate, setDragDate] = useState({ firstDate: undefined, secondDate: undefined })
-	const [newScheduleRenderList, setNewScheduleRenderList] = useState()
 	const [calendarScheduleList, setCalendarScheduleList] = useState()
 	const [dateInfoList, setDateInfoList] = useState()
-	const { calendarStore } = useCalendarContext()
+	const { calendarStore, calendarDispatch } = useCalendarContext()
+	const [draggingRenderList, setDraggingRenderList] = useState([])
 	let currentMonthInfo = getMonthInfo({ year, month: month + 1 })
 	let weekCount = calcWeekCount({ year, month: month + 1 })
+	const { dragDateStore, dragDateDispatch } = useDragDateContext()
+	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
+
+	useEffect(() => {
+		if (dragScheduleStore.isResizing) {
+			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			resizingSchedule = {
+				...resizingSchedule,
+				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+			}
+			calendarDispatch(updateCalendar(resizingSchedule))
+		}
+	}, [dragScheduleStore.dragInfo.endAt])
+
+	useEffect(() => {
+		if (dragScheduleStore.isDropped) {
+			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			movedSchedule = {
+				...movedSchedule,
+				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
+				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+			}
+			calendarDispatch(updateCalendar(movedSchedule))
+			dragScheduleDispatch(resetScheduleDrag())
+		}
+	}, [dragScheduleStore.isDropped])
 
 	useEffect(() => {
 		setScheduleList(calendarStore.scheduleList)
 	}, [calendarStore.scheduleList])
 
-	const changeSchedule = (startAt) => {
-		if (dragSchedule < 0) return
-		const diffDays = dateDiffInDays(scheduleList[dragSchedule].startAt, scheduleList[dragSchedule].endAt)
-		const endAt = new Date(startAt)
-		endAt.setDate(startAt.getDate() + diffDays)
-		scheduleList[dragSchedule] = { ...scheduleList[dragSchedule], startAt: startAt, endAt: endAt }
-		setScheduleList([
-			...scheduleList.slice(0, dragSchedule),
-			{ ...scheduleList[dragSchedule] },
-			...scheduleList.slice(dragSchedule + 1),
-		])
-	}
+	useEffect(() => {
+		makeDraggingRenderList()
+	}, [dragDateStore.renderList])
 
-	const getDragType = () => {
-		if (dragSchedule >= 0) {
-			return dragType.SCHEDULE
-		} else if (dragDate.firstDate || dragDate.secondDate) {
-			return dragType.DATE
-		} else {
-			return undefined
-		}
-	}
 	// 현재 선택된 '달' 달력 정보 만들기
 	const makeDateInfoList = () => {
 		const newDateInfoList = new Array(weekCount).fill(null).map((_) => [])
@@ -189,60 +172,16 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		return newDateInfoList
 	}
 
-	const makeNewSchedule = (newDateInfoList) => {
-		let newScheduleStart = undefined
-		let newScheduleEnd = undefined
-		let tempScheduleRenderList = []
-		if (dragDate.firstDate && dragDate.secondDate) {
-			if (dragDate.firstDate < dragDate.secondDate) {
-				newScheduleStart = dragDate.firstDate
-				newScheduleEnd = dragDate.secondDate
-			} else {
-				newScheduleStart = dragDate.secondDate
-				newScheduleEnd = dragDate.firstDate
-			}
-		}
-
-		for (let week = 0; week < weekCount; week++) {
-			for (let day = 0; day < 7; day++) {
-				if (isSameDate(newDateInfoList[week][day].dateTime, newScheduleStart)) {
-					const time = newScheduleEnd - newScheduleStart
-					let period = Math.floor(time / 86400000 + 1)
-					while (period > 0) {
-						const top = `${(100 / weekCount) * week}%`
-						const left = `${14.29 * day}%`
-						let width
-						if (7 - day < period) {
-							width = `${14.29 * (7 - day)}%`
-							period = period - (7 - day)
-						} else {
-							width = `${period * 14.29}%`
-							period = 0
-						}
-						const height = `${600 / weekCount}px`
-						tempScheduleRenderList.push({ top, left, width, height })
-						week++
-						day = 0
-					}
-				}
-			}
-		}
-		setNewScheduleRenderList(tempScheduleRenderList)
-	}
-
 	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
 	const getNewScheduleList = (scheduleList, dateInfoList) =>
 		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
+			scheduleItem = { ...scheduleItem, index: scheduleIndex, scheduleStartAt: scheduleItem.startAt, scheduleEndAt: scheduleItem.endAt }
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
 			for (let i = 0; i < weekCount; i++) {
 				for (let j = 0; j < 7; j++) {
-					let day = j
-					let week = i
-
 					if (isDateTimeIncludeScheduleItem(dateInfoList[i][j].dateTime, scheduleItem)) {
 						// 전체 기간에서 이전달 달력에 그려지는 기간 빼기
-						period -= dateDiffInDays(scheduleItem.startAt, dateInfoList[i][j].dateTime)
 
 						// 일정을 넣을 수 있는 stack 값 찾기
 						let stack = 1
@@ -290,8 +229,8 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 									const width = `calc(${14.29 * (7 - j)}% - 20px)`
 									renderList.push(
 										Object.assign(
-											{ top, left, width, stack, scheduleIndex },
-											scheduleIndex === DragSchedule && { opacity: 0.5 },
+											{ top, left, width, stack },
+											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
 										),
 									)
 									period = period - (7 - j)
@@ -306,8 +245,8 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 									const width = `calc(${period * 14.29}% - 20px)`
 									renderList.push(
 										Object.assign(
-											{ top, left, width, stack, scheduleIndex },
-											scheduleIndex === dragSchedule && { opacity: 0.5 },
+											{ top, left, width, stack },
+											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
 										),
 									)
 									period = 0
@@ -315,11 +254,10 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							} else {
 								period = 0
 							}
-
 							i++
 							j = 0
 						}
-
+						renderList[renderList.length - 1] = { ...renderList[renderList.length - 1], isLast: true }
 						return {
 							...scheduleItem,
 							renderList,
@@ -333,13 +271,33 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	const ascendingScheduleList = (scheduleList) =>
 		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
 
+	const makeDraggingRenderList = () => {
+		let tempList = [];
+		const firstWeekOfMonth = moment().year(year).month(month).startOf('month').week()
+		dragDateStore.renderList.forEach(duration => {
+			const nthWeek = duration.startAt.week() - firstWeekOfMonth
+			const top = `${(100 / weekCount) * nthWeek}%`
+			const left = `${14.29 * duration.startAt.day()}%`
+			const width = `${14.29 * ((duration.endAt.diff(duration.startAt, 'days') + 1))}%`
+			const height = `${600 / weekCount}px`
+			tempList.push({ top, left, width, height })
+		})
+		setDraggingRenderList(tempList)
+	}
+
+	useEffect(() => {
+		const saturdayList = getSaturdaysOfMonth(year, month)
+		dragDateDispatch(setCalendar(calendarType.MONTH, saturdayList))
+		dragScheduleDispatch(setCalendar(calendarType.MONTH))
+	}, [year, month])
+
 	useEffect(() => {
 		const newDateInfoList = makeDateInfoList() // 달력정보 만들기
 		const newScheduleList = getNewScheduleList(scheduleList, newDateInfoList) // scheduleList 만들기
-		makeNewSchedule(newDateInfoList)
 		setDateInfoList(newDateInfoList)
 		setCalendarScheduleList(newScheduleList)
-	}, [scheduleList, dragSchedule, dragDate, year, month])
+	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
+
 
 	return (
 		<div className={cx('calendar_wrap')}>
@@ -360,18 +318,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 										isDimmed={dateInfoItem.dateTime.getMonth() !== month}
 										isHoliday={dateInfoItem.isHoliday}
 										scheduleList={dateInfoItem.scheduleList}
-										changeSchedule={() => changeSchedule(dateInfoItem.dateTime)}
-										getDragType={() => getDragType()}
-										setDragDateStart={() =>
-											setDragDate({ ...dragDate, firstDate: dateInfoItem.dateTime })
-										}
-										setDragDateEnter={() =>
-											setDragDate({ ...dragDate, secondDate: dateInfoItem.dateTime })
-										}
-										resetDragDate={() =>
-											setDragDate({ firstDate: undefined, secondDate: undefined })
-										}
-										setDragDateDrop={() => console.log(dragDate)}
 									/>
 								)
 							})}
@@ -381,7 +327,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 					{/* 일정 그리기  */}
 					{calendarScheduleList?.map((scheduleItem) => {
 						return scheduleItem?.renderList?.map((renderItem) => {
-							const { top, left, width, stack, opacity, scheduleIndex } = renderItem
+							const { top, left, width, stack, opacity, isLast } = renderItem
 
 							const startAt = getDateInfo(scheduleItem.startAt)
 							const endAt = getDateInfo(scheduleItem.endAt)
@@ -395,15 +341,14 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 											{...scheduleItem}
 											startAt={startAtString}
 											endAt={endAtString}
-											setDragSchedule={() => setDragSchedule(scheduleIndex)}
-											resetDragSchedule={() => setDragSchedule(-1)}
+											isLast={isLast}
 										/>
 									</div>
 								)
 							}
 						})
 					})}
-					{newScheduleRenderList?.map((renderItem) => {
+					{draggingRenderList?.map((renderItem) => {
 						const { top, left, width, height } = renderItem
 						return (
 							<div

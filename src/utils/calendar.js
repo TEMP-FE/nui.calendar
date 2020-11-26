@@ -1,4 +1,5 @@
 import { padStart } from './common'
+import moment from 'moment'
 
 export const dayOfWeekList = [
 	{
@@ -63,3 +64,15 @@ export const isDateTimeIncludeScheduleItem = (dateTime, scheduleItem) =>
 	dateTime.getTime() >= scheduleItem.startAt.getTime() && dateTime.getTime() <= scheduleItem.endAt.getTime()
 		? true
 		: false
+export const getSaturdaysOfMonth = (year, month) => {
+	let saturdayList = []
+	let saturday = moment().year(year).month(month).startOf('month').day("Saturday");
+	if (saturday.date() > 7) saturday.add(7, 'd');
+	let currentMonth = saturday.month();
+	while (currentMonth === saturday.month()) {
+		saturdayList.push(saturday.clone())
+		saturday.add(7, 'd');
+	}
+
+	return saturdayList
+}

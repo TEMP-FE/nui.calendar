@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { dragType } from '../../const/dragType'
-
-const DragDate = ({ setDragDateStart, setDragDateEnter, setDragDateDrop, setDragScheduleDrop, resetDragDate, type, scheduleEnterStyle, children }) => {
+import { startDrag, updateDrag, drop, resetDrag } from '../../reducers/dragDate'
+import { moveScheduleDrag, dropSchedule, updateScheduleDrag, resetScheduleDrag } from '../../reducers/dragSchedule'
+import { useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+const DragDate = ({ className, onClick, date, children }) => {
 	const [dragImg, setDragImg] = useState();
-	const [scheduleEnter, setScheduleEnter] = useState();
+	const [dragEnter, setDragEnter] = useState(false);
+	const { dragDateStore, dragDateDispatch } = useDragDateContext()
+	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
 	useEffect(() => {
 		// TODO 타입별로 다르게 구현
 		const img = new Image()
@@ -13,47 +16,48 @@ const DragDate = ({ setDragDateStart, setDragDateEnter, setDragDateDrop, setDrag
 
 	const handleDragStart = (e) => {
 		e.dataTransfer.setDragImage(dragImg, -10, -10)
-		setDragDateStart()
+		setDragEnter(true)
+		dragDateDispatch(startDrag(date))
 	}
 
 	const handleDragEnter = (e) => {
-		if (type === dragType.DATE) {
-			setDragDateEnter()
+		if (dragScheduleStore.isResizing) {
+			dragScheduleDispatch(updateScheduleDrag(date))
 		}
-		else if (type === dragType.SCHEDULE) {
-			setScheduleEnter(true)
+		else if (dragScheduleStore.isDragging) {
+			dragScheduleDispatch(moveScheduleDrag(date))
 		}
+		else if (!dragEnter) {
+			dragDateDispatch(updateDrag(date))
+		}
+		setDragEnter(true)
 	}
 
 	const handleDragLeave = (e) => {
-		if (type === dragType.SCHEDULE) {
-			setScheduleEnter(false)
-		}
+		setDragEnter(false)
 	}
 
 	const handleDrop = (e) => {
-		e.preventDefault();
-		if (type === dragType.DATE) {
-			setDragDateDrop()
+		if (dragScheduleStore.isResizing) {
+			dragScheduleDispatch(resetScheduleDrag())
 		}
-		else if (type === dragType.SCHEDULE) {
-			setDragScheduleDrop()
-			setScheduleEnter(false)
+		else if (dragScheduleStore.isDragging) {
+			dragScheduleDispatch(dropSchedule())
 		}
+		else {
+			dragDateDispatch(drop())
+		}
+		setDragEnter(false)
 	}
 
 	const handleDragEnd = () => {
-		if (type === dragType.DATE) {
-			resetDragDate()
-		}
+		dragDateDispatch(resetDrag())
 	}
 
 	const handleDragOver = (e) => {
 		e.stopPropagation();
 		e.preventDefault();
 	}
-
-	const style = Object.assign({ width: '100%', height: '100%' }, scheduleEnter && scheduleEnterStyle)
 
 	return (
 		<div
@@ -64,7 +68,8 @@ const DragDate = ({ setDragDateStart, setDragDateEnter, setDragDateDrop, setDrag
 			onDragOver={handleDragOver}
 			onDrop={handleDrop}
 			onDragEnd={handleDragEnd}
-			style={style}
+			className={className}
+			onClick={onClick}
 		>
 			{children}
 		</div>

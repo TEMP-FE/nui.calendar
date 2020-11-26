@@ -16,7 +16,7 @@ const Monthly = ({}) => {
 
 	const getThisMonth = () => {
 		setData({
-			month: getDateInfo().month + 1,
+			month: getDateInfo().month,
 			year: getDateInfo().year,
 		})
 	}

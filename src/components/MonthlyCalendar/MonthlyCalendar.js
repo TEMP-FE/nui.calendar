@@ -120,10 +120,10 @@ const CalendarCell = ({
 						</button>
 					)}
 					{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
-					{isEditorShown && (
-						<CalendarItemPopupEditor handleClose={handleEditorClose} startAt={startAt} endAt={endAt} />
-					)}
 				</div>
+				{isEditorShown && (
+					<CalendarItemPopupEditor handleClose={handleEditorClose} startAt={startAt} endAt={endAt} />
+				)}
 			</DragDate>
 		</div>
 	)
@@ -346,7 +346,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			<div className={cx('calendar_title')}>
 				<strong className={cx('calendar_info')}>{`${year} / ${month + 1}`}</strong>
 			</div>
-			<div className={cx('calendar_area')}>
+			<div id="calendar" className={cx('calendar_area')}>
 				<CalendarHeader />
 				<div className={cx('calendar_content')}>
 					{/* 달력 그리기 */}

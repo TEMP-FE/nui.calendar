@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { dragType } from '../../const/dragType'
 
-const DragDate = ({ setDragDateStart, setDragDateEnter, setDragDateDrop, setDragScheduleDrop, resetDragDate, type, scheduleEnterStyle, children }) => {
-	const [dragImg, setDragImg] = useState();
-	const [scheduleEnter, setScheduleEnter] = useState();
+const DragDate = ({
+	setDragDateStart,
+	setDragDateEnter,
+	setDragDateDrop,
+	setDragScheduleDrop,
+	resetDragDate,
+	type,
+	scheduleEnterStyle,
+	children,
+}) => {
+	const [dragImg, setDragImg] = useState()
+	const [scheduleEnter, setScheduleEnter] = useState()
 	useEffect(() => {
 		// TODO 타입별로 다르게 구현
 		const img = new Image()
@@ -19,8 +28,7 @@ const DragDate = ({ setDragDateStart, setDragDateEnter, setDragDateDrop, setDrag
 	const handleDragEnter = (e) => {
 		if (type === dragType.DATE) {
 			setDragDateEnter()
-		}
-		else if (type === dragType.SCHEDULE) {
+		} else if (type === dragType.SCHEDULE) {
 			setScheduleEnter(true)
 		}
 	}
@@ -32,11 +40,10 @@ const DragDate = ({ setDragDateStart, setDragDateEnter, setDragDateDrop, setDrag
 	}
 
 	const handleDrop = (e) => {
-		e.preventDefault();
+		e.preventDefault()
 		if (type === dragType.DATE) {
 			setDragDateDrop()
-		}
-		else if (type === dragType.SCHEDULE) {
+		} else if (type === dragType.SCHEDULE) {
 			setDragScheduleDrop()
 			setScheduleEnter(false)
 		}
@@ -49,11 +56,14 @@ const DragDate = ({ setDragDateStart, setDragDateEnter, setDragDateDrop, setDrag
 	}
 
 	const handleDragOver = (e) => {
-		e.stopPropagation();
-		e.preventDefault();
+		e.stopPropagation()
+		e.preventDefault()
 	}
 
-	const style = Object.assign({ width: '100%', height: '100%' }, scheduleEnter && scheduleEnterStyle)
+	const style = Object.assign(
+		{ position: 'relative', width: '100%', height: '100%' },
+		scheduleEnter && scheduleEnterStyle,
+	)
 
 	return (
 		<div

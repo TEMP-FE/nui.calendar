@@ -56,8 +56,8 @@ const DragDate = ({ className, onClick, date, children }) => {
 	}
 
 	const handleDragOver = (e) => {
-		e.stopPropagation();
-		e.preventDefault();
+		e.stopPropagation()
+		e.preventDefault()
 	}
 
 	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragEnter && !dragScheduleStore.isResizing

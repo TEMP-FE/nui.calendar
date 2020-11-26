@@ -50,6 +50,7 @@ const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, in
 			draggable={!isBlocked}
 			style={style}
 			onDragStart={handleDragStart}
+			onDragEnd={handleDragEnd}
 		>
 			{children}
 			<span

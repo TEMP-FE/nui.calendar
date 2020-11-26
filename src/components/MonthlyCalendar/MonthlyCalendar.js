@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import classNames from 'classnames/bind'
 import { calendarType } from '../../const/drag'
-import { useCalendarContext, useDragDateContext } from '../../contexts/calendar'
+import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
 import { setCalendar } from '../../reducers/dragDate'
+import { resetScheduleDrag } from '../../reducers/dragSchedule'
+import { updateCalendar } from '../../reducers/calendar'
 import {
 	getMonthInfo,
 	getDateInfo,
@@ -20,14 +22,6 @@ import styles from './MonthlyCalendar.module.scss'
 import DragDate from '../Drag/DragDate'
 const moment = require('moment')
 const cx = classNames.bind(styles)
-const _MS_PER_DAY = 1000 * 60 * 60 * 24
-const dateDiffInDays = (a, b) => {
-	// Discard the time and time-zone information.
-	const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())
-	const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
-
-	return Math.floor((utc2 - utc1) / _MS_PER_DAY)
-}
 
 // 달력 헤더
 const CalendarHeader = () => {
@@ -117,11 +111,37 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	const [scheduleList, setScheduleList] = useState([])
 	const [calendarScheduleList, setCalendarScheduleList] = useState()
 	const [dateInfoList, setDateInfoList] = useState()
-	const { calendarStore } = useCalendarContext()
+	const { calendarStore, calendarDispatch } = useCalendarContext()
 	const [draggingRenderList, setDraggingRenderList] = useState([])
 	let currentMonthInfo = getMonthInfo({ year, month: month + 1 })
 	let weekCount = calcWeekCount({ year, month: month + 1 })
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
+	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
+
+	useEffect(() => {
+		if (dragScheduleStore.isResizing) {
+			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			resizingSchedule = {
+				...resizingSchedule,
+				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+			}
+			calendarDispatch(updateCalendar(resizingSchedule))
+		}
+	}, [dragScheduleStore.dragInfo.endAt])
+
+	useEffect(() => {
+		if (dragScheduleStore.isDropped) {
+			console.log(dragScheduleStore)
+			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			movedSchedule = {
+				...movedSchedule,
+				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
+				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+			}
+			calendarDispatch(updateCalendar(movedSchedule))
+			dragScheduleDispatch(resetScheduleDrag())
+		}
+	}, [dragScheduleStore.isDropped])
 
 	useEffect(() => {
 		setScheduleList(calendarStore.scheduleList)
@@ -156,16 +176,13 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
 	const getNewScheduleList = (scheduleList, dateInfoList) =>
 		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
+			scheduleItem = { ...scheduleItem, index: scheduleIndex }
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
 			for (let i = 0; i < weekCount; i++) {
 				for (let j = 0; j < 7; j++) {
-					let day = j
-					let week = i
-
 					if (isDateTimeIncludeScheduleItem(dateInfoList[i][j].dateTime, scheduleItem)) {
 						// 전체 기간에서 이전달 달력에 그려지는 기간 빼기
-						period -= dateDiffInDays(scheduleItem.startAt, dateInfoList[i][j].dateTime)
 
 						// 일정을 넣을 수 있는 stack 값 찾기
 						let stack = 1
@@ -212,12 +229,11 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 
 									const width = `calc(${14.29 * (7 - j)}% - 20px)`
 									renderList.push(
-										{ top, left, width, stack, scheduleIndex }
+										Object.assign(
+											{ top, left, width, stack, scheduleIndex },
+											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
+										),
 									)
-									// Object.assign(
-									// 	{ top, left, width, stack, scheduleIndex },
-									// 	scheduleIndex === DragSchedule && { opacity: 0.5 },
-									// ),
 									period = period - (7 - j)
 								} else {
 									// 스택 업데이트
@@ -229,18 +245,16 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 
 									const width = `calc(${period * 14.29}% - 20px)`
 									renderList.push(
-										{ top, left, width, stack, scheduleIndex }
+										Object.assign(
+											{ top, left, width, stack, scheduleIndex },
+											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
+										),
 									)
-									// Object.assign(
-									// 	{ top, left, width, stack, scheduleIndex },
-									// 	scheduleIndex === dragSchedule && { opacity: 0.5 },
-									// ),
 									period = 0
 								}
 							} else {
 								period = 0
 							}
-
 							i++
 							j = 0
 						}
@@ -275,11 +289,16 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	useEffect(() => {
 		const saturdayList = getSaturdaysOfMonth(year, month)
 		dragDateDispatch(setCalendar(calendarType.MONTH, saturdayList))
+		dragScheduleDispatch(setCalendar(calendarType.MONTH))
+	}, [year, month])
+
+	useEffect(() => {
+		console.log(scheduleList)
 		const newDateInfoList = makeDateInfoList() // 달력정보 만들기
-		// const newScheduleList = getNewScheduleList(scheduleList, newDateInfoList) // scheduleList 만들기
+		const newScheduleList = getNewScheduleList(scheduleList, newDateInfoList) // scheduleList 만들기
 		setDateInfoList(newDateInfoList)
-		// setCalendarScheduleList(newScheduleList)
-	}, [scheduleList, year, month])
+		setCalendarScheduleList(newScheduleList)
+	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
 
 
 	return (
@@ -343,7 +362,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 									position: 'absolute',
 									zIndex: '-1',
 								}}
-								key={top}
 							/>
 						)
 					})}

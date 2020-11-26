@@ -46,9 +46,11 @@ const reducer = (state, actions) => {
 				for (let i = 0; i < length; ++i) {
 					const prevSunday = i > 0 ? saturdayList[i - 1].clone().add(1, 'd') : undefined
 					const saturday = saturdayList[i]
+					let fullWeek = true
 					if (saturdayForFirst < 0 && firstDay.isSameOrBefore(saturday)) {
 						saturdayForFirst = i
 						tempRenderList.push({ startAt: firstDay, endAt: saturday })
+						fullWeek = false
 					}
 
 					if (lastDay.isSameOrBefore(saturday)) {
@@ -60,7 +62,7 @@ const reducer = (state, actions) => {
 						}
 						break;
 					}
-					else if (i > 0) {
+					else if (i > 0 && fullWeek) {
 						tempRenderList.push({ startAt: prevSunday, endAt: saturday })
 						if (i === length - 1) {
 							const lastSunday = saturday.clone().add(1, 'd')

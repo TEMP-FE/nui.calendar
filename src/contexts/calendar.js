@@ -14,7 +14,7 @@ const initialState = {
 			calendarId: 1,
 			title: '테스트',
 			startAt: new Date('2020-11-23 07:30'),
-			endAt: new Date('2020-11-23 09:30'),
+			endAt: new Date('2020-11-24 09:30'),
 			location: '',
 			category: '',
 			isAllDay: true,

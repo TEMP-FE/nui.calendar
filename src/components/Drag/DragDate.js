@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { startDrag, updateDrag, drop, resetDrag } from '../../reducers/dragDate'
 import { moveScheduleDrag, dropSchedule, updateScheduleDrag, resetScheduleDrag } from '../../reducers/dragSchedule'
 import { useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { calendarType } from '../../const/drag'
 const DragDate = ({ className, onClick, date, children }) => {
 	const [dragImg, setDragImg] = useState();
 	const [dragEnter, setDragEnter] = useState(false);
@@ -59,6 +60,8 @@ const DragDate = ({ className, onClick, date, children }) => {
 		e.preventDefault();
 	}
 
+	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragEnter && !dragScheduleStore.isResizing
+
 	return (
 		<div
 			draggable
@@ -70,6 +73,7 @@ const DragDate = ({ className, onClick, date, children }) => {
 			onDragEnd={handleDragEnd}
 			className={className}
 			onClick={onClick}
+			style={{ backgroundColor: isScheduleMovingIn && 'rgba(255,0,0,0.1)' }}
 		>
 			{children}
 		</div>

@@ -38,39 +38,37 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	}
 }
 
-const DayType = ({ isShown, handleIsShown, setDragSchedule, resetDragSchedule, style, ...item }) => {
-	const { id, title, startAt, endAt, category, isBlocked } = item
+const DayType = ({ isShown, handleIsShown, style, ...item }) => {
+	const { id, title, startAt, endAt, category, isBlocked, index, scheduleStartAt, scheduleEndAt } = item
 
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
-		<div className={cx('component')} draggable={!isBlocked} style={style} onClick={handleItemClick}>
-			<DragSchedule isBlocked={isBlocked} resetDragSchedule={resetDragSchedule} setDragSchedule={setDragSchedule}>
-				<button
-					type="button"
-					className={cx('item', 'type-day')}
-					style={{ backgroundColor: getCategoryColor(category) }}
-					aria-haspopup="dialog"
-					aria-controls={id}
-					aria-expanded={isShown}
-					onClick={handleIsShown}
-				>
-					<span className="blind">{category}</span>
-					<span className="blind">
-						<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
-						<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
-					</span>
-					<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
-					<span className={cx('cell')}>
-						<span className={cx('fixed')}>
-							<span className={cx('cell', 'ellipsis')}>
-								<span className={cx('title')}>{title}</span>
-							</span>
+		<DragSchedule className={cx('component')} isBlocked={isBlocked} style={style} index={index} startAt={moment(scheduleStartAt)} endAt={moment(scheduleEndAt)} onClick={handleItemClick}>
+			<button
+				type="button"
+				className={cx('item', 'type-day')}
+				style={{ backgroundColor: getCategoryColor(category) }}
+				aria-haspopup="dialog"
+				aria-controls={id}
+				aria-expanded={isShown}
+				onClick={handleIsShown}
+			>
+				<span className="blind">{category}</span>
+				<span className="blind">
+					<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
+					<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
+				</span>
+				<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
+				<span className={cx('cell')}>
+					<span className={cx('fixed')}>
+						<span className={cx('cell', 'ellipsis')}>
+							<span className={cx('title')}>{title}</span>
 						</span>
 					</span>
-				</button>
-			</DragSchedule>
-		</div>
+				</span>
+			</button>
+		</DragSchedule>
 	)
 }
 

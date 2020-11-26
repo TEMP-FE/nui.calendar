@@ -5,8 +5,11 @@ import classNames from 'classnames/bind'
 import CalendarItem from '../CalendarItem/CalendarItem'
 import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
-import { dragType } from '../../const/dragType'
-import { useCalendarContext } from '../../contexts/calendar'
+import { calendarType } from '../../const/drag'
+import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { setCalendar } from '../../reducers/dragDate'
+import { resetScheduleDrag } from '../../reducers/dragSchedule'
+import { updateCalendar } from '../../reducers/calendar'
 
 const cx = classNames.bind(styles)
 const moment = require('moment')
@@ -18,29 +21,18 @@ const date = curDay.getDate()
 const dayOfWeek = curDay.getDay()
 
 const WeeklyCalendar = () => {
-	const { calendarStore } = useCalendarContext()
+	const { dragDateDispatch, dragDateStore } = useDragDateContext()
+	const { dragScheduleDispatch, dragScheduleStore } = useDragScheduleContext()
+	const { calendarStore, calendarDispatch } = useCalendarContext()
 	const [calendarItemList, setCalendarItemList] = useState([])
 
 	const [week, setWeek] = useState([])
 	const dayOfWeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 	const timeLine = new Array(24)
-	const [dragSchedule, setDragSchedule] = useState(-1)
-	const [dragDate, setDragDate] = useState({ firstDate: undefined, secondDate: undefined })
-	const [newScheduleRenderList, setNewScheduleRenderList] = useState()
-	const [currentDragType, setCurrentDragType] = useState(undefined)
+	const [draggingRenderList, setDraggingRenderList] = useState()
 
 	for (var i = 0; i < timeLine.length; i++) {
 		timeLine[i] = i
-	}
-
-	const getDragType = () => {
-		if (dragSchedule >= 0) {
-			return dragType.SCHEDULE
-		} else if (dragDate.firstDate) {
-			return dragType.DATE
-		} else {
-			return undefined
-		}
 	}
 
 	const getThisWeek = () => {
@@ -74,31 +66,37 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		getThisWeek()
+		dragDateDispatch(setCalendar(calendarType.WEEK))
+		dragScheduleDispatch(setCalendar(calendarType.WEEK))
 	}, [])
 
 	useEffect(() => {
-		setCurrentDragType(getDragType())
-		if (dragDate.firstDate && dragDate.secondDate) {
-			separateDraggedDate()
-		} else if (!dragDate.firstDate && !dragDate.secondDate) {
-			setNewScheduleRenderList([])
+		setDraggingRenderList(dragDateStore.renderList)
+	}, [dragDateStore.renderList])
+
+	useEffect(() => {
+		if (dragScheduleStore.isResizing) {
+			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			resizingSchedule = {
+				...resizingSchedule,
+				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+			}
+			calendarDispatch(updateCalendar(resizingSchedule))
 		}
-	}, [dragDate, dragSchedule])
+	}, [dragScheduleStore.dragInfo.endAt])
 
-	const getDiffMin = (start, end) => (end - start) / 60000
-
-	const changeSchedule = (startAt) => {
-		if (dragSchedule < 0) return
-		const diffMin = getDiffMin(calendarItemList[dragSchedule].startAt, calendarItemList[dragSchedule].endAt)
-		const endAt = new Date(startAt)
-		endAt.setMinutes(startAt.getMinutes() + diffMin)
-		calendarItemList[dragSchedule] = { ...calendarItemList[dragSchedule], startAt: startAt, endAt: endAt }
-		setCalendarItemList([
-			...calendarItemList.slice(0, dragSchedule),
-			{ ...calendarItemList[dragSchedule] },
-			...calendarItemList.slice(dragSchedule + 1),
-		])
-	}
+	useEffect(() => {
+		if (dragScheduleStore.isDropped) {
+			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			movedSchedule = {
+				...movedSchedule,
+				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
+				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+			}
+			calendarDispatch(updateCalendar(movedSchedule))
+			dragScheduleDispatch(resetScheduleDrag())
+		}
+	}, [dragScheduleStore.isDropped])
 
 	const calcStartPoint = (startDate) => {
 		return Math.round((new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30))
@@ -119,8 +117,9 @@ const WeeklyCalendar = () => {
 	}
 
 	useEffect(() => {
-		const filteredList = calendarStore.scheduleList.map((item) => {
-			const filteredItem = checkItemDateEqual(item)
+		const filteredList = calendarStore.scheduleList.map((item, index) => {
+			const itemWithIndex = { ...item, index: index, scheduleStartAt: item.startAt, scheduleEndAt: item.endAt }
+			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem
 		})
@@ -146,40 +145,6 @@ const WeeklyCalendar = () => {
 		const endItem = { ...Item, startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime }
 
 		return [startItem, endItem]
-	}
-
-	const separateDraggedDate = () => {
-		const startAt =
-			dragDate.firstDate.startAt < dragDate.secondDate.startAt
-				? dragDate.firstDate.startAt
-				: dragDate.secondDate.startAt
-		const endAt =
-			dragDate.firstDate.endAt > dragDate.secondDate.endAt ? dragDate.firstDate.endAt : dragDate.secondDate.endAt
-		const endTime = '24:00'
-		const startTime = '00:00'
-		const tempList = []
-		const dayDiff = endAt.getDay() - startAt.getDay()
-		console.log(dayDiff)
-		if (dayDiff > 0) {
-			tempList.push({ startAt: startAt, endAt: new Date(moment(startAt).format('YYYY-MM-DD') + ' ' + endTime) })
-			for (let i = 1; i < dayDiff; ++i) {
-				const tempStart = new Date(moment(startAt).add(i, 'd').format('YYYY-MM-DD') + ' ' + startTime)
-				const tempEnd = new Date(moment(startAt).add(i, 'd').format('YYYY-MM-DD') + ' ' + endTime)
-				tempList.push({ startAt: tempStart, endAt: tempEnd })
-			}
-			tempList.push({ startAt: new Date(moment(endAt).format('YYYY-MM-DD') + ' ' + startTime), endAt: endAt })
-		} else {
-			tempList.push({ startAt: startAt, endAt: endAt })
-		}
-
-		setNewScheduleRenderList(tempList)
-	}
-
-	const getNewDateWithMinutes = (date, hour, minutes) => {
-		const startAt = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minutes)
-		const endAt = new Date(startAt)
-		endAt.setMinutes(endAt.getMinutes() + 30)
-		return { startAt, endAt }
 	}
 
 	return (
@@ -219,58 +184,12 @@ const WeeklyCalendar = () => {
 								<div className={cx('view_cell')} key={index} onClick={() => log(info)}>
 									{timeLine.map((time) => (
 										<div className={cx('detail_wrap')} key={time}>
-											<DragDate
-												setDragDateStart={() =>
-													setDragDate({
-														...dragDate,
-														firstDate: getNewDateWithMinutes(info, time, 0),
-													})
-												}
-												setDragDateEnter={() =>
-													setDragDate({
-														...dragDate,
-														secondDate: getNewDateWithMinutes(info, time, 0),
-													})
-												}
-												resetDragDate={() =>
-													setDragDate({ firstDate: undefined, secondDate: undefined })
-												}
-												setDragDateDrop={() => console.log(dragDate)}
-												setDragScheduleDrop={() =>
-													changeSchedule(getNewDateWithMinutes(info, time, 30))
-												}
-												type={currentDragType}
-											>
-												<div className={cx('detail_cell')} data-value="0"></div>
-											</DragDate>
-											<DragDate
-												setDragDateStart={() =>
-													setDragDate({
-														...dragDate,
-														firstDate: getNewDateWithMinutes(info, time, 30),
-													})
-												}
-												setDragDateEnter={() =>
-													setDragDate({
-														...dragDate,
-														secondDate: getNewDateWithMinutes(info, time, 30),
-													})
-												}
-												resetDragDate={() =>
-													setDragDate({ firstDate: undefined, secondDate: undefined })
-												}
-												setDragDateDrop={() => console.log(dragDate)}
-												setDragScheduleDrop={() =>
-													changeSchedule(getNewDateWithMinutes(info, time, 30))
-												}
-												type={currentDragType}
-											>
-												<div className={cx('detail_cell')} data-value="30"></div>
-											</DragDate>
+											<DragDate className={cx('detail_cell')} date={moment(info).hour(time)} />
+											<DragDate className={cx('detail_cell')} date={moment(info).hour(time).minute(30)} />
 										</div>
 									))}
 									{calendarItemList.map(
-										(calendarItem, index) =>
+										(calendarItem) =>
 											info.getDate() === new Date(calendarItem.startAt).getDate() && (
 												<CalendarItem
 													{...calendarItem}
@@ -283,22 +202,20 @@ const WeeklyCalendar = () => {
 															calendarItem.endAt,
 														),
 													}}
-													setDragSchedule={() => setDragSchedule(index)}
-													resetDragSchedule={() => setDragSchedule(-1)}
 												/>
 											),
 									)}
-									{newScheduleRenderList?.map(
+									{draggingRenderList?.map(
 										(item) =>
-											item.startAt.getDate() === info.getDate() && (
+											item.startAt.toDate().getDate() === info.getDate() && (
 												<div
 													style={{
 														position: 'absolute',
-														top: calcStartPoint(item.startAt),
+														top: calcStartPoint(item.startAt.toDate()),
 														left: '0',
 														right: '5px',
-														height: calcCalendarItemHeight(item.startAt, item.endAt),
-														backgroundColor: 'orange',
+														height: calcCalendarItemHeight(item.startAt.toDate(), item.endAt.toDate()),
+														backgroundColor: 'rgba(255,0,0,0.1)',
 														zIndex: '-5',
 													}}
 												/>

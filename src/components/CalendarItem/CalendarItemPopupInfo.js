@@ -18,7 +18,7 @@ const cx = classNames.bind(styles)
 const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
 	const { calendarDispatch } = useCalendarContext()
 
-	const { title, startAt, endAt, location, category, isAllday, isPrivate } = item
+	const { title, startAt, endAt, location, category, isAllday, isBlocked, isPrivate } = item
 
 	const startDateAt = moment(startAt).format('MM-DD')
 	const endDateAt = moment(endAt).format('MM-DD')
@@ -67,11 +67,13 @@ const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
 					</div>
 				</dl>
 				<div className={cx('area-button')}>
-					<div className={cx('cell')}>
-						<button type="button" className={cx('button')} onClick={onEdit}>
-							Edit
-						</button>
-					</div>
+					{!isBlocked && (
+						<div className={cx('cell')}>
+							<button type="button" className={cx('button')} onClick={onEdit}>
+								Edit
+							</button>
+						</div>
+					)}
 					<div className={cx('cell')}>
 						<button type="button" className={cx('button')} onClick={onDelete}>
 							Delete

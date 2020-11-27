@@ -18,18 +18,10 @@ const cx = classNames.bind(styles)
 const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
 	const { calendarDispatch } = useCalendarContext()
 
-	const {
-		title,
-		dateInfo,
-		dateRelative,
-		location,
-		category,
-		isPrivate,
-		// isRepeatable = false,
-	} = item
+	const { title, startAt, endAt, location, category, isPrivate } = item
 
-	const startDateAt = moment(dateInfo).format('MM-DD')
-	const endDateAt = moment(dateInfo).add(dateRelative, 'days').format('MM-DD')
+	const startDateAt = moment(startAt).format('MM-DD')
+	const endDateAt = moment(endAt).format('MM-DD')
 
 	const onEdit = () => {
 		handleEdit()

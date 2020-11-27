@@ -7,7 +7,7 @@ const CalendarApp = () => {
 	return (
 		<>
 			<WeeklyCalendar />
-			{/* <Monthly /> */}
+			<Monthly />
 		</>
 	)
 }

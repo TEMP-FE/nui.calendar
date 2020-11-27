@@ -18,10 +18,12 @@ const cx = classNames.bind(styles)
 const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
 	const { calendarDispatch } = useCalendarContext()
 
-	const { title, startAt, endAt, location, category, isPrivate } = item
+	const { title, startAt, endAt, location, category, isAllday, isPrivate } = item
 
 	const startDateAt = moment(startAt).format('MM-DD')
 	const endDateAt = moment(endAt).format('MM-DD')
+	const startTimeAt = moment(startAt).format('h:mm')
+	const endTimeAt = moment(endAt).format('h:mm')
 
 	const onEdit = () => {
 		handleEdit()
@@ -38,7 +40,7 @@ const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
 			<div className={cx('component')}>
 				<strong className={cx('title')}>{title}</strong>
 				<div className={cx('period')}>
-					{startDateAt} ~ {endDateAt}
+					{isAllday ? `${startDateAt} ~ ${endDateAt}` : `${startTimeAt} ~ ${endTimeAt}`}
 				</div>
 				<dl className={cx('list-info')}>
 					{location && (

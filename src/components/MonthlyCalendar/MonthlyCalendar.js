@@ -12,7 +12,7 @@ import {
 	isSameDate,
 	calcScheduleDay,
 	isDateTimeIncludeScheduleItem,
-	getSaturdaysOfMonth
+	getSaturdaysOfMonth,
 } from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
@@ -44,12 +44,7 @@ const CalendarHeader = () => {
 }
 
 // 달력 셀
-const CalendarCell = ({
-	dateTime,
-	isHoliday,
-	isDimmed,
-	scheduleList,
-}) => {
+const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const [moreList, setMoreList] = useState()
 	const { calendarStore } = useCalendarContext()
 	const [isEditorShown, setIsEditorShown] = useState(false)
@@ -123,7 +118,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
 		}
@@ -135,7 +130,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			movedSchedule = {
 				...movedSchedule,
 				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -175,7 +170,12 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
 	const getNewScheduleList = (scheduleList, dateInfoList) =>
 		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
-			scheduleItem = { ...scheduleItem, index: scheduleIndex, scheduleStartAt: scheduleItem.startAt, scheduleEndAt: scheduleItem.endAt }
+			scheduleItem = {
+				...scheduleItem,
+				index: scheduleIndex,
+				scheduleStartAt: scheduleItem.startAt,
+				scheduleEndAt: scheduleItem.endAt,
+			}
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
 			for (let i = 0; i < weekCount; i++) {
@@ -268,17 +268,20 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		})
 
 	// 먼저 시작하는 일정 순서로 정렬
-	const ascendingScheduleList = (scheduleList) =>
-		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
+	const ascendingScheduleList = (scheduleList) => {
+		scheduleList.forEach((a) => console.log(a))
+
+		return scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
+	}
 
 	const makeDraggingRenderList = () => {
-		let tempList = [];
+		let tempList = []
 		const firstWeekOfMonth = moment().year(year).month(month).startOf('month').week()
-		dragDateStore.renderList.forEach(duration => {
+		dragDateStore.renderList.forEach((duration) => {
 			const nthWeek = duration.startAt.week() - firstWeekOfMonth
 			const top = `${(100 / weekCount) * nthWeek}%`
 			const left = `${14.29 * duration.startAt.day()}%`
-			const width = `${14.29 * ((duration.endAt.diff(duration.startAt, 'days') + 1))}%`
+			const width = `${14.29 * (duration.endAt.diff(duration.startAt, 'days') + 1)}%`
 			const height = `${600 / weekCount}px`
 			tempList.push({ top, left, width, height })
 		})
@@ -297,7 +300,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		setDateInfoList(newDateInfoList)
 		setCalendarScheduleList(newScheduleList)
 	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
-
 
 	return (
 		<div className={cx('calendar_wrap')}>
@@ -329,20 +331,10 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 						return scheduleItem?.renderList?.map((renderItem) => {
 							const { top, left, width, stack, opacity, isLast } = renderItem
 
-							const startAt = getDateInfo(scheduleItem.startAt)
-							const endAt = getDateInfo(scheduleItem.endAt)
-							const startAtString = `${startAt.year}/${startAt.month}/${startAt.date}`
-							const endAtString = `${endAt.year}/${endAt.month}/${endAt.date}`
-
 							if (stack < 4) {
 								return (
 									<div className={cx('schedule_item')} style={{ top, left, width, opacity }}>
-										<CalendarItem
-											{...scheduleItem}
-											startAt={startAtString}
-											endAt={endAtString}
-											isLast={isLast}
-										/>
+										<CalendarItem {...scheduleItem} isLast={isLast} />
 									</div>
 								)
 							}

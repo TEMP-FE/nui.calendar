@@ -6,7 +6,7 @@ import WeeklyCalendar from '../components/WeeklyCalendar/WeeklyCalendar'
 const CalendarApp = () => {
 	return (
 		<>
-			<WeeklyCalendar />
+			{/* <WeeklyCalendar /> */}
 			<Monthly />
 		</>
 	)

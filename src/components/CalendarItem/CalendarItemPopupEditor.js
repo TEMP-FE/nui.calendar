@@ -13,7 +13,7 @@ import useInput from './useInput'
 import useToggle from './useToggle'
 
 import styles from './CalendarItemPopupEditor.module.scss'
-import { parseDateToString } from '../../utils/calendar'
+import { parseDateToString, parseDateToTimeString } from '../../utils/calendar'
 import { getCategoryList } from './commonState'
 
 const cx = classNames.bind(styles)
@@ -37,10 +37,19 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 	const isNewItem = !!!item.calendarId
 
 	const handleInputDate = (e) => {
-		const year = parseInt(moment(e.target.value).format('YYYY'))
-		const month = parseInt(moment(e.target.value).format('MM')) - 1
-		const date = parseInt(moment(e.target.value).format('DD'))
-		return new Date(year, month, date)
+		const { type, value } = e.target
+
+		if (type === 'time') {
+			const [hours, minutes] = value.split(':')
+			const formattedDate = new Date(startAtState)
+
+			formattedDate.setHours(hours)
+			formattedDate.setMinutes(minutes)
+
+			return formattedDate
+		}
+
+		return new Date(value)
 	}
 
 	const [titleState, handleTitleChange] = useInput({ initialValue: title })
@@ -127,9 +136,19 @@ const CalendarItemPopupEditor = ({ id, handleClose, ...item }) => {
 						</div>
 					) : (
 						<div className={cx('row-info')}>
-							<InputDate id="time-start" value="00 00:00" handler={() => {}} typeTime />
+							<InputDate
+								id="time-start"
+								value={parseDateToTimeString(startAtState)}
+								handler={handleStartDateAtChange}
+								typeTime
+							/>
 							<span className={cx('delimiter')}>~</span>
-							<InputDate id="time-end" value="00 00:00" handler={() => {}} typeTime />
+							<InputDate
+								id="time-end"
+								value={parseDateToTimeString(endAtState)}
+								handler={handleEndDateAtChange}
+								typeTime
+							/>
 						</div>
 					)}
 					<div className={cx('area-button')}>

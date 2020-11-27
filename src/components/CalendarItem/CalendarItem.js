@@ -44,7 +44,16 @@ const DayType = ({ isShown, handleIsShown, style, isLast, ...item }) => {
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
-		<DragSchedule className={cx('component')} isBlocked={isBlocked} style={style} index={index} startAt={moment(scheduleStartAt)} endAt={moment(scheduleEndAt)} isLast={isLast} onClick={handleItemClick}>
+		<DragSchedule
+			className={cx('component')}
+			isBlocked={isBlocked}
+			style={style}
+			index={index}
+			startAt={moment(scheduleStartAt)}
+			endAt={moment(scheduleEndAt)}
+			isLast={isLast}
+			onClick={handleItemClick}
+		>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}
@@ -101,8 +110,8 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 					</span>
 				</span>
 				<span className={cx('cell', 'type-period')}>
-					<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
-					<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
+					<span className={cx('period')}>{moment(startAt).format('h:mm')}</span>
+					<span className={cx('period')}>{moment(endAt).format('h:mm')}</span>
 				</span>
 				<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
 				<span className={cx('cell')}>

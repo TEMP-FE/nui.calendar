@@ -8,7 +8,7 @@ import ButtonArea from '../ButtonArea/ButtonArea'
 
 const cx = classNames.bind(styles)
 
-const Monthly = ({}) => {
+const Monthly = ({ style }) => {
 	const [monthlyData, setData] = useState({
 		month: '',
 		year: '',
@@ -54,7 +54,9 @@ const Monthly = ({}) => {
 			{monthlyData.year && monthlyData.month && (
 				<>
 					<ButtonArea getThis={getThisMonth} getChange={changeMonth} />
-					<MonthlyCalendar month={monthlyData.month} year={monthlyData.year} />
+					<div style={style}>
+						<MonthlyCalendar month={monthlyData.month} year={monthlyData.year} />
+					</div>
 				</>
 			)}
 		</>

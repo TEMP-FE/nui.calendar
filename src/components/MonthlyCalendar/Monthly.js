@@ -22,27 +22,14 @@ const Monthly = ({}) => {
 	}
 
 	const changeMonth = (state) => {
-		if (state) {
-			monthlyData.month === 11
-				? setData({
-						month: 0,
-						year: monthlyData.year + 1,
-				  })
-				: setData({
-						...monthlyData,
-						month: monthlyData.month + 1,
-				  })
-		} else {
-			monthlyData.month === 0
-				? setData({
-						month: 11,
-						year: monthlyData.year - 1,
-				  })
-				: setData({
-						...monthlyData,
-						month: monthlyData.month - 1,
-				  })
-		}
+		let count = state ? 1 : -1
+		const { year, month } = monthlyData
+		const nextMonthlyData = getDateInfo(new Date(year, month + count))
+
+		setData({
+			year: nextMonthlyData.year,
+			month: nextMonthlyData.month,
+		})
 	}
 
 	useEffect(() => {

@@ -38,7 +38,7 @@ const Monthly = ({}) => {
 
 	return (
 		<>
-			{monthlyData.year && monthlyData.month && (
+			{monthlyData.year !== '' && monthlyData.month !== '' && (
 				<>
 					<ButtonArea getThis={getThisMonth} getChange={changeMonth} />
 					<MonthlyCalendar month={monthlyData.month} year={monthlyData.year} />

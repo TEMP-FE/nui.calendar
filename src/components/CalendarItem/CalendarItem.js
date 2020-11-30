@@ -14,7 +14,7 @@ import moment from 'moment'
 
 const cx = classNames.bind(styles)
 
-const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
+const getIcon = ({ hasLocation, isBlocked, isRepeatable }) => {
 	// 반복 일정
 	if (isRepeatable) {
 		return <IconRepeat width={10} height={10} />
@@ -28,13 +28,6 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	// 위치 지정 일정
 	if (hasLocation) {
 		return <IconLocation width={10} height={10} />
-	}
-
-	// if 개인 일정 else 공개 일정
-	if (isPrivate === 'private') {
-		return <IconLock width={10} height={10} />
-	} else {
-		return <IconPerson width={10} height={10} />
 	}
 }
 

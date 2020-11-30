@@ -1,32 +1,79 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import classNames from 'classnames/bind'
-import { getCategoryColor } from './commonState'
-import { deleteCalendar } from '../../reducers/calendar'
+import { getCategoryList } from './commonState'
+import { createCalendar, deleteCalendar, updateCalendar } from '../../reducers/calendar'
 
 import CalendarItemPopup from './CalendarItemPopup'
 import { useCalendarContext } from '../../contexts/calendar'
 import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
-import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
 
 import styles from './CalendarItemPopupInfo.module.scss'
-import moment from 'moment'
+import useInput from './useInput'
+import useToggle from './useToggle'
+import { InputCheckbox, InputDate, InputSelector, InputText } from './Input'
+import { ReactComponent as IconLockOpen } from '../../assets/images/svg/icon-lock-open.svg'
+import { parseDateToString, parseDateToTimeString } from '../../utils/calendar'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
+const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 	const { calendarDispatch } = useCalendarContext()
 
-	const { title, startAt, endAt, location, category, isAllday, isBlocked, isPrivate } = item
+	const {
+		calendarId = Math.random(),
+		title = '',
+		startAt = new Date(),
+		endAt = new Date(),
+		location = '',
+		category = 'A',
+		isAllDay = false,
+		isBlocked = false,
+		// isRepeatable = false,
+	} = item
 
-	const startDateAt = moment(startAt).format('MM-DD')
-	const endDateAt = moment(endAt).format('MM-DD')
-	const startTimeAt = moment(startAt).format('h:mm')
-	const endTimeAt = moment(endAt).format('h:mm')
+	const isNewItem = !!!item.calendarId
 
-	const onEdit = () => {
-		handleEdit()
+	const handleInputDate = (e) => {
+		const { type, value } = e.target
+
+		if (type === 'time') {
+			const [hours, minutes] = value.split(':')
+			const formattedDate = new Date(startAtState)
+
+			formattedDate.setHours(hours)
+			formattedDate.setMinutes(minutes)
+
+			return formattedDate
+		}
+
+		return new Date(value)
+	}
+
+	const [titleState, handleTitleChange] = useInput({ initialValue: title })
+	const [startAtState, handleStartDateAtChange] = useInput({ initialValue: startAt, handleChange: handleInputDate })
+	const [endAtState, handleEndDateAtChange] = useInput({ initialValue: endAt, handleChange: handleInputDate })
+	const [locationState, handleLocationChange] = useInput({ initialValue: location })
+	const [categoryState] = useInput({ initialValue: category })
+	const [isAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
+	const [isBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
+
+	const getActionCreator = isNewItem ? createCalendar : updateCalendar
+
+	const createNewCalendarItem = () => {
+		const action = getActionCreator({
+			calendarId,
+			title: titleState,
+			startAt: startAtState,
+			endAt: endAtState,
+			location: locationState,
+			category: categoryState,
+			isAllDay: isAllDayState,
+			isBlocked: isBlockedState,
+		})
+
+		calendarDispatch(action)
 	}
 
 	const onDelete = () => {
@@ -35,45 +82,102 @@ const CalendarItemPopupInfo = ({ id, handleEdit, handleClose, ...item }) => {
 		handleClose()
 	}
 
+	useEffect(() => {
+		if (isNew) {
+			createNewCalendarItem()
+		}
+	}, [])
+
 	return (
-		<CalendarItemPopup id={id} backgroundColor={getCategoryColor(category)} handleClose={handleClose}>
+		<CalendarItemPopup id={id} handleClose={handleClose}>
 			<div className={cx('component')}>
-				<strong className={cx('title')}>{title}</strong>
-				<div className={cx('period')}>
-					{isAllday ? `${startDateAt} ~ ${endDateAt}` : `${startTimeAt} ~ ${endTimeAt}`}
+				<div className={cx('area-flex')}>
+					<div className={cx('item', 'type-none')}>
+						<InputSelector
+							id="category"
+							value={categoryState}
+							list={getCategoryList()}
+							handler={() => {}}
+						/>
+					</div>
+					<div className={cx('item')}>
+						<InputText id="title" placeholder="할 일" value={titleState} handler={handleTitleChange} />
+					</div>
+					<div className={cx('item', 'type-none')}>
+						<button type="button" className={cx('button', 'lock')} onClick={handleIsBlockedChange}>
+							{isBlockedState ? (
+								<>
+									<span className="blind">잠금해제</span>
+									<IconLock width={15} height={15} />
+								</>
+							) : (
+								<>
+									<span className="blind">잠금</span>
+									<IconLockOpen width={15} height={15} />
+								</>
+							)}
+						</button>
+					</div>
 				</div>
-				<dl className={cx('list-info')}>
-					{location && (
-						<div className={cx('item-info')}>
-							<dt className={cx('icon')}>
-								<IconLocation width={10} height={10} />
-							</dt>
-							<dd className={cx('info')}>{location}</dd>
+				{isAllDay ? (
+					<div className={cx('area-flex')}>
+						<div className={cx('item')}>
+							<InputDate
+								id="date-start"
+								value={parseDateToString(startAtState)}
+								handler={handleStartDateAtChange}
+							/>
 						</div>
-					)}
-					<div className={cx('item-info')}>
-						<dt className={cx('icon')}>
-							{isPrivate ? <IconLock width={10} height={10} /> : <IconPerson width={10} height={10} />}
-						</dt>
-						<dd className={cx('info')}>{isPrivate ? 'private' : 'anyone'}</dd>
+						<div className={cx('item', 'type-none')}>
+							<span className={cx('delimiter')}>~</span>
+						</div>
+						<div className={cx('item')}>
+							<InputDate
+								id="date-end"
+								value={parseDateToString(endAtState)}
+								handler={handleEndDateAtChange}
+							/>
+						</div>
 					</div>
-					<div className={cx('item-info')}>
-						<dt className={cx('icon')}>
-							<span className={cx('category')} style={{ backgroundColor: getCategoryColor(category) }}>
-								<span className="blind">카테고리</span>
-							</span>
-						</dt>
-						<dd className={cx('info')}>{category}</dd>
+				) : (
+					<div className={cx('area-flex')}>
+						<div className={cx('item')}>
+							<InputDate
+								id="time-start"
+								value={parseDateToTimeString(startAtState)}
+								handler={handleStartDateAtChange}
+								typeTime
+							/>
+						</div>
+						<div className={cx('item')}>
+							<span className={cx('delimiter')}>~</span>
+						</div>
+						<div className={cx('item')}>
+							<InputDate
+								id="time-end"
+								value={parseDateToTimeString(endAtState)}
+								handler={handleEndDateAtChange}
+								typeTime
+							/>
+						</div>
 					</div>
-				</dl>
+				)}
+
+				<InputCheckbox id="all-day" label="하루 종일" value={isAllDayState} handler={handleIsAllDayChange} />
+				{location && (
+					<>
+						<dt className={cx('icon')}>
+							<IconLocation width={10} height={10} />
+						</dt>
+						<InputText
+							id="location"
+							placeholder="위치 정보"
+							value={locationState}
+							handler={handleLocationChange}
+						/>
+					</>
+				)}
 				<div className={cx('area-button')}>
-					{!isBlocked && (
-						<div className={cx('cell')}>
-							<button type="button" className={cx('button')} onClick={onEdit}>
-								Edit
-							</button>
-						</div>
-					)}
 					<div className={cx('cell')}>
 						<button type="button" className={cx('button')} onClick={onDelete}>
 							Delete

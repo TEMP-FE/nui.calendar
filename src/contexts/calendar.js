@@ -19,7 +19,6 @@ const initialState = {
 			category: '',
 			isAllDay: true,
 			isBlocked: false,
-			isPrivate: false,
 			isRepeatable: false,
 		},
 		{
@@ -31,7 +30,6 @@ const initialState = {
 			category: '',
 			isAllDay: true,
 			isBlocked: false,
-			isPrivate: false,
 			isRepeatable: false,
 		},
 	],
@@ -59,8 +57,8 @@ export const AppContext = ({ children }) => {
 				},
 				DragScheduleContext: {
 					dragScheduleStore,
-					dragScheduleDispatch
-				}
+					dragScheduleDispatch,
+				},
 			}}
 		>
 			{children}

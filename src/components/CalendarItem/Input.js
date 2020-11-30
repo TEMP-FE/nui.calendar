@@ -2,9 +2,6 @@ import React from 'react'
 import classNames from 'classnames/bind'
 
 import styles from './Input.module.scss'
-import { ReactComponent as IconLabel } from '../../assets/images/svg/icon-label.svg'
-import { ReactComponent as IconCalendar } from '../../assets/images/svg/icon-calendar.svg'
-import { ReactComponent as IconTime } from '../../assets/images/svg/icon-time.svg'
 import { getCategoryColor } from './commonState'
 
 const cx = classNames.bind(styles)
@@ -14,9 +11,6 @@ export const InputText = ({ id, placeholder, value, handler }) => {
 
 	return (
 		<div className={cx('item-input')}>
-			<label htmlFor={textId} className={cx('icon')}>
-				<IconLabel width={10} height={10} />
-			</label>
 			<input id={textId} type="text" placeholder={placeholder} defaultValue={value} onChange={handler} />
 		</div>
 	)
@@ -40,9 +34,7 @@ export const InputDate = ({ id, value, handler, typeTime = false }) => {
 
 	return (
 		<div className={cx('item-input')}>
-			<label htmlFor={dateId} className={cx('icon')}>
-				{typeTime ? <IconTime width={10} height={10} /> : <IconCalendar width={10} height={10} />}
-			</label>
+			<label htmlFor={dateId} className={cx('icon')} />
 			<input id={dateId} type={typeTime ? 'time' : 'date'} value={value} onChange={handler} />
 		</div>
 	)

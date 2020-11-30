@@ -16,10 +16,10 @@ import {
 } from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
-import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
 
 import styles from './MonthlyCalendar.module.scss'
 import DragDate from '../Drag/DragDate'
+import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 const moment = require('moment')
 const cx = classNames.bind(styles)
 
@@ -94,7 +94,7 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 				)}
 				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
 				{isEditorShown && (
-					<CalendarItemPopupEditor handleClose={handleEditorClose} startAt={startAt} endAt={endAt} />
+					<CalendarItemPopupInfo handleClose={handleEditorClose} startAt={startAt} endAt={endAt} isNew />
 				)}
 			</div>
 		</DragDate>

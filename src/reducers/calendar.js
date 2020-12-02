@@ -65,10 +65,10 @@ export const updateCalendar = (calendar) => {
 	}
 }
 
-export const deleteCalendar = (calendar) => {
+export const deleteCalendar = (calendarId) => {
 	return {
 		type: ACTIONS.DELETE,
-		calendar,
+		calendar: { calendarId },
 	}
 }
 

@@ -268,11 +268,8 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		})
 
 	// 먼저 시작하는 일정 순서로 정렬
-	const ascendingScheduleList = (scheduleList) => {
-		scheduleList.forEach((a) => console.log(a))
-
-		return scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
-	}
+	const ascendingScheduleList = (scheduleList) =>
+		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
 
 	const makeDraggingRenderList = () => {
 		let tempList = []

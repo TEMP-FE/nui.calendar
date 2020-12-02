@@ -9,8 +9,6 @@ const cx = classNames.bind(styles)
 const CalendarItemPopup = ({ id, width, backgroundColor, handleClose, children }) => {
 	const componentRef = useRef(null)
 
-	const calendarArea = document.getElementById('calendar')
-
 	useEffect(() => {
 		setIsShow(true)
 	}, [])
@@ -31,7 +29,7 @@ const CalendarItemPopup = ({ id, width, backgroundColor, handleClose, children }
 	return (
 		<div id={id} ref={componentRef} className={cx('component')} role="dialog">
 			<div className={cx('layer', { hide: !isShow })} onClick={clickHandler}>
-				<div className={cx('inner')} style={{ width, backgroundColor: backgroundColor }}>
+				<div className={cx('inner')} style={{ width }}>
 					{children}
 				</div>
 			</div>

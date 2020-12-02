@@ -4,6 +4,7 @@
 }
 .area-flex {
     display: flex;
+    align-items: center;
     .item {
         flex: 1;
         &.type-none {

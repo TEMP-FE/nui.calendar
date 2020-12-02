@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import classNames from 'classnames/bind'
 import { getCategoryList } from './commonState'
@@ -22,8 +22,8 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 	const { calendarDispatch } = useCalendarContext()
 
 	const {
-		calendarId = Math.random(),
-		title = '',
+		calendarId,
+		title = '할 일',
 		startAt = new Date(),
 		endAt = new Date(),
 		location = '',
@@ -32,8 +32,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 		isBlocked = false,
 		// isRepeatable = false,
 	} = item
-
-	const isNewItem = !!!item.calendarId
 
 	const handleInputDate = (e) => {
 		const { type, value } = e.target
@@ -51,19 +49,11 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 		return new Date(value)
 	}
 
-	const [titleState, handleTitleChange] = useInput({ initialValue: title })
-	const [startAtState, handleStartDateAtChange] = useInput({ initialValue: startAt, handleChange: handleInputDate })
-	const [endAtState, handleEndDateAtChange] = useInput({ initialValue: endAt, handleChange: handleInputDate })
-	const [locationState, handleLocationChange] = useInput({ initialValue: location })
-	const [categoryState] = useInput({ initialValue: category })
-	const [isAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
-	const [isBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
+	const [calendarIdState, setCalendarIdState] = useState(calendarId)
 
-	const getActionCreator = isNewItem ? createCalendar : updateCalendar
-
-	const createNewCalendarItem = () => {
-		const action = getActionCreator({
-			calendarId,
+	const createNewCalendarItem = (newCalendarId) => {
+		const action = createCalendar({
+			calendarId: newCalendarId,
 			title: titleState,
 			startAt: startAtState,
 			endAt: endAtState,
@@ -76,17 +66,44 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 		calendarDispatch(action)
 	}
 
+	useEffect(() => {
+		if (isNew) {
+			const newCalendarItemId = Math.random()
+
+			setCalendarIdState(newCalendarItemId)
+			createNewCalendarItem(newCalendarItemId)
+		}
+	}, [])
+
+	const [titleState, handleTitleChange] = useInput({ initialValue: title })
+	const [startAtState, handleStartDateAtChange] = useInput({ initialValue: startAt, handleChange: handleInputDate })
+	const [endAtState, handleEndDateAtChange] = useInput({ initialValue: endAt, handleChange: handleInputDate })
+	const [locationState, handleLocationChange] = useInput({ initialValue: location })
+	const [categoryState, handleCategoryChange] = useInput({ initialValue: category })
+	const [isAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
+	const [isBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
+
 	const onDelete = () => {
-		calendarDispatch(deleteCalendar(item))
+		calendarDispatch(deleteCalendar(calendarIdState))
 
 		handleClose()
 	}
 
-	useEffect(() => {
-		if (isNew) {
-			createNewCalendarItem()
-		}
-	}, [])
+	const onDone = () => {
+		const action = updateCalendar({
+			calendarId: calendarIdState,
+			title: titleState,
+			startAt: startAtState,
+			endAt: endAtState,
+			location: locationState,
+			category: categoryState,
+			isAllDay: isAllDayState,
+			isBlocked: isBlockedState,
+		})
+
+		calendarDispatch(action)
+		handleClose()
+	}
 
 	return (
 		<CalendarItemPopup id={id} handleClose={handleClose}>
@@ -97,11 +114,18 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 							id="category"
 							value={categoryState}
 							list={getCategoryList()}
-							handler={() => {}}
+							handler={handleCategoryChange}
+							readOnly={isBlockedState}
 						/>
 					</div>
 					<div className={cx('item')}>
-						<InputText id="title" placeholder="할 일" value={titleState} handler={handleTitleChange} />
+						<InputText
+							id="title"
+							placeholder="할 일"
+							value={titleState}
+							handler={handleTitleChange}
+							readOnly={isBlockedState}
+						/>
 					</div>
 					<div className={cx('item', 'type-none')}>
 						<button type="button" className={cx('button', 'lock')} onClick={handleIsBlockedChange}>
@@ -119,68 +143,87 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 						</button>
 					</div>
 				</div>
-				{isAllDay ? (
-					<div className={cx('area-flex')}>
-						<div className={cx('item')}>
-							<InputDate
-								id="date-start"
-								value={parseDateToString(startAtState)}
-								handler={handleStartDateAtChange}
-							/>
-						</div>
-						<div className={cx('item', 'type-none')}>
-							<span className={cx('delimiter')}>~</span>
-						</div>
-						<div className={cx('item')}>
-							<InputDate
-								id="date-end"
-								value={parseDateToString(endAtState)}
-								handler={handleEndDateAtChange}
-							/>
-						</div>
+				<div className={cx('area-flex')}>
+					<div className={cx('item', 'type-none')}>
+						<IconLocation width={10} height={10} />
 					</div>
-				) : (
-					<div className={cx('area-flex')}>
-						<div className={cx('item')}>
-							<InputDate
-								id="time-start"
-								value={parseDateToTimeString(startAtState)}
-								handler={handleStartDateAtChange}
-								typeTime
-							/>
-						</div>
-						<div className={cx('item')}>
-							<span className={cx('delimiter')}>~</span>
-						</div>
-						<div className={cx('item')}>
-							<InputDate
-								id="time-end"
-								value={parseDateToTimeString(endAtState)}
-								handler={handleEndDateAtChange}
-								typeTime
-							/>
-						</div>
-					</div>
-				)}
-
-				<InputCheckbox id="all-day" label="하루 종일" value={isAllDayState} handler={handleIsAllDayChange} />
-				{location && (
-					<>
-						<dt className={cx('icon')}>
-							<IconLocation width={10} height={10} />
-						</dt>
+					<div className={cx('item')}>
 						<InputText
 							id="location"
 							placeholder="위치 정보"
 							value={locationState}
 							handler={handleLocationChange}
+							readOnly={isBlockedState}
 						/>
-					</>
-				)}
+					</div>
+				</div>
+				<div className={cx('area-flex')}>
+					{isAllDayState ? (
+						<>
+							<div className={cx('item')}>
+								<InputDate
+									id="date-start"
+									value={parseDateToString(startAtState)}
+									handler={handleStartDateAtChange}
+									readOnly={isBlockedState}
+								/>
+							</div>
+							<div className={cx('item', 'type-none')}>
+								<span className={cx('delimiter')}>~</span>
+							</div>
+							<div className={cx('item')}>
+								<InputDate
+									id="date-end"
+									value={parseDateToString(endAtState)}
+									handler={handleEndDateAtChange}
+									readOnly={isBlockedState}
+								/>
+							</div>
+						</>
+					) : (
+						<>
+							<div className={cx('item')}>
+								{console.log(startAtState, endAtState)}
+								<InputDate
+									id="time-start"
+									value={parseDateToTimeString(startAtState)}
+									handler={handleStartDateAtChange}
+									typeTime
+									readOnly={isBlockedState}
+								/>
+							</div>
+							<div className={cx('item', 'type-none')}>
+								<span className={cx('delimiter')}>~</span>
+							</div>
+							<div className={cx('item')}>
+								<InputDate
+									id="time-end"
+									value={parseDateToTimeString(endAtState)}
+									handler={handleEndDateAtChange}
+									typeTime
+									readOnly={isBlockedState}
+								/>
+							</div>
+						</>
+					)}
+					<div className={cx('item', 'type-none')}>
+						<InputCheckbox
+							id="all-day"
+							label="하루 종일"
+							value={isAllDayState}
+							handler={handleIsAllDayChange}
+						/>
+					</div>
+				</div>
 				<div className={cx('area-button')}>
 					<div className={cx('cell')}>
 						<button type="button" className={cx('button')} onClick={onDelete}>
 							Delete
+						</button>
+					</div>
+					<div className={cx('cell')}>
+						<button type="button" className={cx('button')} onClick={onDone}>
+							Done
 						</button>
 					</div>
 				</div>

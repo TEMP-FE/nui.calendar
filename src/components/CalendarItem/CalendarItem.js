@@ -2,8 +2,6 @@ import React from 'react'
 import { ReactComponent as IconRepeat } from '../../assets/images/svg/icon-repeat.svg'
 import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
 import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
-import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
-import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
 import DragSchedule from '../Drag/DragSchedule'
 
 import classNames from 'classnames/bind'

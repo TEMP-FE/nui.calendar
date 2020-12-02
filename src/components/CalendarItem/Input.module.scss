@@ -30,13 +30,16 @@
             padding: 0;
             opacity: 0;
         }
+        &[type='date'], &[type='time'] {
+            text-align: center;
+        }
     }
 }
 .item-checkbox {
+    position: relative;
     label {
         display: inline-flex;
         align-items: center;
-        vertical-align: top;
         width: 20px;
         height: 10px;
         border-radius: 16px;
@@ -68,6 +71,7 @@
 }
 .item-select {
     position: relative;
+    padding: 0 15px 0 10px;
     select {
         position: relative;
         z-index: 1;
@@ -79,13 +83,25 @@
         font-size: 14px;
         line-height: 18px;
         color: #fff;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
         outline: none;
+    }
+    .icon {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        width: 5px;
+        height: 5px;
+        transform: translateY(-50%);
+        border-radius: 50%;
     }
     &:after {
         content: '';
         position: absolute;
         top: 50%;
-        right: 10px;
+        right: 5px;
         transform: translateY(-50%);
         border-style: solid;
         border-width: 4px;

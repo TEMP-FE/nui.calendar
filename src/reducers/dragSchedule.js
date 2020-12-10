@@ -1,4 +1,4 @@
-import { calendarType } from '../const/drag';
+import { calendarType, scheduleInitialState } from '../const/drag';
 /**
  * Ducks Patterns
  *
@@ -63,16 +63,8 @@ const reducer = (state, actions) => {
 			}
 		case ACTIONS.RESET:
 			return {
-				...state,
-				dragInfo: {
-					index: -1,
-					startAt: undefined,
-					endAt: undefined,
-					diff: undefined,
-				},
-				isResizing: false,
-				isDragging: false,
-				isDropped: false
+				...scheduleInitialState,
+				calendarType: state.calendarType
 			};
 		case ACTIONS.DROP:
 			return {

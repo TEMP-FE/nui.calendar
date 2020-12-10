@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import classNames from 'classnames/bind'
 import { calendarType } from '../../const/drag'
 import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
@@ -112,7 +112,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	let weekCount = calcWeekCount({ year, month: month + 1 })
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
-
+	const calendarContentRef = useRef(null)
 	useEffect(() => {
 		if (dragScheduleStore.isResizing) {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
@@ -275,7 +275,11 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		let tempList = []
 		const firstWeekOfMonth = moment().year(year).month(month).startOf('month').week()
 		dragDateStore.renderList.forEach((duration) => {
-			const nthWeek = duration.startAt.week() - firstWeekOfMonth
+			let nthWeek = duration.startAt.week() - firstWeekOfMonth
+			if (nthWeek < 0) {
+				const prevWeekNumber = duration.startAt.clone().weekday(0).subtract(1, 'day').week()
+				nthWeek = prevWeekNumber - firstWeekOfMonth + 1
+			}
 			const top = `${(100 / weekCount) * nthWeek}%`
 			const left = `${14.29 * duration.startAt.day()}%`
 			const width = `${14.29 * (duration.endAt.diff(duration.startAt, 'days') + 1)}%`
@@ -298,6 +302,25 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		setCalendarScheduleList(newScheduleList)
 	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
 
+	var timer
+
+	const [cursorPos, setCursorPos] = useState({ x: undefined, y: undefined })
+	const documentDragOver = (e) => {
+		if (!timer) {
+			timer = setTimeout(function () {
+				timer = null
+				setCursorPos({ x: e.clientX, y: e.clientY })
+			}, 5)
+		}
+	}
+
+	useEffect(() => {
+		document.addEventListener('dragover', documentDragOver, false)
+		return () => {
+			document.removeEventListener('dragover', documentDragOver)
+		}
+	}, [])
+
 	return (
 		<div className={cx('calendar_wrap')}>
 			<div className={cx('calendar_title')}>
@@ -305,7 +328,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			</div>
 			<div id="calendar" className={cx('calendar_area')}>
 				<CalendarHeader />
-				<div className={cx('calendar_content')}>
+				<div className={cx('calendar_content')} ref={calendarContentRef}>
 					{/* 달력 그리기 */}
 					{dateInfoList?.map((dateInfoRow, i) => (
 						<div key={`row-${i}`} className={cx('calendar_row')}>
@@ -353,6 +376,17 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							/>
 						)
 					})}
+					{dragScheduleStore.isDragging && !dragScheduleStore.isResizing && (
+						<div
+							className={cx('dragging_monthly')}
+							style={{
+								top: cursorPos.y - calendarContentRef.current.offsetTop + 'px',
+								left: cursorPos.x - calendarContentRef.current.offsetLeft + 'px',
+							}}
+						>
+							<div className={cx('dragging_monthly_inner')} />
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

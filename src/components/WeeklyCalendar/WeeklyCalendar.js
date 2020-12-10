@@ -30,6 +30,7 @@ const WeeklyCalendar = () => {
 	const dayOfWeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 	const timeLine = new Array(24)
 	const [draggingRenderList, setDraggingRenderList] = useState()
+	const [movingSchedule, setMovingSchedule] = useState([])
 
 	for (var i = 0; i < timeLine.length; i++) {
 		timeLine[i] = i
@@ -83,6 +84,18 @@ const WeeklyCalendar = () => {
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
 		}
+		else if (dragScheduleStore.isDragging) {
+			let start = dragScheduleStore.dragInfo.startAt.clone()
+			let end = dragScheduleStore.dragInfo.endAt.clone()
+			let movingRenderList = []
+			while (start.date() !== end.date()) {
+				const tempEnd = start.clone().add(1, 'd').set({ 'hour': 0, 'minute': 0, 'second': 0, 'millisecond': 0 })
+				movingRenderList.push({ startAt: start.toDate(), endAt: tempEnd.toDate() })
+				start = tempEnd
+			}
+			movingRenderList.push({ startAt: start.toDate(), endAt: end.toDate() })
+			setMovingSchedule(movingRenderList)
+		}
 	}, [dragScheduleStore.dragInfo.endAt])
 
 	useEffect(() => {
@@ -95,6 +108,7 @@ const WeeklyCalendar = () => {
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
+			setMovingSchedule([])
 		}
 	}, [dragScheduleStore.isDropped])
 
@@ -204,6 +218,25 @@ const WeeklyCalendar = () => {
 													}}
 												/>
 											),
+									)}
+									{movingSchedule.map(
+										(item) =>
+											info.getDate() === item.startAt.getDate() && (
+												<div
+													style={{
+														position: "absolute",
+														top: calcStartPoint(item.startAt),
+														left: '0',
+														right: '0',
+														zIndex: '-5',
+														backgroundColor: 'rgba(255,0,0,0.1)',
+														height: calcCalendarItemHeight(
+															item.startAt,
+															item.endAt,
+														)
+													}}
+												/>
+											)
 									)}
 									{draggingRenderList?.map(
 										(item) =>

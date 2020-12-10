@@ -13,8 +13,8 @@ const initialState = {
 		{
 			calendarId: 1,
 			title: '테스트',
-			startAt: new Date('2020-11-23 07:30'),
-			endAt: new Date('2020-11-24 09:30'),
+			startAt: new Date('2020-12-10 13:00'),
+			endAt: new Date('2020-12-10 17:30'),
 			location: '',
 			category: '',
 			isAllDay: true,
@@ -24,8 +24,8 @@ const initialState = {
 		{
 			calendarId: 2,
 			title: '테스트',
-			startAt: new Date('2020-11-26 07:30'),
-			endAt: new Date('2020-11-27 04:00'),
+			startAt: new Date('2020-12-11 14:30'),
+			endAt: new Date('2020-12-11 16:00'),
 			location: '',
 			category: '',
 			isAllDay: true,

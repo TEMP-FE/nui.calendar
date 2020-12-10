@@ -38,38 +38,17 @@ const reducer = (state, actions) => {
 		case ACTIONS.UPDATE:
 			const firstDay = state.dragInfo.firstPoint.isBefore(actions.date) ? state.dragInfo.firstPoint : actions.date
 			const lastDay = firstDay.isSame(actions.date) ? state.dragInfo.firstPoint : actions.date
-			const saturdayList = state.saturdayList
 			let tempRenderList = [];
 			if (state.calendarType === calendarType.MONTH) {
-				let saturdayForFirst = -1
-				const length = saturdayList.length;
-				for (let i = 0; i < length; ++i) {
-					const prevSunday = i > 0 ? saturdayList[i - 1].clone().add(1, 'd') : undefined
-					const saturday = saturdayList[i]
-					let fullWeek = true
-					if (saturdayForFirst < 0 && firstDay.isSameOrBefore(saturday)) {
-						saturdayForFirst = i
-						tempRenderList.push({ startAt: firstDay, endAt: saturday })
-						fullWeek = false
-					}
-
-					if (lastDay.isSameOrBefore(saturday)) {
-						if (saturdayForFirst === i) {
-							tempRenderList[0].endAt = lastDay
-						}
-						else {
-							tempRenderList.push({ startAt: prevSunday, endAt: lastDay })
-						}
-						break;
-					}
-					else if (i > 0 && fullWeek) {
-						tempRenderList.push({ startAt: prevSunday, endAt: saturday })
-						if (i === length - 1) {
-							const lastSunday = saturday.clone().add(1, 'd')
-							tempRenderList.push({ startAt: lastSunday, endAt: lastDay })
-						}
-					}
+				let start = firstDay
+				let endOfWeek = start.clone().weekday(6)
+				const end = lastDay
+				while (!end.isSameOrBefore(endOfWeek)) {
+					tempRenderList.push({ startAt: start.clone(), endAt: endOfWeek.clone() })
+					start = endOfWeek.clone().add(1, 'day')
+					endOfWeek = endOfWeek.add(7, 'day')
 				}
+				tempRenderList.push({ startAt: start.clone(), endAt: end.clone() })
 			}
 			else if (state.calendarType === calendarType.WEEK) {
 				let start = firstDay.clone()

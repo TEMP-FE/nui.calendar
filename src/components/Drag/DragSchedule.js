@@ -27,13 +27,15 @@ const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, in
 	}, dragScheduleStore.calendarType === calendarType.MONTH ? monthReiszeStyle : dayReiszeStyle)
 	useEffect(() => {
 		// TODO 타입별로 다르게 구현
-		const img = new Image()
-		img.src = 'https://avatars1.githubusercontent.com/u/19828721?s=96&v=4'
-		img.onload = () => setDragImg(img)
+		setDragImg(new Image())
 	}, [])
 
 	const handleDragStart = (e) => {
-		e.dataTransfer.setDragImage(dragImg, -10, -10)
+		if (!dragScheduleStore.isResizing && dragScheduleStore.calendarType === calendarType.MONTH) {
+			document.body.classList.add('monthly_schedule_move')
+			e.currentTarget.style.cursor = "move"
+		}
+		e.dataTransfer.setDragImage(dragImg, 0, 0)
 		dragScheduleDispatch(startDrag(index, startAt, endAt))
 	}
 	const handleDragEnd = (e) => {

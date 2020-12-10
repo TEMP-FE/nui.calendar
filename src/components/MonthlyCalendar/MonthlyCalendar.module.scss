@@ -1,5 +1,4 @@
 .calendar_wrap {
-	width: 1124px;
 	display: flex;
 	flex-direction: column;
 }
@@ -61,7 +60,7 @@
 .date {
 	display: block;
 	text-align: left;
-	
+
 	&.-holiday {
 		color: #ff4040;
 	}

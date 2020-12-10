@@ -2,8 +2,6 @@ import React from 'react'
 import { ReactComponent as IconRepeat } from '../../assets/images/svg/icon-repeat.svg'
 import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
 import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
-import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
-import { ReactComponent as IconPerson } from '../../assets/images/svg/icon-person.svg'
 import DragSchedule from '../Drag/DragSchedule'
 
 import classNames from 'classnames/bind'
@@ -14,7 +12,7 @@ import moment from 'moment'
 
 const cx = classNames.bind(styles)
 
-const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
+const getIcon = ({ hasLocation, isBlocked, isRepeatable }) => {
 	// 반복 일정
 	if (isRepeatable) {
 		return <IconRepeat width={10} height={10} />
@@ -29,13 +27,6 @@ const getIcon = ({ isPrivate, hasLocation, isBlocked, isRepeatable }) => {
 	if (hasLocation) {
 		return <IconLocation width={10} height={10} />
 	}
-
-	// if 개인 일정 else 공개 일정
-	if (isPrivate === 'private') {
-		return <IconLock width={10} height={10} />
-	} else {
-		return <IconPerson width={10} height={10} />
-	}
 }
 
 const DayType = ({ isShown, handleIsShown, style, isLast, ...item }) => {
@@ -44,7 +35,16 @@ const DayType = ({ isShown, handleIsShown, style, isLast, ...item }) => {
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
-		<DragSchedule className={cx('component')} isBlocked={isBlocked} style={style} index={index} startAt={moment(scheduleStartAt)} endAt={moment(scheduleEndAt)} isLast={isLast} onClick={handleItemClick}>
+		<DragSchedule
+			className={cx('component')}
+			isBlocked={isBlocked}
+			style={style}
+			index={index}
+			startAt={moment(scheduleStartAt)}
+			endAt={moment(scheduleEndAt)}
+			isLast={isLast}
+			onClick={handleItemClick}
+		>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}
@@ -101,8 +101,8 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 					</span>
 				</span>
 				<span className={cx('cell', 'type-period')}>
-					<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
-					<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
+					<span className={cx('period')}>{moment(startAt).format('h:mm')}</span>
+					<span className={cx('period')}>{moment(endAt).format('h:mm')}</span>
 				</span>
 				<span className={cx('cell', 'type-icon')}>{getIcon(item)}</span>
 				<span className={cx('cell')}>

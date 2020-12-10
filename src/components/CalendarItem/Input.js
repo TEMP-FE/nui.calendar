@@ -2,32 +2,40 @@ import React from 'react'
 import classNames from 'classnames/bind'
 
 import styles from './Input.module.scss'
-import { ReactComponent as IconLabel } from '../../assets/images/svg/icon-label.svg'
-import { ReactComponent as IconCalendar } from '../../assets/images/svg/icon-calendar.svg'
-import { ReactComponent as IconTime } from '../../assets/images/svg/icon-time.svg'
 import { getCategoryColor } from './commonState'
 
 const cx = classNames.bind(styles)
 
-export const InputText = ({ id, placeholder, value, handler }) => {
+export const InputText = ({ id, placeholder, value, handler, readOnly = false }) => {
 	const textId = `text-${id}`
 
 	return (
 		<div className={cx('item-input')}>
-			<label htmlFor={textId} className={cx('icon')}>
-				<IconLabel width={10} height={10} />
-			</label>
-			<input id={textId} type="text" placeholder={placeholder} defaultValue={value} onChange={handler} />
+			<input
+				id={textId}
+				type="text"
+				placeholder={placeholder}
+				value={value}
+				onChange={handler}
+				readOnly={readOnly}
+			/>
 		</div>
 	)
 }
 
-export const InputCheckbox = ({ id, label, value, handler }) => {
+export const InputCheckbox = ({ id, label, value, handler, readOnly = false }) => {
 	const checkboxId = `checkbox-${id}`
 
 	return (
 		<div className={cx('item-checkbox')}>
-			<input id={checkboxId} type="checkbox" className="blind" checked={value} readOnly />
+			<input
+				id={checkboxId}
+				type="checkbox"
+				className="blind"
+				checked={value}
+				onChange={() => {}}
+				readOnly={readOnly}
+			/>
 			<label htmlFor={checkboxId} onClick={handler}>
 				<span className="blind">{label}</span>
 			</label>
@@ -35,26 +43,30 @@ export const InputCheckbox = ({ id, label, value, handler }) => {
 	)
 }
 
-export const InputDate = ({ id, value, handler, typeTime = false }) => {
+export const InputDate = ({ id, value, handler, typeTime = false, readOnly = false }) => {
 	const dateId = `date-${id}`
 
 	return (
 		<div className={cx('item-input')}>
-			<label htmlFor={dateId} className={cx('icon')}>
-				{typeTime ? <IconTime width={10} height={10} /> : <IconCalendar width={10} height={10} />}
-			</label>
-			<input id={dateId} type={typeTime ? 'time' : 'date'} value={value} onChange={handler} />
+			<label htmlFor={dateId} className={cx('icon')} />
+			<input
+				id={dateId}
+				type={typeTime ? 'time' : 'date'}
+				defaultValue={value}
+				onChange={handler}
+				readOnly={readOnly}
+			/>
 		</div>
 	)
 }
 
-export const InputSelector = ({ id, value, list, handler }) => {
+export const InputSelector = ({ id, value, list, handler, readOnly = false }) => {
 	const selectorId = `selector-${id}`
 
 	return (
 		<div className={cx('item-select')}>
-			<span className={cx('icon', 'category')} style={{ backgroundColor: getCategoryColor(value) }} />
-			<select id={selectorId} defaultChecked={value} onChange={handler}>
+			<span className={cx('icon')} style={{ backgroundColor: getCategoryColor(value) }} />
+			<select id={selectorId} defaultChecked={value} onChange={handler} disabled={readOnly}>
 				{list &&
 					list.map((option) => (
 						<option value={option} key={option}>

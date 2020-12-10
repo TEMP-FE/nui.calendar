@@ -16,10 +16,10 @@ import {
 } from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
-import CalendarItemPopupEditor from '../CalendarItem/CalendarItemPopupEditor'
 
 import styles from './MonthlyCalendar.module.scss'
 import DragDate from '../Drag/DragDate'
+import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 const moment = require('moment')
 const cx = classNames.bind(styles)
 
@@ -94,7 +94,7 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 				)}
 				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
 				{isEditorShown && (
-					<CalendarItemPopupEditor handleClose={handleEditorClose} startAt={startAt} endAt={endAt} />
+					<CalendarItemPopupInfo handleClose={handleEditorClose} startAt={startAt} endAt={endAt} isNew />
 				)}
 			</div>
 		</DragDate>
@@ -351,20 +351,10 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 						return scheduleItem?.renderList?.map((renderItem) => {
 							const { top, left, width, stack, opacity, isLast } = renderItem
 
-							const startAt = getDateInfo(scheduleItem.startAt)
-							const endAt = getDateInfo(scheduleItem.endAt)
-							const startAtString = `${startAt.year}/${startAt.month}/${startAt.date}`
-							const endAtString = `${endAt.year}/${endAt.month}/${endAt.date}`
-
 							if (stack < 4) {
 								return (
 									<div className={cx('schedule_item')} style={{ top, left, width, opacity }}>
-										<CalendarItem
-											{...scheduleItem}
-											startAt={startAtString}
-											endAt={endAtString}
-											isLast={isLast}
-										/>
+										<CalendarItem {...scheduleItem} isLast={isLast} />
 									</div>
 								)
 							}

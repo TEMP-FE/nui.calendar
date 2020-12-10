@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 
 import CalendarItem from './CalendarItem'
-import CalendarItemPopupEditor from './CalendarItemPopupEditor'
 import CalendarItemPopupInfo from './CalendarItemPopupInfo'
 
 const Index = (item) => {
@@ -29,15 +28,13 @@ const Index = (item) => {
 				handleIsShown={handleInfoShown}
 				{...item}
 			/>
-			{isEditShown && (
-				<CalendarItemPopupEditor id={`wa-popup-${item.calendarId}`} handleClose={handleEditShown} {...item} />
-			)}
 			{isInfoShown && (
 				<CalendarItemPopupInfo
 					id={`wa-popup-${item.calendarId}`}
 					isShown={isInfoShown}
 					handleEdit={handleEdit}
 					handleClose={handleInfoShown}
+					isNew={isEditShown}
 					{...item}
 				/>
 			)}

@@ -12,7 +12,6 @@ const CalendarApp = () => {
 		<>
 			<WeeklyCalendar />
 			<Monthly style={monthlyStyle} />
-			<Monthly />
 		</>
 	)
 }

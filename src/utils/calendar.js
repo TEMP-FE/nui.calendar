@@ -54,20 +54,18 @@ export const calcScheduleDay = (schedule) => {
 }
 
 // DateTime 객체 -> YYYY-MM-DD string 형태로 변환
-export const parseDateToString = (dateTime) => {
-	const { year, month, date } = getDateInfo(dateTime)
-	return `${year}-${padStart(month + 1, 2)}-${padStart(date, 2)}`
-}
+export const parseDateToString = (dateTime) => moment(dateTime).format('YYYY-MM-DD')
+export const parseDateToTimeString = (dateTime) => moment(dateTime).format('HH:MM:SS')
 
 // dateTime 이 scheduleItem 에 포함되어있는지 판단하는 함수
 export const getSaturdaysOfMonth = (year, month) => {
 	let saturdayList = []
-	let saturday = moment().year(year).month(month).startOf('month').day("Saturday");
-	if (saturday.date() > 7) saturday.add(7, 'd');
-	let currentMonth = saturday.month();
+	let saturday = moment().year(year).month(month).startOf('month').day('Saturday')
+	if (saturday.date() > 7) saturday.add(7, 'd')
+	let currentMonth = saturday.month()
 	while (currentMonth === saturday.month()) {
 		saturdayList.push(saturday.clone())
-		saturday.add(7, 'd');
+		saturday.add(7, 'd')
 	}
 	return saturdayList
 }

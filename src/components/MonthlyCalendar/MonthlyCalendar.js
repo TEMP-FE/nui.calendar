@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import classNames from 'classnames/bind'
 import { calendarType } from '../../const/drag'
 import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
@@ -117,7 +117,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	let weekCount = calcWeekCount({ year, month: month + 1 })
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
-
+	const calendarContentRef = useRef(null)
 	useEffect(() => {
 		if (dragScheduleStore.isResizing) {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
@@ -299,6 +299,18 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
 
 
+	const [cursorPos, setCursorPos] = useState({ x: undefined, y: undefined })
+	const documentDragOver = (e) => {
+		setCursorPos({ x: e.clientX, y: e.clientY })
+	}
+
+	useEffect(() => {
+		document.addEventListener('dragover', documentDragOver, false)
+		return () => {
+			document.removeEventListener('dragover', documentDragOver)
+		}
+	}, [])
+
 	return (
 		<div className={cx('calendar_wrap')}>
 			<div className={cx('calendar_title')}>
@@ -306,7 +318,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			</div>
 			<div id="calendar" className={cx('calendar_area')}>
 				<CalendarHeader />
-				<div className={cx('calendar_content')}>
+				<div className={cx('calendar_content')} ref={calendarContentRef}>
 					{/* 달력 그리기 */}
 					{dateInfoList?.map((dateInfoRow, i) => (
 						<div key={`row-${i}`} className={cx('calendar_row')}>
@@ -364,6 +376,15 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							/>
 						)
 					})}
+					{(dragScheduleStore.isDragging && !dragScheduleStore.isResizing)
+						&& <div className={cx('dragging_monthly')}
+							style={{
+								top: (cursorPos.y - calendarContentRef.current.offsetTop) + 'px',
+								left: (cursorPos.x - calendarContentRef.current.offsetLeft) + 'px'
+							}}
+						>
+							<div className={cx('dragging_monthly_inner')} />
+						</div>}
 				</div>
 			</div>
 		</div>

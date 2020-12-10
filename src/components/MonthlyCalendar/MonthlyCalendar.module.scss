@@ -89,6 +89,7 @@
 	position: absolute;
 	height: 26px;
 	width: 160px;
+	pointer-events: none;
 	&_inner {
 		position: relative;
 		top: -50%;

@@ -80,16 +80,15 @@ const WeeklyCalendar = () => {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
-		}
-		else if (dragScheduleStore.isDragging) {
+		} else if (dragScheduleStore.isDragging) {
 			let start = dragScheduleStore.dragInfo.startAt.clone()
 			let end = dragScheduleStore.dragInfo.endAt.clone()
 			let movingRenderList = []
 			while (start.date() !== end.date()) {
-				const tempEnd = start.clone().add(1, 'd').set({ 'hour': 0, 'minute': 0, 'second': 0, 'millisecond': 0 })
+				const tempEnd = start.clone().add(1, 'd').set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 				movingRenderList.push({ startAt: start.toDate(), endAt: tempEnd.toDate() })
 				start = tempEnd
 			}
@@ -104,7 +103,7 @@ const WeeklyCalendar = () => {
 			movedSchedule = {
 				...movedSchedule,
 				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -132,7 +131,7 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = { ...item, index: index, scheduleStartAt: item.startAt, scheduleEndAt: item.endAt }
+			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt }
 			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem
@@ -199,7 +198,10 @@ const WeeklyCalendar = () => {
 									{timeLine.map((time) => (
 										<div className={cx('detail_wrap')} key={time}>
 											<DragDate className={cx('detail_cell')} date={moment(info).hour(time)} />
-											<DragDate className={cx('detail_cell')} date={moment(info).hour(time).minute(30)} />
+											<DragDate
+												className={cx('detail_cell')}
+												date={moment(info).hour(time).minute(30)}
+											/>
 										</div>
 									))}
 									{calendarItemList.map(
@@ -224,19 +226,16 @@ const WeeklyCalendar = () => {
 											info.getDate() === item.startAt.getDate() && (
 												<div
 													style={{
-														position: "absolute",
+														position: 'absolute',
 														top: calcStartPoint(item.startAt),
 														left: '0',
 														right: '0',
 														zIndex: '-5',
 														backgroundColor: 'rgba(255,0,0,0.1)',
-														height: calcCalendarItemHeight(
-															item.startAt,
-															item.endAt,
-														)
+														height: calcCalendarItemHeight(item.startAt, item.endAt),
 													}}
 												/>
-											)
+											),
 									)}
 									{draggingRenderList?.map(
 										(item) =>
@@ -247,7 +246,10 @@ const WeeklyCalendar = () => {
 														top: calcStartPoint(item.startAt.toDate()),
 														left: '0',
 														right: '5px',
-														height: calcCalendarItemHeight(item.startAt.toDate(), item.endAt.toDate()),
+														height: calcCalendarItemHeight(
+															item.startAt.toDate(),
+															item.endAt.toDate(),
+														),
 														backgroundColor: 'rgba(255,0,0,0.1)',
 														zIndex: '-5',
 													}}

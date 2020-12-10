@@ -30,7 +30,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 		category = 'A',
 		isAllDay = false,
 		isBlocked = false,
-		// isRepeatable = false,
 	} = item
 
 	const handleInputDate = (e) => {
@@ -83,13 +82,13 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 	const [isAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
 	const [isBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
 
-	const onDelete = () => {
+	const onDelete = (e) => {
 		calendarDispatch(deleteCalendar(calendarIdState))
 
-		handleClose()
+		handleClose(e)
 	}
 
-	const onDone = () => {
+	const onDone = (e) => {
 		const action = updateCalendar({
 			calendarId: calendarIdState,
 			title: titleState,
@@ -102,7 +101,8 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 		})
 
 		calendarDispatch(action)
-		handleClose()
+
+		handleClose(e)
 	}
 
 	return (
@@ -183,7 +183,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 					) : (
 						<>
 							<div className={cx('item')}>
-								{console.log(startAtState, endAtState)}
 								<InputDate
 									id="time-start"
 									value={parseDateToTimeString(startAtState)}

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import ReactDOM from 'react-dom'
 
 import classNames from 'classnames/bind'
 
@@ -6,7 +7,15 @@ import styles from './CalendarItemPopup.module.scss'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopup = ({ id, width, backgroundColor, handleClose, children }) => {
+const CalendarItemPopup = ({ id, width, handleClose, children }) => {
+	const [target, setTarget] = useState(null)
+
+	useEffect(() => {
+		const cellElement = document.getElementById(id)
+
+		setTarget(cellElement)
+	}, [])
+
 	const componentRef = useRef(null)
 
 	useEffect(() => {
@@ -27,13 +36,17 @@ const CalendarItemPopup = ({ id, width, backgroundColor, handleClose, children }
 	}, [handleClose])
 
 	return (
-		<div id={id} ref={componentRef} className={cx('component')} role="dialog">
-			<div className={cx('layer', { hide: !isShow })} onClick={clickHandler}>
-				<div className={cx('inner')} style={{ width }}>
-					{children}
+		target &&
+		ReactDOM.createPortal(
+			<div ref={componentRef} className={cx('component')} role="dialog">
+				<div className={cx('layer', { hide: !isShow })} onClick={clickHandler}>
+					<div className={cx('inner')} style={{ width }}>
+						{children}
+					</div>
 				</div>
-			</div>
-		</div>
+			</div>,
+			target,
+		)
 	)
 }
 

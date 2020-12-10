@@ -12,7 +12,7 @@ import {
 	isSameDate,
 	calcScheduleDay,
 	isDateTimeIncludeScheduleItem,
-	getSaturdaysOfMonth
+	getSaturdaysOfMonth,
 } from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
@@ -44,12 +44,7 @@ const CalendarHeader = () => {
 }
 
 // 달력 셀
-const CalendarCell = ({
-	dateTime,
-	isHoliday,
-	isDimmed,
-	scheduleList,
-}) => {
+const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const [moreList, setMoreList] = useState()
 	const { calendarStore } = useCalendarContext()
 	const [isEditorShown, setIsEditorShown] = useState(false)
@@ -123,7 +118,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
 		}
@@ -135,7 +130,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			movedSchedule = {
 				...movedSchedule,
 				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -175,7 +170,12 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
 	const getNewScheduleList = (scheduleList, dateInfoList) =>
 		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
-			scheduleItem = { ...scheduleItem, index: scheduleIndex, scheduleStartAt: scheduleItem.startAt, scheduleEndAt: scheduleItem.endAt }
+			scheduleItem = {
+				...scheduleItem,
+				index: scheduleIndex,
+				scheduleStartAt: scheduleItem.startAt,
+				scheduleEndAt: scheduleItem.endAt,
+			}
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
 			for (let i = 0; i < weekCount; i++) {
@@ -272,9 +272,9 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
 
 	const makeDraggingRenderList = () => {
-		let tempList = [];
+		let tempList = []
 		const firstWeekOfMonth = moment().year(year).month(month).startOf('month').week()
-		dragDateStore.renderList.forEach(duration => {
+		dragDateStore.renderList.forEach((duration) => {
 			let nthWeek = duration.startAt.week() - firstWeekOfMonth
 			if (nthWeek < 0) {
 				const prevWeekNumber = duration.startAt.clone().weekday(0).subtract(1, 'day').week()
@@ -282,7 +282,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			}
 			const top = `${(100 / weekCount) * nthWeek}%`
 			const left = `${14.29 * duration.startAt.day()}%`
-			const width = `${14.29 * ((duration.endAt.diff(duration.startAt, 'days') + 1))}%`
+			const width = `${14.29 * (duration.endAt.diff(duration.startAt, 'days') + 1)}%`
 			const height = `${600 / weekCount}px`
 			tempList.push({ top, left, width, height })
 		})
@@ -302,10 +302,16 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		setCalendarScheduleList(newScheduleList)
 	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
 
+	var timer
 
 	const [cursorPos, setCursorPos] = useState({ x: undefined, y: undefined })
 	const documentDragOver = (e) => {
-		setCursorPos({ x: e.clientX, y: e.clientY })
+		if (!timer) {
+			timer = setTimeout(function () {
+				timer = null
+				setCursorPos({ x: e.clientX, y: e.clientY })
+			}, 5)
+		}
 	}
 
 	useEffect(() => {
@@ -380,15 +386,17 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							/>
 						)
 					})}
-					{(dragScheduleStore.isDragging && !dragScheduleStore.isResizing)
-						&& <div className={cx('dragging_monthly')}
+					{dragScheduleStore.isDragging && !dragScheduleStore.isResizing && (
+						<div
+							className={cx('dragging_monthly')}
 							style={{
-								top: (cursorPos.y - calendarContentRef.current.offsetTop) + 'px',
-								left: (cursorPos.x - calendarContentRef.current.offsetLeft) + 'px'
+								top: cursorPos.y - calendarContentRef.current.offsetTop + 'px',
+								left: cursorPos.x - calendarContentRef.current.offsetLeft + 'px',
 							}}
 						>
 							<div className={cx('dragging_monthly_inner')} />
-						</div>}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

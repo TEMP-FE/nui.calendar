@@ -275,7 +275,11 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		let tempList = [];
 		const firstWeekOfMonth = moment().year(year).month(month).startOf('month').week()
 		dragDateStore.renderList.forEach(duration => {
-			const nthWeek = duration.startAt.week() - firstWeekOfMonth
+			let nthWeek = duration.startAt.week() - firstWeekOfMonth
+			if (nthWeek < 0) {
+				const prevWeekNumber = duration.startAt.clone().weekday(0).subtract(1, 'day').week()
+				nthWeek = prevWeekNumber - firstWeekOfMonth + 1
+			}
 			const top = `${(100 / weekCount) * nthWeek}%`
 			const left = `${14.29 * duration.startAt.day()}%`
 			const width = `${14.29 * ((duration.endAt.diff(duration.startAt, 'days') + 1))}%`

@@ -17,11 +17,12 @@ import {
 } from '../../utils/calendar'
 
 import DragDate from '../Drag/DragDate'
-import CalendarItem from '../CalendarItem/CalendarItem'
+import CalendarItem from '../CalendarItem/CalendarItemWithPopup'
 import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 import useToggle from '../CalendarItem/useToggle'
 
 import styles from './MonthlyCalendar.module.scss'
+import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
 
 const cx = classNames.bind(styles)
 
@@ -108,8 +109,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	const [dateInfoList, setDateInfoList] = useState()
 	const { calendarStore, calendarDispatch } = useCalendarContext()
 	const [draggingRenderList, setDraggingRenderList] = useState([])
-
-	const [isPopupShown, toggleIsPopupShown] = useToggle({ initialValue: false })
 
 	let currentMonthInfo = getMonthInfo({ year, month: month + 1 })
 	let weekCount = calcWeekCount({ year, month: month + 1 })
@@ -360,18 +359,11 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 										className={cx('schedule_item')}
 										style={{ top, left, width, opacity }}
 									>
-										<CalendarItem
-											handleIsShown={toggleIsPopupShown}
+										<CalendarItemWithPopup
+											id={`cell-${month}-${date}`}
 											isLast={isLast}
 											{...scheduleItem}
 										/>
-										{isPopupShown && (
-											<CalendarItemPopupInfo
-												id={`cell-${month}-${date}`}
-												handleClose={toggleIsPopupShown}
-												{...scheduleItem}
-											/>
-										)}
 									</div>
 								)
 							}

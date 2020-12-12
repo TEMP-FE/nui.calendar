@@ -4,9 +4,8 @@ import classNames from 'classnames/bind'
 import { getCategoryList } from './commonState'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../reducers/calendar'
 
-import CalendarItemPopup from './CalendarItemPopup'
+import CalendarItemPopupPortal from './CalendarItemPopupPortal'
 import { useCalendarContext } from '../../contexts/calendar'
-import { ReactComponent as IconLocation } from '../../assets/images/svg/icon-location.svg'
 import { ReactComponent as IconLock } from '../../assets/images/svg/icon-lock.svg'
 
 import styles from './CalendarItemPopupInfo.module.scss'
@@ -26,7 +25,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 		title = '할 일',
 		startAt = new Date(),
 		endAt = new Date(),
-		location = '',
 		category = 'A',
 		isAllDay = false,
 		isBlocked = false,
@@ -56,7 +54,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 			title: titleState,
 			startAt: startAtState,
 			endAt: endAtState,
-			location: locationState,
 			category: categoryState,
 			isAllDay: isAllDayState,
 			isBlocked: isBlockedState,
@@ -77,7 +74,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 	const [titleState, handleTitleChange] = useInput({ initialValue: title })
 	const [startAtState, handleStartDateAtChange] = useInput({ initialValue: startAt, handleChange: handleInputDate })
 	const [endAtState, handleEndDateAtChange] = useInput({ initialValue: endAt, handleChange: handleInputDate })
-	const [locationState, handleLocationChange] = useInput({ initialValue: location })
 	const [categoryState, handleCategoryChange] = useInput({ initialValue: category })
 	const [isAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
 	const [isBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
@@ -94,7 +90,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 			title: titleState,
 			startAt: startAtState,
 			endAt: endAtState,
-			location: locationState,
 			category: categoryState,
 			isAllDay: isAllDayState,
 			isBlocked: isBlockedState,
@@ -106,7 +101,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 	}
 
 	return (
-		<CalendarItemPopup id={id} handleClose={handleClose}>
+		<CalendarItemPopupPortal id={id} handleClose={handleClose}>
 			<div className={cx('component')}>
 				<div className={cx('area-flex')}>
 					<div className={cx('item', 'type-none')}>
@@ -141,20 +136,6 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 								</>
 							)}
 						</button>
-					</div>
-				</div>
-				<div className={cx('area-flex')}>
-					<div className={cx('item', 'type-none')}>
-						<IconLocation width={10} height={10} />
-					</div>
-					<div className={cx('item')}>
-						<InputText
-							id="location"
-							placeholder="위치 정보"
-							value={locationState}
-							handler={handleLocationChange}
-							readOnly={isBlockedState}
-						/>
 					</div>
 				</div>
 				<div className={cx('area-flex')}>
@@ -227,7 +208,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 					</div>
 				</div>
 			</div>
-		</CalendarItemPopup>
+		</CalendarItemPopupPortal>
 	)
 }
 

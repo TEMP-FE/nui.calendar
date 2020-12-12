@@ -3,11 +3,11 @@ import ReactDOM from 'react-dom'
 
 import classNames from 'classnames/bind'
 
-import styles from './CalendarItemPopup.module.scss'
+import styles from './CalendarItemPopupPortal.module.scss'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopup = ({ id, width, handleClose, children }) => {
+const CalendarItemPopupPortal = ({ id, width, handleClose, children }) => {
 	const [target, setTarget] = useState(null)
 
 	useEffect(() => {
@@ -50,4 +50,4 @@ const CalendarItemPopup = ({ id, width, handleClose, children }) => {
 	)
 }
 
-export default CalendarItemPopup
+export default CalendarItemPopupPortal

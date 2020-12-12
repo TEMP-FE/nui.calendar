@@ -49,13 +49,7 @@ export const InputDate = ({ id, value, handler, typeTime = false, readOnly = fal
 	return (
 		<div className={cx('item-input')}>
 			<label htmlFor={dateId} className={cx('icon')} />
-			<input
-				id={dateId}
-				type={typeTime ? 'time' : 'date'}
-				defaultValue={value}
-				onChange={handler}
-				readOnly={readOnly}
-			/>
+			<input id={dateId} type={typeTime ? 'time' : 'date'} value={value} onChange={handler} readOnly={readOnly} />
 		</div>
 	)
 }

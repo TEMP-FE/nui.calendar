@@ -86,6 +86,7 @@
 	border-left: 1px solid rgb(229, 229, 229);
 }
 .detail_wrap {
+	position: relative;
 	height: 52px;
 	box-sizing: border-box;
 	&:not(:first-child) {

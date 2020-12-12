@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react'
 import styles from './WeeklyCalendar.module.scss'
 import classNames from 'classnames/bind'
 
-import CalendarItem from '../CalendarItem/CalendarItem'
 import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
 import { calendarType } from '../../const/drag'
 import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import useToggle from '../CalendarItem/useToggle'
 import { setCalendar } from '../../reducers/dragDate'
 import { resetScheduleDrag } from '../../reducers/dragSchedule'
 import { updateCalendar } from '../../reducers/calendar'
+import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
+import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 
 const cx = classNames.bind(styles)
 const moment = require('moment')
@@ -19,6 +21,36 @@ const year = curDay.getFullYear()
 const month = curDay.getMonth()
 const date = curDay.getDate()
 const dayOfWeek = curDay.getDay()
+
+const WeeklyCell = ({ info, time }) => {
+	const [isPopupShown, toggleIsPopupShown] = useToggle({ initialValue: false })
+
+	const onCellClick = (e) => {
+		e.stopPropagation()
+
+		toggleIsPopupShown(e)
+	}
+
+	const date = moment(info).date()
+	const startAt = moment(info).hour(time)
+	const endAt = moment(info).hour(time).minute(30)
+
+	return (
+		<div id={`time-${date}-${time}`} className={cx('detail_wrap')} onClick={onCellClick}>
+			<DragDate className={cx('detail_cell')} date={startAt} />
+			<DragDate className={cx('detail_cell')} date={endAt} />
+			{isPopupShown && (
+				<CalendarItemPopupInfo
+					id={`time-${date}-${time}`}
+					handleClose={toggleIsPopupShown}
+					startAt={new Date()}
+					endAt={new Date()}
+					isNew
+				/>
+			)}
+		</div>
+	)
+}
 
 const WeeklyCalendar = () => {
 	const { dragDateDispatch, dragDateStore } = useDragDateContext()
@@ -137,6 +169,8 @@ const WeeklyCalendar = () => {
 			return filteredItem
 		})
 
+		console.log(filteredList)
+
 		setCalendarItemList(filteredList.flat())
 	}, [calendarStore.scheduleList])
 
@@ -194,21 +228,20 @@ const WeeklyCalendar = () => {
 						</div>
 						<div className={cx('view')}>
 							{week.map((info, index) => (
-								<div className={cx('view_cell')} key={index} onClick={() => log(info)}>
-									{timeLine.map((time) => (
-										<div className={cx('detail_wrap')} key={time}>
-											<DragDate className={cx('detail_cell')} date={moment(info).hour(time)} />
-											<DragDate
-												className={cx('detail_cell')}
-												date={moment(info).hour(time).minute(30)}
-											/>
-										</div>
+								<div className={cx('view_cell')} key={index}>
+									{timeLine.map((time, timeIndex) => (
+										<WeeklyCell key={`time-${timeIndex}`} info={info} time={time} />
 									))}
-									{calendarItemList.map(
-										(calendarItem) =>
-											info.getDate() === new Date(calendarItem.startAt).getDate() && (
-												<CalendarItem
-													{...calendarItem}
+									{calendarItemList.map((calendarItem) => {
+										const currentDate = info.getDate()
+										const itemDate = new Date(calendarItem.startAt).getDate()
+										const itemHour = new Date(calendarItem.startAt).getHours()
+										const hasItem = currentDate === itemDate
+
+										return (
+											hasItem && (
+												<CalendarItemWithPopup
+													id={`time-${itemDate}-${itemHour}`}
 													style={{
 														top: calcStartPoint(calendarItem.startAt),
 														left: '0',
@@ -218,9 +251,11 @@ const WeeklyCalendar = () => {
 															calendarItem.endAt,
 														),
 													}}
+													{...calendarItem}
 												/>
-											),
-									)}
+											)
+										)
+									})}
 									{movingSchedule.map(
 										(item) =>
 											info.getDate() === item.startAt.getDate() && (

@@ -4,6 +4,7 @@ import CalendarItem from './CalendarItem'
 import CalendarItemPopupInfo from './CalendarItemPopupInfo'
 
 const CalendarItemWithPopup = ({ id, ...item }) => {
+	console.log(item)
 	const [isPopupShown, setIsPopupShown] = useState(false)
 
 	const handleIsPopupShown = () => {

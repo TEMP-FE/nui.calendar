@@ -10,7 +10,7 @@ const CalendarApp = () => {
 
 	return (
 		<>
-			{/* <WeeklyCalendar /> */}
+			<WeeklyCalendar />
 			<Monthly style={monthlyStyle} />
 		</>
 	)

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import CalendarItem from './CalendarItem'
 import CalendarItemPopupInfo from './CalendarItemPopupInfo'
@@ -8,13 +8,7 @@ const CalendarItemWithPopup = ({ id, ...item }) => {
 
 	const handleIsPopupShown = () => {
 		setIsPopupShown(!isPopupShown)
-
-		console.log('test')
 	}
-
-	useEffect(() => {
-		console.log(isPopupShown)
-	}, [isPopupShown])
 
 	return (
 		<>

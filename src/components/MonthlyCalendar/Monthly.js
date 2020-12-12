@@ -41,7 +41,7 @@ const Monthly = ({ style }) => {
 			{monthlyData.year !== '' && monthlyData.month !== '' && (
 				<>
 					<ButtonArea getThis={getThisMonth} getChange={changeMonth} />
-					<div style={style}>
+					<div id="calendar-container" style={style}>
 						<MonthlyCalendar month={monthlyData.month} year={monthlyData.year} />
 					</div>
 				</>

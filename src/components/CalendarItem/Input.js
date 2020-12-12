@@ -28,6 +28,7 @@ export const InputCheckbox = ({ id, label, value, handler, readOnly = false }) =
 
 	return (
 		<div className={cx('item-checkbox')}>
+			<span className={cx('label')}>{label} :</span>
 			<input
 				id={checkboxId}
 				type="checkbox"

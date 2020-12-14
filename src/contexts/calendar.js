@@ -3,6 +3,7 @@ import calendarReducer from '../reducers/calendar'
 import { dateInitialState, scheduleInitialState } from '../const/drag'
 import dragDateReducer from '../reducers/dragDate'
 import dragScheduleReducer from '../reducers/dragSchedule'
+import moment from 'moment'
 
 const appContext = createContext(null)
 
@@ -13,8 +14,8 @@ const initialState = {
 		{
 			calendarId: 1,
 			title: '테스트',
-			startAt: new Date('2020-12-10 13:00'),
-			endAt: new Date('2020-12-10 17:30'),
+			startAt: moment().year(2020).month(11).date(11),
+			endAt: moment().year(2020).month(11).date(12),
 			location: '',
 			category: '',
 			isAllDay: true,
@@ -24,8 +25,8 @@ const initialState = {
 		{
 			calendarId: 2,
 			title: '테스트',
-			startAt: new Date('2020-12-11 14:30'),
-			endAt: new Date('2020-12-11 16:00'),
+			startAt: moment().year(2020).month(11).date(19),
+			endAt: moment().year(2020).month(11).date(20),
 			location: '',
 			category: '',
 			isAllDay: true,

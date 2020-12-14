@@ -13,8 +13,8 @@ export const dayOfWeekList = [
 ]
 
 // 초기 Date 객체
-export const getDateInfo = (date = new Date()) => {
-	return { year: date.getFullYear(), month: date.getMonth(), date: date.getDate() }
+export const getDateInfo = (date = moment()) => {
+	return { year: +date.format('YYYY'), month: +date.format('MM') - 1, date: +date.format('DD') }
 }
 
 export const getMonthInfo = ({ year, month }) => {
@@ -49,8 +49,7 @@ export const isSameDate = (date1, date2) => {
 }
 
 export const calcScheduleDay = (schedule) => {
-	const time = schedule.endAt.getTime() - schedule.startAt.getTime()
-	return Math.floor(time / 86400000 + 1)
+	return moment(schedule.endAt).diff(schedule.startAt, 'd') + 1
 }
 
 // DateTime 객체 -> YYYY-MM-DD string 형태로 변환
@@ -71,7 +70,7 @@ export const getSaturdaysOfMonth = (year, month) => {
 }
 
 export const isDateTimeIncludeScheduleItem = (dateTime, scheduleItem) => {
-	const scheduleStart = scheduleItem.startAt.getTime()
-	const scheduleEnd = scheduleItem.endAt.getTime()
-	return dateTime.getTime() >= scheduleStart && dateTime.getTime() <= scheduleEnd ? true : false
+	const startDiff = moment(dateTime).diff(scheduleItem.startAt, 'd')
+	const endDiff = moment(dateTime).diff(scheduleItem.endAt, 'd')
+	return startDiff >= 0 && endDiff <= 0 ? true : false
 }

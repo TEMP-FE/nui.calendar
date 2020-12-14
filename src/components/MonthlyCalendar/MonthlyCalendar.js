@@ -16,11 +16,11 @@ import {
 } from '../../utils/calendar'
 
 import CalendarItem from '../CalendarItem'
-
 import styles from './MonthlyCalendar.module.scss'
 import DragDate from '../Drag/DragDate'
 import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
-const moment = require('moment')
+import moment from 'moment'
+
 const cx = classNames.bind(styles)
 
 // 달력 헤더
@@ -50,12 +50,9 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const [isEditorShown, setIsEditorShown] = useState(false)
 
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
-	const { year, month, date } = getDateInfo(dateTime)
+	const { date } = getDateInfo(dateTime)
 	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
 	const calendarList = calendarStore[dateInfo]
-	const startAt = new Date(year, month, date)
-	const endAt = new Date(year, month, date)
-
 	// 셀 클릭 이벤트
 	const onCellClick = (e) => {
 		e.stopPropagation()
@@ -94,7 +91,7 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 				)}
 				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
 				{isEditorShown && (
-					<CalendarItemPopupInfo handleClose={handleEditorClose} startAt={startAt} endAt={endAt} isNew />
+					<CalendarItemPopupInfo handleClose={handleEditorClose} startAt={dateTime} endAt={dateTime} isNew />
 				)}
 			</div>
 		</DragDate>
@@ -151,7 +148,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		for (let i = 0; i < weekCount; i++) {
 			for (let j = 0; j < 7; j++) {
 				const date = 1 - currentMonthInfo.firstDayOfWeek + j + i * 7
-				const dateTime = new Date(year, month, date)
+				const dateTime = moment().year(year).month(month).date(date)
 
 				const dateInfo = {
 					dateTime,
@@ -176,8 +173,10 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 				scheduleStartAt: scheduleItem.startAt,
 				scheduleEndAt: scheduleItem.endAt,
 			}
+
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
+
 			for (let i = 0; i < weekCount; i++) {
 				for (let j = 0; j < 7; j++) {
 					if (isDateTimeIncludeScheduleItem(dateInfoList[i][j].dateTime, scheduleItem)) {
@@ -258,6 +257,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							j = 0
 						}
 						renderList[renderList.length - 1] = { ...renderList[renderList.length - 1], isLast: true }
+						console.log(renderList)
 						return {
 							...scheduleItem,
 							renderList,
@@ -268,8 +268,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 		})
 
 	// 먼저 시작하는 일정 순서로 정렬
-	const ascendingScheduleList = (scheduleList) =>
-		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
+	const ascendingScheduleList = (scheduleList) => scheduleList.sort((a, b) => moment(a.startAt).diff(b.startAt))
 
 	const makeDraggingRenderList = () => {
 		let tempList = []
@@ -335,9 +334,9 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							{dateInfoRow?.map((dateInfoItem, j) => {
 								return (
 									<CalendarCell
-										key={dateInfoItem.dateTime.getTime()}
+										key={`col-${j}`}
 										dateTime={dateInfoItem.dateTime}
-										isDimmed={dateInfoItem.dateTime.getMonth() !== month}
+										isDimmed={+dateInfoItem.dateTime.format('MM') - 1 !== month}
 										isHoliday={dateInfoItem.isHoliday}
 										scheduleList={dateInfoItem.scheduleList}
 									/>

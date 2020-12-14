@@ -9,7 +9,6 @@ import {
 	getMonthInfo,
 	getDateInfo,
 	calcWeekCount,
-	isSameDate,
 	calcScheduleDay,
 	isDateTimeIncludeScheduleItem,
 	getSaturdaysOfMonth,
@@ -53,6 +52,7 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const { date } = getDateInfo(dateTime)
 	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
 	const calendarList = calendarStore[dateInfo]
+
 	// 셀 클릭 이벤트
 	const onCellClick = (e) => {
 		e.stopPropagation()
@@ -110,6 +110,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
 	const calendarContentRef = useRef(null)
+
 	useEffect(() => {
 		if (dragScheduleStore.isResizing) {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
@@ -257,7 +258,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 							j = 0
 						}
 						renderList[renderList.length - 1] = { ...renderList[renderList.length - 1], isLast: true }
-						console.log(renderList)
 						return {
 							...scheduleItem,
 							renderList,

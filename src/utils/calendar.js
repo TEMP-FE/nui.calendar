@@ -1,4 +1,3 @@
-import { padStart } from './common'
 import moment from 'moment'
 
 export const dayOfWeekList = [

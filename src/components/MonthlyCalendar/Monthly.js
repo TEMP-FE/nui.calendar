@@ -5,6 +5,7 @@ import classNames from 'classnames/bind'
 
 import MonthlyCalendar from '../MonthlyCalendar/MonthlyCalendar'
 import ButtonArea from '../ButtonArea/ButtonArea'
+import moment from 'moment'
 
 const cx = classNames.bind(styles)
 
@@ -24,11 +25,15 @@ const Monthly = ({ style }) => {
 	const changeMonth = (state) => {
 		let count = state ? 1 : -1
 		const { year, month } = monthlyData
-		const nextMonthlyData = getDateInfo(new Date(year, month + count))
+		const nextDate = moment()
+			.year(year)
+			.month(month + count)
+		const nextYear = +nextDate.format('YYYY')
+		const nextMonth = +nextDate.format('MM') - 1
 
 		setData({
-			year: nextMonthlyData.year,
-			month: nextMonthlyData.month,
+			year: nextYear,
+			month: nextMonth,
 		})
 	}
 

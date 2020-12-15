@@ -1,58 +1,83 @@
 {
-  "name": "nui.calendar",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "classnames": "^2.2.6",
-    "moment": "^2.29.1",
-    "node-sass": "^4.14.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "es6": true,
-      "node": true
-    },
-    "extends": [
-      "react-app",
-      "airbnb",
-      "airbnb/hooks",
-      "plugin:prettier/recommended"
-    ],
-    "rules": {}
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "eslint-config-airbnb": "^18.2.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-jsx-a11y": "^6.3.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react": "^7.20.6",
-    "eslint-plugin-react-hooks": "^4.0.0",
-    "prettier": "^2.1.1"
-  }
+	"name": "man_calendar_test1",
+	"version": "1.1.6",
+	"private": false,
+	"babel": {
+		"presets": [
+			"@babel/preset-react",
+			"@babel/preset-env"
+		],
+		"plugins": [
+			"module:@babel/plugin-proposal-optional-chaining",
+			"@babel/plugin-transform-destructuring",
+			"@babel/plugin-transform-parameters",
+			"inline-react-svg"
+		]
+	},
+	"peerDependencies": {
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
+		"react-scripts": "3.4.3"
+	},
+	"dependencies": {
+		"@testing-library/jest-dom": "^4.2.4",
+		"@testing-library/react": "^9.3.2",
+		"@testing-library/user-event": "^7.1.2",
+		"classnames": "^2.2.6",
+		"moment": "^2.29.1",
+		"node-sass": "^4.14.1",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
+		"react-scripts": "3.4.3"
+	},
+	"scripts": {
+		"start": "react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject",
+		"publish:npm": "rm -rf dist && mkdir dist && babel src -d dist --copy-files"
+	},
+	"eslintConfig": {
+		"env": {
+			"browser": true,
+			"es6": true,
+			"node": true
+		},
+		"extends": [
+			"react-app",
+			"airbnb",
+			"airbnb/hooks",
+			"plugin:prettier/recommended"
+		],
+		"rules": {}
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.12.10",
+		"@babel/plugin-proposal-optional-chaining": "^7.12.7",
+		"@babel/plugin-transform-destructuring": "^7.12.1",
+		"@babel/plugin-transform-parameters": "^7.12.1",
+		"@babel/preset-env": "^7.12.10",
+		"@babel/preset-react": "^7.12.10",
+		"babel-plugin-inline-react-svg": "^1.1.2",
+		"eslint-config-airbnb": "^18.2.0",
+		"eslint-config-prettier": "^6.11.0",
+		"eslint-plugin-import": "^2.22.0",
+		"eslint-plugin-jsx-a11y": "^6.3.1",
+		"eslint-plugin-prettier": "^3.1.4",
+		"eslint-plugin-react": "^7.20.6",
+		"eslint-plugin-react-hooks": "^4.0.0",
+		"prettier": "^2.1.1"
+	}
 }

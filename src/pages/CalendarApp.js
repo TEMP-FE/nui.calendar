@@ -5,7 +5,7 @@ import WeeklyCalendar from '../components/WeeklyCalendar/WeeklyCalendar'
 
 const CalendarApp = () => {
 	const monthlyStyle = {
-		width: 600,
+		width: 1000,
 	}
 
 	return (

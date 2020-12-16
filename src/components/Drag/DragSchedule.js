@@ -31,14 +31,21 @@ const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, in
 	}, [])
 
 	const handleDragStart = (e) => {
-		if (!dragScheduleStore.isResizing && dragScheduleStore.calendarType === calendarType.MONTH) {
-			document.body.classList.add('monthly_schedule_move')
-			e.currentTarget.style.cursor = "move"
+		if (dragScheduleStore.calendarType === calendarType.MONTH) {
+			let ghost = document.createElement("div")
+			ghost.setAttribute('id', 'dragging_ghost')
+			ghost.setAttribute('style', 'position:absolute; top:0;left:0;width:120px;height:26px;border-radius:4px;background-color:red;z-index:-1;')
+			e.currentTarget.appendChild(ghost)
+			e.dataTransfer.setDragImage(ghost, 60, 13)
 		}
-		e.dataTransfer.setDragImage(dragImg, 0, 0)
+		else {
+			e.dataTransfer.setDragImage(dragImg, 0, 0)
+		}
 		dragScheduleDispatch(startDrag(index, startAt, endAt))
 	}
 	const handleDragEnd = (e) => {
+		let ghost = document.getElementById('dragging_ghost')
+		e.currentTarget.removeChild(ghost)
 		dragScheduleDispatch(resetScheduleDrag())
 	}
 	const handleResizeDragStart = () => {

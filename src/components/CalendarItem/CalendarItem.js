@@ -80,13 +80,23 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 		endAt,
 		category,
 		isBlocked,
+		index,
+		scheduleStartAt,
+		scheduleEndAt
 		// isRepeatable = false,
 	} = item
 
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
-		<div className={cx('component')} onClick={handleItemClick} draggable={!isBlocked}>
+		<DragSchedule
+			className={cx('component')}
+			isBlocked={isBlocked}
+			index={index}
+			startAt={moment(scheduleStartAt)}
+			endAt={moment(scheduleEndAt)}
+			onClick={handleItemClick}
+		>
 			<button
 				type="button"
 				className={cx('item')}
@@ -113,7 +123,7 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 					</span>
 				</span>
 			</button>
-		</div>
+		</DragSchedule>
 	)
 }
 

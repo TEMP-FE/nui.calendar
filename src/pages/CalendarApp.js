@@ -1,5 +1,7 @@
 import React from 'react'
-import Monthly from '../components/lib/MonthlyCalendar/Monthly'
+
+import Monthly from '../components/MonthlyCalendar/Monthly'
+import WeeklyCalendar from '../components/WeeklyCalendar/WeeklyCalendar'
 
 const CalendarApp = () => {
 	const monthlyStyle = {
@@ -8,7 +10,8 @@ const CalendarApp = () => {
 
 	return (
 		<>
-			<Monthly></Monthly>
+			{/* <WeeklyCalendar /> */}
+			<Monthly style={monthlyStyle} />
 		</>
 	)
 }

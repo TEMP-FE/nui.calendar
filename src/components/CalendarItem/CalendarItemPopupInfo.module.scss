@@ -5,12 +5,35 @@
 .area-flex {
     display: flex;
     align-items: center;
+    + .area-flex {
+       margin-top: 10px;
+    }
     .item {
         flex: 1;
         &.type-none {
             flex: none;
             margin-left: auto;
         }
+        &.type-date {
+            position: relative;
+            padding-right: 8px;
+            ~ .type-date {
+                padding-left: 8px;
+                &:before {
+                    content: '~';
+                    position: absolute;
+                    top: 50%;
+                    left: 0;
+                    transform: translate(-50%, -50%);
+                }
+            }
+        }
+    }
+    .button {
+        border: 0;
+        background-color: transparent;
+        color: #fff;
+        font-weight: 600;
     }
 }
 .area-button {

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
+import moment from 'moment'
 import classNames from 'classnames/bind'
+
 import { calendarType } from '../../const/drag'
 import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
 import { setCalendar } from '../../reducers/dragDate'
@@ -9,18 +11,19 @@ import {
 	getMonthInfo,
 	getDateInfo,
 	calcWeekCount,
-	isSameDate,
 	calcScheduleDay,
 	isDateTimeIncludeScheduleItem,
 	getSaturdaysOfMonth,
 } from '../../utils/calendar'
 
-import CalendarItem from '../CalendarItem'
+import DragDate from '../Drag/DragDate'
+import CalendarItem from '../CalendarItem/CalendarItemWithPopup'
+import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
+import useToggle from '../CalendarItem/useToggle'
 
 import styles from './MonthlyCalendar.module.scss'
-import DragDate from '../Drag/DragDate'
-import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
-const moment = require('moment')
+import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
+
 const cx = classNames.bind(styles)
 
 // 달력 헤더
@@ -46,13 +49,10 @@ const CalendarHeader = () => {
 // 달력 셀
 const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const [moreList, setMoreList] = useState()
-	const { calendarStore } = useCalendarContext()
-	const [isEditorShown, setIsEditorShown] = useState(false)
+	const [isPopupShown, toggleIsPopupShown] = useToggle({ initialValue: false })
 
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
 	const { year, month, date } = getDateInfo(dateTime)
-	const dateInfo = moment(dateTime).format('YYYY-MM-DD')
-	const calendarList = calendarStore[dateInfo]
 	const startAt = new Date(year, month, date)
 	const endAt = new Date(year, month, date)
 
@@ -60,11 +60,7 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const onCellClick = (e) => {
 		e.stopPropagation()
 
-		setIsEditorShown(!isEditorShown)
-	}
-
-	const handleEditorClose = () => {
-		setIsEditorShown(!isEditorShown)
+		toggleIsPopupShown(e)
 	}
 
 	// 더보기 버튼 클릭 이벤트
@@ -85,16 +81,21 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 
 	return (
 		<DragDate className={cx('calendar_cell')} onClick={onCellClick} date={moment(dateTime)}>
-			<div className={cx('cell_header')}>
+			<div id={`cell-${month}-${date}`} className={cx('cell_header')}>
 				<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
 				{moreList && moreList.length > 0 && (
 					<button className={cx('more_button')} type={'button'} onClick={onMoreButtonClick}>
 						{moreList.length} more
 					</button>
 				)}
-				{calendarList && calendarList.map((item) => <CalendarItem key={item.calendarId} {...item} />)}
-				{isEditorShown && (
-					<CalendarItemPopupInfo handleClose={handleEditorClose} startAt={startAt} endAt={endAt} isNew />
+				{isPopupShown && (
+					<CalendarItemPopupInfo
+						id={`cell-${month}-${date}`}
+						handleClose={toggleIsPopupShown}
+						startAt={startAt}
+						endAt={endAt}
+						isNew
+					/>
 				)}
 			</div>
 		</DragDate>
@@ -108,6 +109,7 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 	const [dateInfoList, setDateInfoList] = useState()
 	const { calendarStore, calendarDispatch } = useCalendarContext()
 	const [draggingRenderList, setDraggingRenderList] = useState([])
+
 	let currentMonthInfo = getMonthInfo({ year, month: month + 1 })
 	let weekCount = calcWeekCount({ year, month: month + 1 })
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
@@ -173,8 +175,6 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 			scheduleItem = {
 				...scheduleItem,
 				index: scheduleIndex,
-				scheduleStartAt: scheduleItem.startAt,
-				scheduleEndAt: scheduleItem.endAt,
 			}
 			let period = calcScheduleDay(scheduleItem)
 			let renderList = []
@@ -350,11 +350,20 @@ const MonthlyCalendar = ({ year = getDateInfo().year, month = getDateInfo().mont
 					{calendarScheduleList?.map((scheduleItem) => {
 						return scheduleItem?.renderList?.map((renderItem) => {
 							const { top, left, width, stack, opacity, isLast } = renderItem
+							const { month, date } = getDateInfo(scheduleItem.startAt)
 
 							if (stack < 4) {
 								return (
-									<div className={cx('schedule_item')} style={{ top, left, width, opacity }}>
-										<CalendarItem {...scheduleItem} isLast={isLast} />
+									<div
+										key={scheduleItem.id}
+										className={cx('schedule_item')}
+										style={{ top, left, width, opacity }}
+									>
+										<CalendarItemWithPopup
+											id={`cell-${month}-${date}`}
+											isLast={isLast}
+											{...scheduleItem}
+										/>
 									</div>
 								)
 							}

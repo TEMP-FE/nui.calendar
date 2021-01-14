@@ -54,14 +54,39 @@ const DayType = ({ handleIsShown, style, isLast, ...item }) => {
 	)
 }
 
-const TimeType = ({ handleIsShown, ...item }) => {
-	const { title, startAt, endAt, category, isBlocked } = item
+const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
+	const {
+		id,
+		title,
+		startAt,
+		endAt,
+		category,
+		isBlocked,
+		index,
+		scheduleStartAt,
+		scheduleEndAt
+		// isRepeatable = false,
+	} = item
 
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
-		<div className={cx('component')} onClick={handleItemClick} draggable={!isBlocked}>
-			<button type="button" className={cx('item')} onClick={handleIsShown}>
+		<DragSchedule
+			className={cx('component')}
+			isBlocked={isBlocked}
+			index={index}
+			startAt={moment(scheduleStartAt)}
+			endAt={moment(scheduleEndAt)}
+			onClick={handleItemClick}
+		>
+			<button
+				type="button"
+				className={cx('item')}
+				aria-haspopup="dialog"
+				aria-controls={id}
+				aria-expanded={isShown}
+				onClick={handleIsShown}
+			>
 				<span className={cx('cell', 'type-group')}>
 					<span className={cx('group')} style={{ backgroundColor: getCategoryColor(category) }}>
 						<span className="blind">{category}</span>
@@ -82,7 +107,7 @@ const TimeType = ({ handleIsShown, ...item }) => {
 					</span>
 				)}
 			</button>
-		</div>
+		</DragSchedule>
 	)
 }
 

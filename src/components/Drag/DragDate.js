@@ -4,19 +4,13 @@ import { moveScheduleDrag, dropSchedule, updateScheduleDrag, resetScheduleDrag }
 import { useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
 import { calendarType } from '../../const/drag'
 const DragDate = ({ className, onClick, date, children }) => {
-	const [dragImg, setDragImg] = useState();
 	const [dragEnter, setDragEnter] = useState(false);
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
-	useEffect(() => {
-		// TODO 타입별로 다르게 구현
-		const img = new Image()
-		img.src = 'https://avatars1.githubusercontent.com/u/19828721?s=96&v=4'
-		img.onload = () => setDragImg(img)
-	}, [])
 
 	const handleDragStart = (e) => {
-		e.dataTransfer.setDragImage(dragImg, -10, -10)
+		const img = new Image()
+		e.dataTransfer.setDragImage(img, 0, 0)
 		setDragEnter(true)
 		dragDateDispatch(startDrag(date))
 	}

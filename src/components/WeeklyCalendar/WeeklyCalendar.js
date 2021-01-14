@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react'
 import styles from './WeeklyCalendar.module.scss'
 import classNames from 'classnames/bind'
 
-import CalendarItem from '../CalendarItem/CalendarItem'
 import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
 import { calendarType } from '../../const/drag'
 import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import useToggle from '../CalendarItem/useToggle'
 import { setCalendar } from '../../reducers/dragDate'
 import { resetScheduleDrag } from '../../reducers/dragSchedule'
 import { updateCalendar } from '../../reducers/calendar'
+import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
+import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 
 const cx = classNames.bind(styles)
 const moment = require('moment')
@@ -19,6 +21,36 @@ const year = curDay.getFullYear()
 const month = curDay.getMonth()
 const date = curDay.getDate()
 const dayOfWeek = curDay.getDay()
+
+const WeeklyCell = ({ info, time }) => {
+	const [isPopupShown, toggleIsPopupShown] = useToggle({ initialValue: false })
+
+	const onCellClick = (e) => {
+		e.stopPropagation()
+
+		toggleIsPopupShown(e)
+	}
+
+	const date = moment(info).date()
+	const startAt = moment(info).hour(time)
+	const endAt = moment(info).hour(time).minute(30)
+
+	return (
+		<div id={`time-${date}-${time}`} className={cx('detail_wrap')} onClick={onCellClick}>
+			<DragDate className={cx('detail_cell')} date={startAt} />
+			<DragDate className={cx('detail_cell')} date={endAt} />
+			{isPopupShown && (
+				<CalendarItemPopupInfo
+					id={`time-${date}-${time}`}
+					handleClose={toggleIsPopupShown}
+					startAt={new Date()}
+					endAt={new Date()}
+					isNew
+				/>
+			)}
+		</div>
+	)
+}
 
 const WeeklyCalendar = () => {
 	const { dragDateDispatch, dragDateStore } = useDragDateContext()
@@ -80,16 +112,15 @@ const WeeklyCalendar = () => {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
-		}
-		else if (dragScheduleStore.isDragging) {
+		} else if (dragScheduleStore.isDragging) {
 			let start = dragScheduleStore.dragInfo.startAt.clone()
 			let end = dragScheduleStore.dragInfo.endAt.clone()
 			let movingRenderList = []
 			while (start.date() !== end.date()) {
-				const tempEnd = start.clone().add(1, 'd').set({ 'hour': 0, 'minute': 0, 'second': 0, 'millisecond': 0 })
+				const tempEnd = start.clone().add(1, 'd').set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
 				movingRenderList.push({ startAt: start.toDate(), endAt: tempEnd.toDate() })
 				start = tempEnd
 			}
@@ -104,7 +135,7 @@ const WeeklyCalendar = () => {
 			movedSchedule = {
 				...movedSchedule,
 				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate()
+				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -132,11 +163,13 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = { ...item, index: index, scheduleStartAt: item.startAt, scheduleEndAt: item.endAt }
+			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt }
 			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem
 		})
+
+		console.log(filteredList)
 
 		setCalendarItemList(filteredList.flat())
 	}, [calendarStore.scheduleList])
@@ -195,18 +228,20 @@ const WeeklyCalendar = () => {
 						</div>
 						<div className={cx('view')}>
 							{week.map((info, index) => (
-								<div className={cx('view_cell')} key={index} onClick={() => log(info)}>
-									{timeLine.map((time) => (
-										<div className={cx('detail_wrap')} key={time}>
-											<DragDate className={cx('detail_cell')} date={moment(info).hour(time)} />
-											<DragDate className={cx('detail_cell')} date={moment(info).hour(time).minute(30)} />
-										</div>
+								<div className={cx('view_cell')} key={index}>
+									{timeLine.map((time, timeIndex) => (
+										<WeeklyCell key={`time-${timeIndex}`} info={info} time={time} />
 									))}
-									{calendarItemList.map(
-										(calendarItem) =>
-											info.getDate() === new Date(calendarItem.startAt).getDate() && (
-												<CalendarItem
-													{...calendarItem}
+									{calendarItemList.map((calendarItem) => {
+										const currentDate = info.getDate()
+										const itemDate = new Date(calendarItem.startAt).getDate()
+										const itemHour = new Date(calendarItem.startAt).getHours()
+										const hasItem = currentDate === itemDate
+
+										return (
+											hasItem && (
+												<CalendarItemWithPopup
+													id={`time-${itemDate}-${itemHour}`}
 													style={{
 														top: calcStartPoint(calendarItem.startAt),
 														left: '0',
@@ -216,27 +251,26 @@ const WeeklyCalendar = () => {
 															calendarItem.endAt,
 														),
 													}}
+													{...calendarItem}
 												/>
-											),
-									)}
+											)
+										)
+									})}
 									{movingSchedule.map(
 										(item) =>
 											info.getDate() === item.startAt.getDate() && (
 												<div
 													style={{
-														position: "absolute",
+														position: 'absolute',
 														top: calcStartPoint(item.startAt),
 														left: '0',
 														right: '0',
 														zIndex: '-5',
 														backgroundColor: 'rgba(255,0,0,0.1)',
-														height: calcCalendarItemHeight(
-															item.startAt,
-															item.endAt,
-														)
+														height: calcCalendarItemHeight(item.startAt, item.endAt),
 													}}
 												/>
-											)
+											),
 									)}
 									{draggingRenderList?.map(
 										(item) =>
@@ -247,7 +281,10 @@ const WeeklyCalendar = () => {
 														top: calcStartPoint(item.startAt.toDate()),
 														left: '0',
 														right: '5px',
-														height: calcCalendarItemHeight(item.startAt.toDate(), item.endAt.toDate()),
+														height: calcCalendarItemHeight(
+															item.startAt.toDate(),
+															item.endAt.toDate(),
+														),
 														backgroundColor: 'rgba(255,0,0,0.1)',
 														zIndex: '-5',
 													}}

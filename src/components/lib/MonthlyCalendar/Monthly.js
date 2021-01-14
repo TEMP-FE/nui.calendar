@@ -3,8 +3,12 @@ import React, { useState, useEffect } from 'react'
 import MonthlyCalendar from '../MonthlyCalendar/MonthlyCalendar'
 import ButtonArea from '../../ButtonArea/ButtonArea'
 import { getDateInfo } from '../../../utils/calendar'
+import { useCalendarContext } from '../../../contexts/calendar'
 
 const Monthly = ({ style }) => {
+	const { calendarStore } = useCalendarContext()
+	console.log(calendarStore)
+
 	const [monthlyData, setData] = useState({
 		month: '',
 		year: '',

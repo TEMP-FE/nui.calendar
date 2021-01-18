@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styles from './WeeklyCalendar.module.scss'
 import classNames from 'classnames/bind'
+import moment from 'moment'
 
 import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
@@ -14,7 +15,6 @@ import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
 import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 
 const cx = classNames.bind(styles)
-const moment = require('moment')
 
 const curDay = new Date()
 const year = curDay.getFullYear()
@@ -59,7 +59,6 @@ const WeeklyCalendar = () => {
 	const [calendarItemList, setCalendarItemList] = useState([])
 
 	const [week, setWeek] = useState([])
-	const dayOfWeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 	const timeLine = new Array(24)
 	const [draggingRenderList, setDraggingRenderList] = useState()
 	const [movingSchedule, setMovingSchedule] = useState([])
@@ -72,7 +71,7 @@ const WeeklyCalendar = () => {
 		const thisWeek = []
 
 		for (var i = 0; i < 7; i++) {
-			thisWeek.push(new Date(year, month, date + (i - dayOfWeek)))
+			thisWeek.push(moment().day(i))
 		}
 
 		setWeek(thisWeek)
@@ -80,17 +79,17 @@ const WeeklyCalendar = () => {
 
 	const changeWeek = (state) => {
 		const tempWeek = []
+		const calcDay = state ? 7 : -7
 
-		for (let i = 0; i < 7; i++) {
-			var temp = new Date(week[i])
-			temp.setDate(temp.getDate() + (state ? 7 : -7))
-			tempWeek.push(temp)
-		}
+		week.map((day) => (
+			tempWeek.push(day.add(calcDay, 'day'))
+		))
+
 		setWeek(tempWeek)
 	}
 
 	const log = (info) => {
-		console.log(info.getFullYear(), info.getMonth() + 1, info.getDate())
+		console.log(info)
 	}
 
 	const timelog = (time, value) => {
@@ -202,10 +201,10 @@ const WeeklyCalendar = () => {
 			</strong>
 			<div className={cx('table')}>
 				<div className={cx('header')}>
-					{dayOfWeekList.map((dayOfWeek, index) => (
-						<div key={index} className={cx('date', new Date(week[index]) < new Date() && 'dimmed')}>
-							{new Date(week[index]).getDate()}
-							<em>{dayOfWeek}</em>
+					{week.map((day, index) => (
+						<div key={index} className={cx('date', day.isBefore(moment().subtract(1, 'day')) && 'dimmed')}>
+							{day.format('D')}
+							<em>{day.format('ddd')}</em>
 						</div>
 					))}
 				</div>
@@ -226,7 +225,7 @@ const WeeklyCalendar = () => {
 								</div>
 							))}
 						</div>
-						<div className={cx('view')}>
+						{/* <div className={cx('view')}>
 							{week.map((info, index) => (
 								<div className={cx('view_cell')} key={index}>
 									{timeLine.map((time, timeIndex) => (
@@ -293,7 +292,7 @@ const WeeklyCalendar = () => {
 									)}
 								</div>
 							))}
-						</div>
+						</div> */}
 						<div></div>
 					</div>
 				</div>

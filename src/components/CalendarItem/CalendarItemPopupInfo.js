@@ -4,6 +4,8 @@ import classNames from 'classnames/bind'
 import { getCategoryList } from './commonState'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../reducers/calendar'
 
+import CalendarDate from '../../utils/CalendarDate'
+
 import { useCalendarContext } from '../../contexts/calendar'
 import CalendarItemPopupPortal from './CalendarItemPopupPortal'
 
@@ -11,7 +13,6 @@ import styles from './CalendarItemPopupInfo.module.scss'
 import useInput from './useInput'
 import useToggle from './useToggle'
 import { InputCheckbox, InputDate, InputSelector, InputText } from './Input'
-import { parseDateToString, parseDateToTimeString } from '../../utils/calendar'
 
 const cx = classNames.bind(styles)
 
@@ -132,7 +133,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 							<div className={cx('item', 'type-date')}>
 								<InputDate
 									id="date-start"
-									value={parseDateToString(startAtState)}
+									value={CalendarDate.getDateString(startAtState)}
 									handler={handleStartDateAtChange}
 									readOnly={isBlockedState}
 								/>
@@ -140,7 +141,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 							<div className={cx('item', 'type-date')}>
 								<InputDate
 									id="date-end"
-									value={parseDateToString(endAtState)}
+									value={CalendarDate.getDateString(endAtState)}
 									handler={handleEndDateAtChange}
 									readOnly={isBlockedState}
 								/>
@@ -151,7 +152,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 							<div className={cx('item', 'type-date')}>
 								<InputDate
 									id="time-start"
-									value={parseDateToTimeString(startAtState)}
+									value={CalendarDate.getDateTimeString(startAtState)}
 									handler={handleStartDateAtChange}
 									typeTime
 									readOnly={isBlockedState}
@@ -160,7 +161,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 							<div className={cx('item', 'type-date')}>
 								<InputDate
 									id="time-end"
-									value={parseDateToTimeString(endAtState)}
+									value={CalendarDate.getDateTimeString(endAtState)}
 									handler={handleEndDateAtChange}
 									typeTime
 									readOnly={isBlockedState}

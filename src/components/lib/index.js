@@ -1,1 +1,1 @@
-export { default as Monthly } from './MonthlyCalendar/Monthly'
+export { default as Monthly } from './Monthly'

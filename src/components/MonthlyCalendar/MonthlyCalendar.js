@@ -104,8 +104,8 @@ const MonthlyCalendar = ({ year, month }) => {
 	const { calendarStore, calendarDispatch } = useCalendarContext()
 	const [draggingRenderList, setDraggingRenderList] = useState([])
 
-	let currentMonthInfo = CalendarDate.getMonthInfo({ year, month: month + 1 })
-	let weekCount = CalendarDate.calcWeekCount({ year, month: month + 1 })
+	let currentMonthInfo = CalendarDate.getMonthInfo({ year, month: month })
+	let weekCount = CalendarDate.calcWeekCount({ year, month: month })
 
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()

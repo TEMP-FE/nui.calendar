@@ -24,9 +24,7 @@ const Monthly = ({ style }) => {
 		setMonthlyData(initialState)
 	}, [])
 
-	const changeMonth = (state) => {
-		let isSetNext = state ? 1 : -1
-
+	const changeMonth = (isSetNext) => {
 		const nextMonthlyData = new CalendarDate(monthlyData.CURRENT_DATE)
 
 		if (isSetNext) {

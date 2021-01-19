@@ -15,6 +15,8 @@ class CalendarDate {
 	static calcWeekCount({ year, month }) {
 		const monthInfo = CalendarDate.getMonthInfo({ year, month })
 
+		console.log(year, month)
+
 		let weekCount = Math.ceil((monthInfo.lastDate + monthInfo.firstDayOfWeek) / 7)
 
 		return weekCount
@@ -65,7 +67,7 @@ class CalendarDate {
 	}
 
 	setPrevMonth() {
-		this.CURRENT_DATE.substract(1, 'months')
+		this.CURRENT_DATE.subtract(1, 'months')
 		this.setDateInfo()
 	}
 }

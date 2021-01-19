@@ -28,12 +28,12 @@ class CalendarDate {
 		return Math.floor(startToEnd / 86400 + 1)
 	}
 
-	static getDateString(date) {
-		return moment(date).format('YYYY-MM-DD')
+	static getDateString(date, format = 'YYYY-MM-DD') {
+		return moment(date).format(format)
 	}
 
-	static getDateTimeString(date) {
-		return moment(date).format('HH:MM:SS')
+	static getDateTimeString(date, format = 'HH:MM:SS') {
+		return moment(date).format(format)
 	}
 
 	static getDateInfo(date = new Date()) {

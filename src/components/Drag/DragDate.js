@@ -54,7 +54,7 @@ const DragDate = ({ className, onClick, date, children }) => {
 		e.preventDefault()
 	}
 
-	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragEnter && !dragScheduleStore.isResizing
+	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragEnter && !dragScheduleStore.isResizing && dragScheduleStore.isDragging
 
 	return (
 		<div

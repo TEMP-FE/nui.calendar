@@ -3,13 +3,13 @@ import { startDrag, updateDrag, drop, resetDrag } from '../../reducers/dragDate'
 import { moveScheduleDrag, dropSchedule, updateScheduleDrag, resetScheduleDrag } from '../../reducers/dragSchedule'
 import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 import { calendarType } from '../../const/drag'
-const DragDate = ({ className, onClick, date, children }) => {
+const DragDate = ({ className, openPopup, date, children }) => {
+	const img = new Image()
 	const [dragEnter, setDragEnter] = useState(false);
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
 
 	const handleDragStart = (e) => {
-		const img = new Image()
 		e.dataTransfer.setDragImage(img, 0, 0)
 		setDragEnter(true)
 		dragDateDispatch(startDrag(date))
@@ -40,6 +40,11 @@ const DragDate = ({ className, onClick, date, children }) => {
 			dragScheduleDispatch(dropSchedule())
 		}
 		else {
+			const { firstPoint, secondPoint } = dragDateStore.dragInfo
+			firstPoint.isSameOrBefore(secondPoint) ?
+				openPopup(firstPoint.toDate(), secondPoint.add(30, 'm').toDate()) :
+				openPopup(secondPoint.toDate(), firstPoint.add(30, 'm').toDate())
+
 			dragDateDispatch(drop())
 		}
 		setDragEnter(false)
@@ -54,6 +59,11 @@ const DragDate = ({ className, onClick, date, children }) => {
 		e.preventDefault()
 	}
 
+	const handleClick = () => {
+		const tempEndAt = date.clone().add(30, 'm')
+		openPopup(date.toDate(), tempEndAt.toDate())
+	}
+
 	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragEnter && !dragScheduleStore.isResizing && dragScheduleStore.isDragging
 
 	return (
@@ -66,7 +76,7 @@ const DragDate = ({ className, onClick, date, children }) => {
 			onDrop={handleDrop}
 			onDragEnd={handleDragEnd}
 			className={className}
-			onClick={onClick}
+			onClick={handleClick}
 			style={{ backgroundColor: isScheduleMovingIn && 'rgba(255,0,0,0.1)' }}
 		>
 			{children}

@@ -24,28 +24,23 @@ const date = curDay.getDate()
 const dayOfWeek = curDay.getDay()
 
 const WeeklyCell = ({ info, time }) => {
-	const [isPopupShown, toggleIsPopupShown] = useToggle({ initialValue: false })
-
-	const onCellClick = (e) => {
-		e.stopPropagation()
-
-		toggleIsPopupShown(e)
-	}
-
 	const date = moment(info).date()
 	const startAt = moment(info).hour(time)
-	const endAt = moment(info).hour(time).minute(30)
+	const endAt = startAt.clone().minute(30)
+	const [popupInfo, setPopupInfo] = useState({ startAt: startAt, endAt: endAt, isPopupShown: false })
+	const openPopup = (start = startAt, end = endAt) => setPopupInfo({ startAt: start, endAt: end, isPopupShown: true })
+	const closePopup = () => setPopupInfo({ ...popupInfo, isPopupShown: false })
 
 	return (
-		<div id={`time-${date}-${time}`} className={cx('detail_wrap')} onClick={onCellClick}>
-			<DragDate className={cx('detail_cell')} date={startAt} />
-			<DragDate className={cx('detail_cell')} date={endAt} />
-			{isPopupShown && (
+		<div id={`time-${date}-${time}`} className={cx('detail_wrap')}>
+			<DragDate className={cx('detail_cell')} date={startAt} openPopup={openPopup} />
+			<DragDate className={cx('detail_cell')} date={endAt} openPopup={openPopup} />
+			{popupInfo.isPopupShown && (
 				<CalendarItemPopupInfo
 					id={`time-${date}-${time}`}
-					handleClose={toggleIsPopupShown}
-					startAt={new Date()}
-					endAt={new Date()}
+					handleClose={closePopup}
+					startAt={popupInfo.startAt}
+					endAt={popupInfo.endAt}
 					isNew
 				/>
 			)}

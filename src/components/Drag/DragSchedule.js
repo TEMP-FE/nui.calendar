@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import cx from 'classnames'
+import dragStyle from './Drag.scss'
 import { getCategoryColor } from '../CalendarItem/commonState'
 import { startDrag, resetScheduleDrag, startReisze } from '../../reducers/dragSchedule'
 import { useDragScheduleContext } from '../../contexts/drag'
@@ -7,25 +9,6 @@ import { calendarType } from '../../const/drag'
 const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, index, isLast, children, isTimeType, category, title }) => {
 	const [dragImg, setDragImg] = useState()
 	const { dragScheduleDispatch, dragScheduleStore } = useDragScheduleContext()
-	const monthReiszeStyle = {
-		cursor: 'col-resize',
-		top: 0,
-		right: 0,
-		bottom: 0,
-	}
-	const dayReiszeStyle = {
-		cursor: 'row-resize',
-		right: 0,
-		bottom: 0,
-		left: 0,
-	}
-	const resizeStyle = Object.assign({
-		position: 'absolute',
-		margin: 'auto',
-		width: '15px',
-		height: '15px',
-		backgroundColor: 'black'
-	}, dragScheduleStore.calendarType === calendarType.MONTH ? monthReiszeStyle : dayReiszeStyle)
 	useEffect(() => {
 		// TODO 타입별로 다르게 구현
 		setDragImg(new Image())
@@ -72,7 +55,8 @@ const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, in
 		>
 			{children}
 			{isLast && <span
-				style={resizeStyle}
+				className={cx(dragScheduleStore.calendarType === calendarType.MONTH ?
+					'col_resize' : 'row_resize')}
 				draggable={!isBlocked}
 				onDragStart={handleResizeDragStart}
 			/>}

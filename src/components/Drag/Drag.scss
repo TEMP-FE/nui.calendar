@@ -1,0 +1,21 @@
+.col_resize {
+    cursor: col-resize;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.row_resize {
+    cursor: row-resize;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.col_resize , .row_resize {
+    position: absolute;
+    margin: auto;
+    width: 15px;
+    height: 15px;
+    background-color: black;
+}

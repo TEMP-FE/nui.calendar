@@ -148,9 +148,9 @@ const WeeklyCalendar = () => {
 
 	const checkItemDateEqual = (item) => {
 		const { startAt, endAt } = item
-		
+
 		if (moment(endAt).format('D') === moment(startAt).format('D')) {
-			return item
+			return { ...item, isLast: true }
 		}
 
 		return isAllday(startAt, endAt) ? pushAlldayItem(item) : pushSeparatedItem(item, startAt, endAt)
@@ -249,7 +249,7 @@ const WeeklyCalendar = () => {
 									})}
 									{movingSchedule.map(
 										(item) =>
-										info.format('D') === moment(item.startAt).format('D') && (
+											info.format('D') === moment(item.startAt).format('D') && (
 												<div
 													style={{
 														position: 'absolute',
@@ -265,7 +265,7 @@ const WeeklyCalendar = () => {
 									)}
 									{draggingRenderList?.map(
 										(item) =>
-										item.startAt.toDate().getDate() === info.getDate() && (
+											item.startAt.toDate().getDate() === info.getDate() && (
 												<div
 													style={{
 														position: 'absolute',

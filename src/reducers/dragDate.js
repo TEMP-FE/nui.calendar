@@ -36,13 +36,13 @@ const reducer = (state, actions) => {
 				renderList: [{ startAt: actions.date, endAt: secondPoint }]
 			}
 		case ACTIONS.UPDATE:
-			const firstDay = state.dragInfo.firstPoint.isBefore(actions.date) ? state.dragInfo.firstPoint : actions.date
-			const lastDay = firstDay.isSame(actions.date) ? state.dragInfo.firstPoint : actions.date
+			const firstDate = state.dragInfo.firstPoint.isBefore(actions.date) ? state.dragInfo.firstPoint : actions.date
+			const secondDate = firstDate.isSame(actions.date) ? state.dragInfo.firstPoint : actions.date
 			let tempRenderList = [];
 			if (state.calendarType === calendarType.MONTH) {
-				let start = firstDay
+				let start = firstDate
 				let endOfWeek = start.clone().weekday(6)
-				const end = lastDay
+				const end = secondDate
 				while (!end.isSameOrBefore(endOfWeek)) {
 					tempRenderList.push({ startAt: start.clone(), endAt: endOfWeek.clone() })
 					start = endOfWeek.clone().add(1, 'day')
@@ -51,9 +51,9 @@ const reducer = (state, actions) => {
 				tempRenderList.push({ startAt: start.clone(), endAt: end.clone() })
 			}
 			else if (state.calendarType === calendarType.WEEK) {
-				let start = firstDay.clone()
-				const end = lastDay.clone().add(30, 'm')
-				while (start.date() !== lastDay.date()) {
+				let start = firstDate.clone()
+				const end = secondDate.clone().add(30, 'm')
+				while (start.date() !== secondDate.date()) {
 					const tempEnd = start.clone().add(1, 'd').set({ 'hour': 0, 'minute': 0, 'second': 0, 'millisecond': 0 })
 					tempRenderList.push({ startAt: start, endAt: tempEnd })
 					start = tempEnd

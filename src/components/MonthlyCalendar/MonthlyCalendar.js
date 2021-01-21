@@ -3,7 +3,7 @@ import moment from 'moment'
 import classNames from 'classnames/bind'
 
 import { calendarType } from '../../const/drag'
-import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { useCalendarContext } from '../../contexts/calendar'
 import { setCalendar } from '../../reducers/dragDate'
 import { resetScheduleDrag } from '../../reducers/dragSchedule'
 import { updateCalendar } from '../../reducers/calendar'
@@ -17,6 +17,7 @@ import useToggle from '../CalendarItem/useToggle'
 
 import styles from './MonthlyCalendar.module.scss'
 import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
+import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 
 const cx = classNames.bind(styles)
 

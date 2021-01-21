@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { startDrag, updateDrag, drop, resetDrag } from '../../reducers/dragDate'
 import { moveScheduleDrag, dropSchedule, updateScheduleDrag, resetScheduleDrag } from '../../reducers/dragSchedule'
-import { useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 import { calendarType } from '../../const/drag'
 const DragDate = ({ className, onClick, date, children }) => {
 	const [dragEnter, setDragEnter] = useState(false);

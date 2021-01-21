@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react'
 import calendarReducer from '../reducers/calendar'
-import { dateInitialState, scheduleInitialState } from '../const/drag'
-import dragDateReducer from '../reducers/dragDate'
-import dragScheduleReducer from '../reducers/dragSchedule'
 
 const appContext = createContext(null)
 
@@ -41,8 +38,6 @@ const initializer = (state) => {
 
 export const AppContext = ({ children }) => {
 	const [calendarStore, calendarDispatch] = useReducer(calendarReducer, initialState, initializer)
-	const [dragDateStore, dragDateDispatch] = useReducer(dragDateReducer, dateInitialState, initializer)
-	const [dragScheduleStore, dragScheduleDispatch] = useReducer(dragScheduleReducer, scheduleInitialState, initializer)
 
 	return (
 		<Provider
@@ -50,14 +45,6 @@ export const AppContext = ({ children }) => {
 				CalendarContext: {
 					calendarStore,
 					calendarDispatch,
-				},
-				DragDateContext: {
-					dragDateStore,
-					dragDateDispatch,
-				},
-				DragScheduleContext: {
-					dragScheduleStore,
-					dragScheduleDispatch,
 				},
 			}}
 		>
@@ -67,5 +54,3 @@ export const AppContext = ({ children }) => {
 }
 
 export const useCalendarContext = () => useContext(appContext).CalendarContext
-export const useDragDateContext = () => useContext(appContext).DragDateContext
-export const useDragScheduleContext = () => useContext(appContext).DragScheduleContext

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { startDrag, resetScheduleDrag, startReisze } from '../../reducers/dragSchedule'
-import { useDragScheduleContext } from '../../contexts/calendar'
+import { useDragScheduleContext } from '../../contexts/drag'
 import { calendarType } from '../../const/drag'
 
 const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, index, isLast, children }) => {

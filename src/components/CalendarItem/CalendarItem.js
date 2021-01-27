@@ -1,12 +1,15 @@
 import React from 'react'
+import moment from 'moment'
+import classNames from 'classnames/bind'
+
 import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
+
+import { getCategoryColor } from './commonState'
+import CalendarDate from '../../utils/CalendarDate'
+
 import DragSchedule from '../Drag/DragSchedule'
 
-import classNames from 'classnames/bind'
-import { getCategoryColor } from './commonState'
-
 import styles from './CalendarItem.module.scss'
-import moment from 'moment'
 
 const cx = classNames.bind(styles)
 
@@ -37,8 +40,8 @@ const DayType = ({ handleIsShown, style, isLast, ...item }) => {
 					<span className={cx('fixed')}>
 						<span className={cx('cell', 'ellipsis')}>
 							<span className="blind">
-								<span className={cx('period')}>{moment(startAt).format('MM-DD')}</span>
-								<span className={cx('period')}>{moment(endAt).format('MM-DD')}</span>
+								<span className={cx('period')}>{CalendarDate.getDateString(startAt, 'MM-DD')}</span>
+								<span className={cx('period')}>{CalendarDate.getDateString(endAt, 'MM-DD')}</span>
 							</span>
 							<span className={cx('title')}>{title}</span>
 						</span>
@@ -55,18 +58,7 @@ const DayType = ({ handleIsShown, style, isLast, ...item }) => {
 }
 
 const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
-	const {
-		id,
-		title,
-		startAt,
-		endAt,
-		category,
-		isBlocked,
-		index,
-		scheduleStartAt,
-		scheduleEndAt
-		// isRepeatable = false,
-	} = item
+	const { id, title, startAt, endAt, category, isBlocked, index, scheduleStartAt, scheduleEndAt } = item
 
 	const handleItemClick = (e) => e.stopPropagation()
 
@@ -95,8 +87,8 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 				<span className={cx('cell', 'type-period')}>
 					<span className={cx('fixed')}>
 						<span className={cx('cell', 'ellipsis')}>
-							<span className={cx('period')}>{moment(startAt).format('h:mm')}</span>
-							<span className={cx('period')}>{moment(endAt).format('h:mm')}</span>
+							<span className={cx('period')}>{CalendarDate.getDateTimeString(startAt, 'h:mm')}</span>
+							<span className={cx('period')}>{CalendarDate.getDateTimeString(endAt, 'h:mm')}</span>
 							<span className={cx('title')}>{title}</span>
 						</span>
 					</span>

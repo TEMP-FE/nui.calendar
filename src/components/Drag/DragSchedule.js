@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import dragStyle from './Drag.scss'
 import { getCategoryColor } from '../CalendarItem/commonState'
-import { startDrag, resetScheduleDrag, startReisze } from '../../reducers/dragSchedule'
+import { startDrag, resetScheduleDrag, startResize } from '../../reducers/dragSchedule'
 import { useDragScheduleContext } from '../../contexts/drag'
 import { calendarType } from '../../const/drag'
 
@@ -40,20 +40,23 @@ const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, in
 		}
 		dragScheduleDispatch(resetScheduleDrag())
 	}
-	const handleResizeDragStart = () => {
-		dragScheduleDispatch(startReisze())
+	const handleResizeDragStart = (e) => {
+		e.dataTransfer.setDragImage(dragImg, 0, 0)
+		dragScheduleDispatch(startDrag(index, startAt, endAt))
+		dragScheduleDispatch(startResize())
 	}
 
 	return (
-		<div
-			className={className}
-			onClick={onClick}
-			draggable={!isBlocked}
-			style={style}
-			onDragStart={handleDragStart}
-			onDragEnd={handleDragEnd}
-		>
-			{children}
+		<div className={className} style={style}>
+			<div
+				style={{ height: '100%', width: '100%' }}
+				onClick={onClick}
+				draggable={!isBlocked}
+				onDragStart={handleDragStart}
+				onDragEnd={handleDragEnd}
+			>
+				{children}
+			</div>
 			{isLast && <span
 				className={cx(dragScheduleStore.calendarType === calendarType.MONTH ?
 					'col_resize' : 'row_resize')}

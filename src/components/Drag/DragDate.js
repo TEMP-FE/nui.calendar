@@ -17,6 +17,9 @@ const DragDate = ({ className, openPopup, date, children }) => {
 
 	const handleDragEnter = (e) => {
 		if (dragScheduleStore.isResizing) {
+			if (dragScheduleStore.calendarType !== calendarType.MONTH) {
+				date.add(30, 'm')
+			}
 			dragScheduleDispatch(updateScheduleDrag(date))
 		}
 		else if (dragScheduleStore.isDragging) {

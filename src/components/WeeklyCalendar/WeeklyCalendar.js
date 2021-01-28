@@ -143,17 +143,17 @@ const WeeklyCalendar = () => {
 	}, [dragScheduleStore.isDropped])
 
 	const calcStartPoint = (startDate) => {
-		return Math.round((new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30))
+		return Math.round((moment(startDate).format('H') * 60 + parseInt(moment(startDate).format('m'))) * (26 / 30))
 	}
 
 	const calcCalendarItemHeight = (startDate, endDate) => {
-		return Math.round(((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60)) * (26 / 30))
+		return Math.round(((moment(endDate).valueOf() - moment(startDate).valueOf()) / (1000 * 60)) * (26 / 30))
 	}
 
 	const checkItemDateEqual = (item) => {
 		const { startAt, endAt } = item
-
-		if (endAt.getDate() === startAt.getDate()) {
+		
+		if (moment(endAt).format('D') === moment(startAt).format('D')) {
 			return item
 		}
 
@@ -168,18 +168,14 @@ const WeeklyCalendar = () => {
 			return filteredItem
 		})
 
-		console.log(filteredList)
-
 		setCalendarItemList(filteredList.flat())
 	}, [calendarStore.scheduleList])
 
 	const isAllday = (startAt, endAt) => {
-		return endAt.getTime() - startAt.getTime() > 86400000 ? true : false
+		return moment(endAt).valueOf() - moment(startAt).valueOf() > 86400000 ? true : false
 	}
 
 	const pushAlldayItem = (item) => {
-		console.log('allDay아이템입니다.')
-
 		return item
 	}
 
@@ -225,16 +221,16 @@ const WeeklyCalendar = () => {
 								</div>
 							))}
 						</div>
-						{/* <div className={cx('view')}>
+						<div className={cx('view')}>
 							{week.map((info, index) => (
 								<div className={cx('view_cell')} key={index}>
 									{timeLine.map((time, timeIndex) => (
 										<WeeklyCell key={`time-${timeIndex}`} info={info} time={time} />
 									))}
 									{calendarItemList.map((calendarItem) => {
-										const currentDate = info.getDate()
-										const itemDate = new Date(calendarItem.startAt).getDate()
-										const itemHour = new Date(calendarItem.startAt).getHours()
+										const currentDate = info.format('D')
+										const itemDate = moment(calendarItem.startAt).format('D')
+										const itemHour = moment(calendarItem.startAt).format('H')
 										const hasItem = currentDate === itemDate
 
 										return (
@@ -257,7 +253,7 @@ const WeeklyCalendar = () => {
 									})}
 									{movingSchedule.map(
 										(item) =>
-											info.getDate() === item.startAt.getDate() && (
+										info.format('D') === moment(item.startAt).format('D') && (
 												<div
 													style={{
 														position: 'absolute',
@@ -273,7 +269,7 @@ const WeeklyCalendar = () => {
 									)}
 									{draggingRenderList?.map(
 										(item) =>
-											item.startAt.toDate().getDate() === info.getDate() && (
+										item.startAt.toDate().getDate() === info.getDate() && (
 												<div
 													style={{
 														position: 'absolute',
@@ -292,8 +288,7 @@ const WeeklyCalendar = () => {
 									)}
 								</div>
 							))}
-						</div> */}
-						<div></div>
+						</div>
 					</div>
 				</div>
 			</div>

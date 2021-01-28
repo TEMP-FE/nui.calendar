@@ -1,15 +1,24 @@
+.dimmed {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 2000;
+}
 .component {
 	position: absolute;
 	top: 50%;
 	left: 100%;
 	z-index: 2000;
-	&:before {
-		content: '';
-		position: fixed;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
+	transform: translateY(-50%);
+	&.direction-left {
+		right: 100%;
+		left: auto;
+		.layer:after {
+			right: -5px;
+			left: auto;
+		}
 	}
 }
 .layer {
@@ -32,7 +41,7 @@
 		display: none;
 	}
 	.inner {
-		width: 300px;
+		width: 250px;
 		border-radius: 8px;
 		overflow: hidden;
 		background-color: #444;

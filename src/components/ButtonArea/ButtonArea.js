@@ -7,7 +7,7 @@ import { ReactComponent as IconNext } from '../../assets/images/svg/arrow_next.s
 
 const cx = classNames.bind(styles)
 
-const ButtonArea = ({ data, getThis, getChange }) => {
+const ButtonArea = ({ getThis, getChange }) => {
 	return (
 		<>
 			<div className={cx('menu')}>

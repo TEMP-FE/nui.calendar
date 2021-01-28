@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import styles from './Monthly.module.scss'
-import { getDateInfo } from '../../utils/calendar'
 import classNames from 'classnames/bind'
+
+import CalendarDate from '../../utils/CalendarDate'
 
 import MonthlyCalendar from '../MonthlyCalendar/MonthlyCalendar'
 import ButtonArea from '../ButtonArea/ButtonArea'
@@ -9,40 +10,38 @@ import ButtonArea from '../ButtonArea/ButtonArea'
 const cx = classNames.bind(styles)
 
 const Monthly = ({ style }) => {
-	const [monthlyData, setData] = useState({
-		month: '',
-		year: '',
-	})
+	const currentMonth = new CalendarDate()
+
+	const [monthlyData, setMonthlyData] = useState(null)
 
 	const getThisMonth = () => {
-		setData({
-			month: getDateInfo().month,
-			year: getDateInfo().year,
-		})
-	}
-
-	const changeMonth = (state) => {
-		let count = state ? 1 : -1
-		const { year, month } = monthlyData
-		const nextMonthlyData = getDateInfo(new Date(year, month + count))
-
-		setData({
-			year: nextMonthlyData.year,
-			month: nextMonthlyData.month,
-		})
+		setMonthlyData(currentMonth)
 	}
 
 	useEffect(() => {
-		getThisMonth()
+		const initialState = new CalendarDate(currentMonth.CURRENT_DATE)
+
+		setMonthlyData(initialState)
 	}, [])
+
+	const changeMonth = (isSetNext) => {
+		const nextMonthlyData = new CalendarDate(monthlyData.CURRENT_DATE)
+
+		if (isSetNext) {
+			nextMonthlyData.setNextMonth()
+		} else {
+			nextMonthlyData.setPrevMonth()
+		}
+		setMonthlyData(nextMonthlyData)
+	}
 
 	return (
 		<>
-			{monthlyData.year !== '' && monthlyData.month !== '' && (
+			{monthlyData && (
 				<>
 					<ButtonArea getThis={getThisMonth} getChange={changeMonth} />
-					<div style={style}>
-						<MonthlyCalendar month={monthlyData.month} year={monthlyData.year} />
+					<div id="calendar-container" style={style}>
+						<MonthlyCalendar year={monthlyData.YEAR} month={monthlyData.MONTH} />
 					</div>
 				</>
 			)}

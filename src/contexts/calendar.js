@@ -35,14 +35,14 @@ const initialState = {
 	],
 }
 
-const initializer = () => {
-	return initialState
+const initializer = (state) => {
+	return state
 }
 
 export const AppContext = ({ children }) => {
 	const [calendarStore, calendarDispatch] = useReducer(calendarReducer, initialState, initializer)
-	const [dragDateStore, dragDateDispatch] = useReducer(dragDateReducer, dateInitialState)
-	const [dragScheduleStore, dragScheduleDispatch] = useReducer(dragScheduleReducer, scheduleInitialState)
+	const [dragDateStore, dragDateDispatch] = useReducer(dragDateReducer, dateInitialState, initializer)
+	const [dragScheduleStore, dragScheduleDispatch] = useReducer(dragScheduleReducer, scheduleInitialState, initializer)
 
 	return (
 		<Provider

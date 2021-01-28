@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styles from './WeeklyCalendar.module.scss'
 import classNames from 'classnames/bind'
+import moment from 'moment'
 
 import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
@@ -14,7 +15,6 @@ import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
 import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 
 const cx = classNames.bind(styles)
-const moment = require('moment')
 
 const curDay = new Date()
 const year = curDay.getFullYear()
@@ -59,7 +59,6 @@ const WeeklyCalendar = () => {
 	const [calendarItemList, setCalendarItemList] = useState([])
 
 	const [week, setWeek] = useState([])
-	const dayOfWeekList = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 	const timeLine = new Array(24)
 	const [draggingRenderList, setDraggingRenderList] = useState()
 	const [movingSchedule, setMovingSchedule] = useState([])
@@ -72,7 +71,7 @@ const WeeklyCalendar = () => {
 		const thisWeek = []
 
 		for (var i = 0; i < 7; i++) {
-			thisWeek.push(new Date(year, month, date + (i - dayOfWeek)))
+			thisWeek.push(moment().day(i))
 		}
 
 		setWeek(thisWeek)
@@ -80,17 +79,17 @@ const WeeklyCalendar = () => {
 
 	const changeWeek = (state) => {
 		const tempWeek = []
+		const calcDay = state ? 7 : -7
 
-		for (let i = 0; i < 7; i++) {
-			var temp = new Date(week[i])
-			temp.setDate(temp.getDate() + (state ? 7 : -7))
-			tempWeek.push(temp)
-		}
+		week.map((day) => (
+			tempWeek.push(day.add(calcDay, 'day'))
+		))
+
 		setWeek(tempWeek)
 	}
 
 	const log = (info) => {
-		console.log(info.getFullYear(), info.getMonth() + 1, info.getDate())
+		console.log(info)
 	}
 
 	const timelog = (time, value) => {
@@ -144,17 +143,17 @@ const WeeklyCalendar = () => {
 	}, [dragScheduleStore.isDropped])
 
 	const calcStartPoint = (startDate) => {
-		return Math.round((new Date(startDate).getHours() * 60 + new Date(startDate).getMinutes()) * (26 / 30))
+		return Math.round((moment(startDate).format('H') * 60 + parseInt(moment(startDate).format('m'))) * (26 / 30))
 	}
 
 	const calcCalendarItemHeight = (startDate, endDate) => {
-		return Math.round(((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60)) * (26 / 30))
+		return Math.round(((moment(endDate).valueOf() - moment(startDate).valueOf()) / (1000 * 60)) * (26 / 30))
 	}
 
 	const checkItemDateEqual = (item) => {
 		const { startAt, endAt } = item
-
-		if (endAt.getDate() === startAt.getDate()) {
+		
+		if (moment(endAt).format('D') === moment(startAt).format('D')) {
 			return item
 		}
 
@@ -169,18 +168,14 @@ const WeeklyCalendar = () => {
 			return filteredItem
 		})
 
-		console.log(filteredList)
-
 		setCalendarItemList(filteredList.flat())
 	}, [calendarStore.scheduleList])
 
 	const isAllday = (startAt, endAt) => {
-		return endAt.getTime() - startAt.getTime() > 86400000 ? true : false
+		return moment(endAt).valueOf() - moment(startAt).valueOf() > 86400000 ? true : false
 	}
 
 	const pushAlldayItem = (item) => {
-		console.log('allDay아이템입니다.')
-
 		return item
 	}
 
@@ -202,10 +197,10 @@ const WeeklyCalendar = () => {
 			</strong>
 			<div className={cx('table')}>
 				<div className={cx('header')}>
-					{dayOfWeekList.map((dayOfWeek, index) => (
-						<div key={index} className={cx('date', new Date(week[index]) < new Date() && 'dimmed')}>
-							{new Date(week[index]).getDate()}
-							<em>{dayOfWeek}</em>
+					{week.map((day, index) => (
+						<div key={index} className={cx('date', day.isBefore(moment().subtract(1, 'day')) && 'dimmed')}>
+							{day.format('D')}
+							<em>{day.format('ddd')}</em>
 						</div>
 					))}
 				</div>
@@ -233,9 +228,9 @@ const WeeklyCalendar = () => {
 										<WeeklyCell key={`time-${timeIndex}`} info={info} time={time} />
 									))}
 									{calendarItemList.map((calendarItem) => {
-										const currentDate = info.getDate()
-										const itemDate = new Date(calendarItem.startAt).getDate()
-										const itemHour = new Date(calendarItem.startAt).getHours()
+										const currentDate = info.format('D')
+										const itemDate = moment(calendarItem.startAt).format('D')
+										const itemHour = moment(calendarItem.startAt).format('H')
 										const hasItem = currentDate === itemDate
 
 										return (
@@ -258,7 +253,7 @@ const WeeklyCalendar = () => {
 									})}
 									{movingSchedule.map(
 										(item) =>
-											info.getDate() === item.startAt.getDate() && (
+										info.format('D') === moment(item.startAt).format('D') && (
 												<div
 													style={{
 														position: 'absolute',
@@ -274,7 +269,7 @@ const WeeklyCalendar = () => {
 									)}
 									{draggingRenderList?.map(
 										(item) =>
-											item.startAt.toDate().getDate() === info.getDate() && (
+										item.startAt.toDate().getDate() === info.getDate() && (
 												<div
 													style={{
 														position: 'absolute',
@@ -294,7 +289,6 @@ const WeeklyCalendar = () => {
 								</div>
 							))}
 						</div>
-						<div></div>
 					</div>
 				</div>
 			</div>

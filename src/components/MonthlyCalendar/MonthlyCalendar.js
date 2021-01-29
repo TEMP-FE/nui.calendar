@@ -142,7 +142,12 @@ const MonthlyCalendar = ({ year, month }) => {
 			let renderList = []
 			for (let i = 0; i < weekLength; i++) {
 				for (let j = 0; j < 7; j++) {
-					if (CalendarDate.isDateTimeIncludeScheduleItem(dateInfoList[i][j].dateTime, scheduleItem)) {
+					if (
+						CalendarDate.isDateTimeIncludeScheduleItem({
+							dateTime: dateInfoList[i][j].dateTime,
+							scheduleItem,
+						})
+					) {
 						// 전체 기간에서 이전달 달력에 그려지는 기간 빼기
 
 						// 일정을 넣을 수 있는 stack 값 찾기

@@ -50,8 +50,6 @@ const DragDate = ({ className, openPopup, date, children }) => {
 				openPopup(secondPoint, firstPoint.add(30, 'm'));
 
 			dragDateDispatch(drop())
-			console.log('첫번째 위치 : ', firstPoint)
-			console.log('두번째 위치 : ', secondPoint)
 		}
 		setDragScheduleEnter(false)
 	}

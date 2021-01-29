@@ -158,7 +158,7 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt }
+			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt, renderStartAt: item.startAt, renderEndAt: item.endAt }
 			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem
@@ -179,8 +179,8 @@ const WeeklyCalendar = () => {
 		const endTime = '24:00'
 		const startTime = '00:00'
 
-		const startItem = { ...Item, endAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime }
-		const endItem = { ...Item, startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime, isLast: true }
+		const startItem = { ...Item, renderEndAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime }
+		const endItem = { ...Item, renderStartAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime, isLast: true }
 
 		return [startItem, endItem]
 	}
@@ -225,8 +225,8 @@ const WeeklyCalendar = () => {
 									))}
 									{calendarItemList.map((calendarItem) => {
 										const currentDate = info.format('D')
-										const itemDate = moment(calendarItem.startAt).format('D')
-										const itemHour = moment(calendarItem.startAt).format('H')
+										const itemDate = moment(calendarItem.renderStartAt).format('D')
+										const itemHour = moment(calendarItem.renderStartAt).format('H')
 										const hasItem = currentDate === itemDate
 
 										return (
@@ -234,12 +234,12 @@ const WeeklyCalendar = () => {
 												<CalendarItemWithPopup
 													id={`time-${itemDate}-${itemHour}`}
 													style={{
-														top: calcStartPoint(calendarItem.startAt),
+														top: calcStartPoint(calendarItem.renderStartAt),
 														left: '0',
 														right: '5px',
 														height: calcCalendarItemHeight(
-															calendarItem.startAt,
-															calendarItem.endAt,
+															calendarItem.renderStartAt,
+															calendarItem.renderEndAt,
 														),
 													}}
 													{...calendarItem}

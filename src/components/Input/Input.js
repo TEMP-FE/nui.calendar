@@ -2,7 +2,7 @@ import React from 'react'
 import classNames from 'classnames/bind'
 
 import styles from './Input.module.scss'
-import { getCategoryColor } from './commonState'
+import { CATEGORY_COLOR } from '../../constants/defaultCategory'
 
 const cx = classNames.bind(styles)
 
@@ -60,7 +60,7 @@ export const InputSelector = ({ id, value, list, handler, readOnly = false }) =>
 
 	return (
 		<div className={cx('item-select')}>
-			<span className={cx('icon')} style={{ backgroundColor: getCategoryColor(value) }} />
+			<span className={cx('icon')} style={{ backgroundColor: CATEGORY_COLOR[value] }} />
 			<select id={selectorId} defaultChecked={value} onChange={handler} disabled={readOnly}>
 				{list &&
 					list.map((option) => (

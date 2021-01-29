@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react'
 
 import classNames from 'classnames/bind'
-import { getCategoryList } from './commonState'
+import { CATEGORY_NAME, CATEGORY_COLOR } from '../../constants/defaultCategory'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../reducers/calendar'
 
 import CalendarDate from '../../utils/CalendarDate'
+import { useInput, useToggle } from '../../hooks'
 
 import { useCalendarContext } from '../../contexts/calendar'
 import CalendarItemPopupPortal from './CalendarItemPopupPortal'
 
 import styles from './CalendarItemPopupInfo.module.scss'
-import useInput from './useInput'
-import useToggle from './useToggle'
-import { InputCheckbox, InputDate, InputSelector, InputText } from './Input'
+import { InputCheckbox, InputDate, InputSelector, InputText } from '../Input/Input'
 
 const cx = classNames.bind(styles)
 
 const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
+	const categoryList = Object.keys(CATEGORY_COLOR)
+
 	const { calendarDispatch } = useCalendarContext()
 
 	const {
@@ -24,7 +25,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 		title = '할 일',
 		startAt = new Date(),
 		endAt = new Date(),
-		category = 'A',
+		category = CATEGORY_NAME.PERSONAL,
 		isAllDay = false,
 		isBlocked = false,
 	} = item
@@ -107,7 +108,7 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
 						<InputSelector
 							id="category"
 							value={categoryState}
-							list={getCategoryList()}
+							list={categoryList}
 							handler={handleCategoryChange}
 							readOnly={isBlockedState}
 						/>

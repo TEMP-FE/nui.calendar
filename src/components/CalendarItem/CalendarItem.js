@@ -4,7 +4,7 @@ import classNames from 'classnames/bind'
 
 import { ReactComponent as IconBlock } from '../../assets/images/svg/icon-block.svg'
 
-import { getCategoryColor } from './commonState'
+import { CATEGORY_COLOR } from '../../constants/defaultCategory'
 import CalendarDate from '../../utils/CalendarDate'
 
 import DragSchedule from '../Drag/DragSchedule'
@@ -34,7 +34,7 @@ const DayType = ({ handleIsShown, style, isLast, ...item }) => {
 			<button
 				type="button"
 				className={cx('item', 'type-day')}
-				style={{ backgroundColor: getCategoryColor(category) }}
+				style={{ backgroundColor: CATEGORY_COLOR[category] }}
 				onClick={handleIsShown}
 			>
 				<span className="blind">{category}</span>
@@ -83,7 +83,7 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 				onClick={handleIsShown}
 			>
 				<span className={cx('cell', 'type-group')}>
-					<span className={cx('group')} style={{ backgroundColor: getCategoryColor(category) }}>
+					<span className={cx('group')} style={{ backgroundColor: CATEGORY_COLOR[category] }}>
 						<span className="blind">{category}</span>
 					</span>
 				</span>

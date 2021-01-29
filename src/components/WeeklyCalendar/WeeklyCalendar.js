@@ -7,7 +7,7 @@ import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
 import { calendarType } from '../../const/drag'
 import { useCalendarContext } from '../../contexts/calendar'
-import useToggle from '../CalendarItem/useToggle'
+import { useToggle } from '../../hooks'
 import { setCalendar } from '../../reducers/dragDate'
 import { resetScheduleDrag } from '../../reducers/dragSchedule'
 import { updateCalendar } from '../../reducers/calendar'
@@ -77,9 +77,7 @@ const WeeklyCalendar = () => {
 		const tempWeek = []
 		const calcDay = state ? 7 : -7
 
-		week.map((day) => (
-			tempWeek.push(day.add(calcDay, 'day'))
-		))
+		week.map((day) => tempWeek.push(day.add(calcDay, 'day')))
 
 		setWeek(tempWeek)
 	}
@@ -164,7 +162,14 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt, renderStartAt: moment(item.startAt), renderEndAt: moment(item.endAt) }
+			const itemWithIndex = {
+				...item,
+				index: index,
+				startAt: item.startAt,
+				endAt: item.endAt,
+				renderStartAt: moment(item.startAt),
+				renderEndAt: moment(item.endAt),
+			}
 			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem
@@ -278,10 +283,7 @@ const WeeklyCalendar = () => {
 														top: calcStartPoint(item.startAt),
 														left: '0',
 														right: '5px',
-														height: calcCalendarItemHeight(
-															item.startAt,
-															item.endAt,
-														),
+														height: calcCalendarItemHeight(item.startAt, item.endAt),
 														backgroundColor: 'rgba(255,0,0,0.1)',
 														zIndex: '-5',
 													}}

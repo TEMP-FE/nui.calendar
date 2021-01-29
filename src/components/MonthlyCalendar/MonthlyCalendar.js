@@ -3,7 +3,7 @@ import moment from 'moment'
 import classNames from 'classnames/bind'
 
 import { calendarType } from '../../const/drag'
-import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { useCalendarContext } from '../../contexts/calendar'
 import { setCalendar } from '../../reducers/dragDate'
 import { resetScheduleDrag } from '../../reducers/dragSchedule'
 import { updateCalendar } from '../../reducers/calendar'
@@ -13,10 +13,10 @@ import { getSaturdaysOfMonth, isDateTimeIncludeScheduleItem } from '../../utils/
 
 import DragDate from '../Drag/DragDate'
 import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
-import useToggle from '../CalendarItem/useToggle'
 
 import styles from './MonthlyCalendar.module.scss'
 import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
+import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 
 const cx = classNames.bind(styles)
 
@@ -43,24 +43,17 @@ const CalendarHeader = () => {
 // 달력 셀
 const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const [moreList, setMoreList] = useState()
-	const [isPopupShown, toggleIsPopupShown] = useToggle({ initialValue: false })
-
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
 	const { year, month, date } = CalendarDate.getDateInfo(dateTime)
-	const startAt = new Date(year, month, date)
-	const endAt = new Date(year, month, date)
+	const currentDate = new Date(year, month, date)
+	const [popupInfo, setPopupInfo] = useState({ startAt: currentDate, endAt: currentDate, isPopupShown: false })
 
-	// 셀 클릭 이벤트
-	const onCellClick = (e) => {
-		e.stopPropagation()
-
-		toggleIsPopupShown(e)
-	}
+	const openPopup = (start = currentDate, end = currentDate) => setPopupInfo({ startAt: start, endAt: end, isPopupShown: true })
+	const closePopup = () => setPopupInfo({ ...popupInfo, isPopupShown: false })
 
 	// 더보기 버튼 클릭 이벤트
 	const onMoreButtonClick = (e) => {
 		e.stopPropagation()
-		console.log('moreList : ', moreList)
 	}
 
 	const filterOverStackSchedule = () => scheduleList.filter((scheduleItem) => scheduleItem.stack > 3)
@@ -69,12 +62,8 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 		setMoreList(filterOverStackSchedule())
 	}, [scheduleList])
 
-	const scheduleEnterStyle = {
-		backgroundColor: 'grey',
-	}
-
 	return (
-		<DragDate className={cx('calendar_cell')} onClick={onCellClick} date={moment(dateTime)}>
+		<DragDate className={cx('calendar_cell')} openPopup={openPopup} date={moment(dateTime)}>
 			<div id={`cell-${month}-${date}`} className={cx('cell_header')}>
 				<span className={cx('date', { '-holiday': isHoliday, is_dimmed: isDimmed })}>{date}</span>
 				{moreList && moreList.length > 0 && (
@@ -82,12 +71,13 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 						{moreList.length} more
 					</button>
 				)}
-				{isPopupShown && (
+				{popupInfo.isPopupShown && (
 					<CalendarItemPopupInfo
 						id={`cell-${month}-${date}`}
-						handleClose={toggleIsPopupShown}
-						startAt={startAt}
-						endAt={endAt}
+						handleClose={closePopup}
+						startAt={popupInfo.startAt}
+						endAt={popupInfo.endAt}
+						isAllDay={!popupInfo.startAt.isSame(popupInfo.endAt, 'day')}
 						isNew
 					/>
 				)}
@@ -115,7 +105,7 @@ const MonthlyCalendar = ({ year, month }) => {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
 		}
@@ -126,8 +116,8 @@ const MonthlyCalendar = ({ year, month }) => {
 			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			movedSchedule = {
 				...movedSchedule,
-				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				startAt: dragScheduleStore.dragInfo.startAt,
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -144,14 +134,11 @@ const MonthlyCalendar = ({ year, month }) => {
 
 	// 현재 선택된 '달' 달력 정보 만들기
 	const makeDateInfoList = () => {
-		console.log(weekCount)
-
 		const newDateInfoList = new Array(weekCount).fill(null).map((_) => [])
 		for (let i = 0; i < weekCount; i++) {
 			for (let j = 0; j < 7; j++) {
 				const date = 1 - currentMonthInfo.firstDayOfWeek + j + i * 7
-				const dateTime = new Date(year, month, date)
-
+				const dateTime = moment([year, month - 1, 1]).add(date, 'days')
 				const dateInfo = {
 					dateTime,
 					isHoliday: j === 0,
@@ -162,7 +149,6 @@ const MonthlyCalendar = ({ year, month }) => {
 				newDateInfoList[i].push(dateInfo)
 			}
 		}
-
 		return newDateInfoList
 	}
 
@@ -266,11 +252,11 @@ const MonthlyCalendar = ({ year, month }) => {
 
 	// 먼저 시작하는 일정 순서로 정렬
 	const ascendingScheduleList = (scheduleList) =>
-		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
+		scheduleList.sort((a, b) => a.startAt - b.startAt)
 
 	const makeDraggingRenderList = () => {
 		let tempList = []
-		const firstWeekOfMonth = moment().year(year).month(month).startOf('month').week()
+		const firstWeekOfMonth = moment().year(year).month(month - 1).startOf('month').week()
 		dragDateStore.renderList.forEach((duration) => {
 			let nthWeek = duration.startAt.week() - firstWeekOfMonth
 			if (nthWeek < 0) {
@@ -314,9 +300,9 @@ const MonthlyCalendar = ({ year, month }) => {
 							{dateInfoRow?.map((dateInfoItem, j) => {
 								return (
 									<CalendarCell
-										key={dateInfoItem.dateTime.getTime()}
+										key={dateInfoItem.dateTime}
 										dateTime={dateInfoItem.dateTime}
-										isDimmed={dateInfoItem.dateTime.getMonth() !== month}
+										isDimmed={dateInfoItem.dateTime.month() + 1 !== month}
 										isHoliday={dateInfoItem.isHoliday}
 										scheduleList={dateInfoItem.scheduleList}
 									/>

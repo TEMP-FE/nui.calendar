@@ -20,8 +20,8 @@ export const getSaturdaysOfMonth = ({ year, month }) => {
 }
 
 export const isDateTimeIncludeScheduleItem = (dateTime, scheduleItem) => {
-	const scheduleStart = scheduleItem.startAt.getTime()
-	const scheduleEnd = scheduleItem.endAt.getTime()
+	const scheduleStart = scheduleItem.startAt
+	const scheduleEnd = scheduleItem.endAt
 
-	return dateTime.getTime() >= scheduleStart && dateTime.getTime() <= scheduleEnd ? true : false
+	return dateTime.isSameOrAfter(scheduleStart) && dateTime.isSameOrBefore(scheduleEnd) ? true : false
 }

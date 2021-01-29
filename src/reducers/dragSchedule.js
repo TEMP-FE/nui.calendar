@@ -93,7 +93,7 @@ export const startDrag = (index, startAt, endAt) => {
 	}
 }
 
-export const startReisze = () => {
+export const startResize = () => {
 	return {
 		type: ACTIONS.RESIZE,
 	}

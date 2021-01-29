@@ -6,16 +6,14 @@ class CalendarDate {
 	MONTH = null
 	DATE = null
 
-	constructor(initialDate = new Date()) {
-		this.CURRENT_DATE = moment(initialDate)
+	constructor(initialDate = moment()) {
+		this.CURRENT_DATE = initialDate.clone()
 
 		this.setDateInfo()
 	}
 
 	static calcWeekCount({ year, month }) {
 		const monthInfo = CalendarDate.getMonthInfo({ year, month })
-
-		console.log(year, month)
 
 		let weekCount = Math.ceil((monthInfo.lastDate + monthInfo.firstDayOfWeek) / 7)
 
@@ -36,8 +34,8 @@ class CalendarDate {
 		return moment(date).format(format)
 	}
 
-	static getDateInfo(date = new Date()) {
-		return { year: date.getFullYear(), month: date.getMonth(), date: date.getDate() }
+	static getDateInfo(date = moment()) {
+		return { year: date.year(), month: date.month(), date: date.date() }
 	}
 
 	static getMonthInfo({ year, month }) {

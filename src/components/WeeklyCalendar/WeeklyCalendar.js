@@ -6,13 +6,14 @@ import moment from 'moment'
 import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
 import { calendarType } from '../../const/drag'
-import { useCalendarContext, useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { useCalendarContext } from '../../contexts/calendar'
 import useToggle from '../CalendarItem/useToggle'
 import { setCalendar } from '../../reducers/dragDate'
 import { resetScheduleDrag } from '../../reducers/dragSchedule'
 import { updateCalendar } from '../../reducers/calendar'
 import CalendarItemWithPopup from '../CalendarItem/CalendarItemWithPopup'
 import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
+import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 
 const cx = classNames.bind(styles)
 
@@ -23,28 +24,23 @@ const date = curDay.getDate()
 const dayOfWeek = curDay.getDay()
 
 const WeeklyCell = ({ info, time }) => {
-	const [isPopupShown, toggleIsPopupShown] = useToggle({ initialValue: false })
-
-	const onCellClick = (e) => {
-		e.stopPropagation()
-
-		toggleIsPopupShown(e)
-	}
-
 	const date = moment(info).date()
-	const startAt = moment(info).hour(time)
-	const endAt = moment(info).hour(time).minute(30)
+	const startAt = moment(info).hour(time).minute(0).second(0)
+	const endAt = startAt.clone().minute(30)
+	const [popupInfo, setPopupInfo] = useState({ startAt: startAt, endAt: endAt, isPopupShown: false })
+	const openPopup = (start = startAt, end = endAt) => setPopupInfo({ startAt: start, endAt: end, isPopupShown: true })
+	const closePopup = () => setPopupInfo({ ...popupInfo, isPopupShown: false })
 
 	return (
-		<div id={`time-${date}-${time}`} className={cx('detail_wrap')} onClick={onCellClick}>
-			<DragDate className={cx('detail_cell')} date={startAt} />
-			<DragDate className={cx('detail_cell')} date={endAt} />
-			{isPopupShown && (
+		<div id={`time-${date}-${time}`} className={cx('detail_wrap')}>
+			<DragDate className={cx('detail_cell')} date={startAt} openPopup={openPopup} />
+			<DragDate className={cx('detail_cell')} date={endAt} openPopup={openPopup} />
+			{popupInfo.isPopupShown && (
 				<CalendarItemPopupInfo
 					id={`time-${date}-${time}`}
-					handleClose={toggleIsPopupShown}
-					startAt={new Date()}
-					endAt={new Date()}
+					handleClose={closePopup}
+					startAt={popupInfo.startAt}
+					endAt={popupInfo.endAt}
 					isNew
 				/>
 			)}
@@ -111,7 +107,7 @@ const WeeklyCalendar = () => {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
 		} else if (dragScheduleStore.isDragging) {
@@ -120,10 +116,10 @@ const WeeklyCalendar = () => {
 			let movingRenderList = []
 			while (start.date() !== end.date()) {
 				const tempEnd = start.clone().add(1, 'd').set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-				movingRenderList.push({ startAt: start.toDate(), endAt: tempEnd.toDate() })
+				movingRenderList.push({ startAt: start, endAt: tempEnd })
 				start = tempEnd
 			}
-			movingRenderList.push({ startAt: start.toDate(), endAt: end.toDate() })
+			movingRenderList.push({ startAt: start, endAt: end })
 			setMovingSchedule(movingRenderList)
 		}
 	}, [dragScheduleStore.dragInfo.endAt])
@@ -133,8 +129,8 @@ const WeeklyCalendar = () => {
 			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			movedSchedule = {
 				...movedSchedule,
-				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				startAt: dragScheduleStore.dragInfo.startAt,
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -152,9 +148,15 @@ const WeeklyCalendar = () => {
 
 	const checkItemDateEqual = (item) => {
 		const { startAt, endAt } = item
-		
+
 		if (moment(endAt).format('D') === moment(startAt).format('D')) {
-			return item
+			return { ...item, isLast: true }
+		}
+
+		const renderStart = moment(item.renderStartAt)
+		const renderEnd = moment(item.renderEndAt)
+		if (renderEnd.hour() + renderEnd.minute() === 0 && renderEnd.subtract(1, 'day').day() === renderStart.day()) {
+			return { ...item, renderEndAt: renderStart.clone().set({ hour: 24, minute: 0 }), isLast: true }
 		}
 
 		return isAllday(startAt, endAt) ? pushAlldayItem(item) : pushSeparatedItem(item, startAt, endAt)
@@ -162,7 +164,7 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt }
+			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt, renderStartAt: moment(item.startAt), renderEndAt: moment(item.endAt) }
 			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem
@@ -183,8 +185,8 @@ const WeeklyCalendar = () => {
 		const endTime = '24:00'
 		const startTime = '00:00'
 
-		const startItem = { ...Item, endAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime }
-		const endItem = { ...Item, startAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime, isLast: true }
+		const startItem = { ...Item, renderEndAt: moment(startAt).format('YYYY-MM-DD') + ' ' + endTime }
+		const endItem = { ...Item, renderStartAt: moment(endAt).format('YYYY-MM-DD') + ' ' + startTime, isLast: true }
 
 		return [startItem, endItem]
 	}
@@ -229,8 +231,8 @@ const WeeklyCalendar = () => {
 									))}
 									{calendarItemList.map((calendarItem) => {
 										const currentDate = info.format('D')
-										const itemDate = moment(calendarItem.startAt).format('D')
-										const itemHour = moment(calendarItem.startAt).format('H')
+										const itemDate = moment(calendarItem.renderStartAt).format('D')
+										const itemHour = moment(calendarItem.renderStartAt).format('H')
 										const hasItem = currentDate === itemDate
 
 										return (
@@ -238,12 +240,12 @@ const WeeklyCalendar = () => {
 												<CalendarItemWithPopup
 													id={`time-${itemDate}-${itemHour}`}
 													style={{
-														top: calcStartPoint(calendarItem.startAt),
+														top: calcStartPoint(calendarItem.renderStartAt),
 														left: '0',
 														right: '5px',
 														height: calcCalendarItemHeight(
-															calendarItem.startAt,
-															calendarItem.endAt,
+															calendarItem.renderStartAt,
+															calendarItem.renderEndAt,
 														),
 													}}
 													{...calendarItem}
@@ -253,7 +255,7 @@ const WeeklyCalendar = () => {
 									})}
 									{movingSchedule.map(
 										(item) =>
-										info.format('D') === moment(item.startAt).format('D') && (
+											info.format('D') === moment(item.startAt).format('D') && (
 												<div
 													style={{
 														position: 'absolute',
@@ -269,16 +271,16 @@ const WeeklyCalendar = () => {
 									)}
 									{draggingRenderList?.map(
 										(item) =>
-										item.startAt.toDate().getDate() === info.getDate() && (
+											item.startAt.isSame(info, 'day') && (
 												<div
 													style={{
 														position: 'absolute',
-														top: calcStartPoint(item.startAt.toDate()),
+														top: calcStartPoint(item.startAt),
 														left: '0',
 														right: '5px',
 														height: calcCalendarItemHeight(
-															item.startAt.toDate(),
-															item.endAt.toDate(),
+															item.startAt,
+															item.endAt,
 														),
 														backgroundColor: 'rgba(255,0,0,0.1)',
 														zIndex: '-5',

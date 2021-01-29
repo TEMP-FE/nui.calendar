@@ -27,6 +27,8 @@ const DayType = ({ handleIsShown, style, isLast, ...item }) => {
 			startAt={moment(startAt)}
 			endAt={moment(endAt)}
 			isLast={isLast}
+			category={category}
+			title={title}
 			onClick={handleItemClick}
 		>
 			<button
@@ -67,6 +69,7 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 			className={cx('component')}
 			isBlocked={isBlocked}
 			index={index}
+			isTimeType={true}
 			startAt={moment(scheduleStartAt)}
 			endAt={moment(scheduleEndAt)}
 			onClick={handleItemClick}

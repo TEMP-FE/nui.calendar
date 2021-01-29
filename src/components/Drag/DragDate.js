@@ -1,35 +1,39 @@
 import React, { useEffect, useState } from 'react'
 import { startDrag, updateDrag, drop, resetDrag } from '../../reducers/dragDate'
 import { moveScheduleDrag, dropSchedule, updateScheduleDrag, resetScheduleDrag } from '../../reducers/dragSchedule'
-import { useDragDateContext, useDragScheduleContext } from '../../contexts/calendar'
+import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 import { calendarType } from '../../const/drag'
-const DragDate = ({ className, onClick, date, children }) => {
-	const [dragEnter, setDragEnter] = useState(false);
+const DragDate = ({ className, openPopup, date, children }) => {
+	const img = new Image()
+	const [dragScheduleEnter, setDragScheduleEnter] = useState(false);
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
 
 	const handleDragStart = (e) => {
-		const img = new Image()
 		e.dataTransfer.setDragImage(img, 0, 0)
-		setDragEnter(true)
+		setDragScheduleEnter(true)
 		dragDateDispatch(startDrag(date))
 	}
 
 	const handleDragEnter = (e) => {
+		const cloneDate = date.clone()
 		if (dragScheduleStore.isResizing) {
-			dragScheduleDispatch(updateScheduleDrag(date))
+			if (dragScheduleStore.calendarType !== calendarType.MONTH) {
+				cloneDate.add(30, 'm')
+			}
+			dragScheduleDispatch(updateScheduleDrag(cloneDate))
 		}
 		else if (dragScheduleStore.isDragging) {
-			dragScheduleDispatch(moveScheduleDrag(date))
+			dragScheduleDispatch(moveScheduleDrag(cloneDate))
 		}
-		else if (!dragEnter) {
-			dragDateDispatch(updateDrag(date))
+		else if (!dragScheduleEnter) {
+			dragDateDispatch(updateDrag(cloneDate))
 		}
-		setDragEnter(true)
+		setDragScheduleEnter(true)
 	}
 
 	const handleDragLeave = (e) => {
-		setDragEnter(false)
+		setDragScheduleEnter(false)
 	}
 
 	const handleDrop = (e) => {
@@ -40,9 +44,14 @@ const DragDate = ({ className, onClick, date, children }) => {
 			dragScheduleDispatch(dropSchedule())
 		}
 		else {
+			const { firstPoint, secondPoint } = dragDateStore.dragInfo
+			firstPoint.isSameOrBefore(secondPoint) ?
+				openPopup(firstPoint, secondPoint.add(30, 'm')) :
+				openPopup(secondPoint, firstPoint.add(30, 'm'));
+
 			dragDateDispatch(drop())
 		}
-		setDragEnter(false)
+		setDragScheduleEnter(false)
 	}
 
 	const handleDragEnd = () => {
@@ -54,7 +63,12 @@ const DragDate = ({ className, onClick, date, children }) => {
 		e.preventDefault()
 	}
 
-	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragEnter && !dragScheduleStore.isResizing
+	const handleClick = () => {
+		const tempEndAt = date.clone().add(30, 'm')
+		openPopup(date, tempEndAt)
+	}
+
+	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragScheduleEnter && !dragScheduleStore.isResizing && dragScheduleStore.isDragging
 
 	return (
 		<div
@@ -66,7 +80,7 @@ const DragDate = ({ className, onClick, date, children }) => {
 			onDrop={handleDrop}
 			onDragEnd={handleDragEnd}
 			className={className}
-			onClick={onClick}
+			onClick={handleClick}
 			style={{ backgroundColor: isScheduleMovingIn && 'rgba(255,0,0,0.1)' }}
 		>
 			{children}

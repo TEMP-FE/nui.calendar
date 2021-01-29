@@ -153,12 +153,18 @@ const WeeklyCalendar = () => {
 			return { ...item, isLast: true }
 		}
 
+		const renderStart = moment(item.renderStartAt)
+		const renderEnd = moment(item.renderEndAt)
+		if (renderEnd.hour() + renderEnd.minute() === 0 && renderEnd.subtract(1, 'day').day() === renderStart.day()) {
+			return { ...item, renderEndAt: renderStart.clone().set({ hour: 24, minute: 0 }), isLast: true }
+		}
+
 		return isAllday(startAt, endAt) ? pushAlldayItem(item) : pushSeparatedItem(item, startAt, endAt)
 	}
 
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt, renderStartAt: item.startAt, renderEndAt: item.endAt }
+			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt, renderStartAt: moment(item.startAt), renderEndAt: moment(item.endAt) }
 			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem

@@ -5,34 +5,35 @@ import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 import { calendarType } from '../../const/drag'
 const DragDate = ({ className, openPopup, date, children }) => {
 	const img = new Image()
-	const [dragEnter, setDragEnter] = useState(false);
+	const [dragScheduleEnter, setDragScheduleEnter] = useState(false);
 	const { dragDateStore, dragDateDispatch } = useDragDateContext()
 	const { dragScheduleStore, dragScheduleDispatch } = useDragScheduleContext()
 
 	const handleDragStart = (e) => {
 		e.dataTransfer.setDragImage(img, 0, 0)
-		setDragEnter(true)
+		setDragScheduleEnter(true)
 		dragDateDispatch(startDrag(date))
 	}
 
 	const handleDragEnter = (e) => {
+		const cloneDate = date.clone()
 		if (dragScheduleStore.isResizing) {
 			if (dragScheduleStore.calendarType !== calendarType.MONTH) {
-				date.add(30, 'm')
+				cloneDate.add(30, 'm')
 			}
-			dragScheduleDispatch(updateScheduleDrag(date))
+			dragScheduleDispatch(updateScheduleDrag(cloneDate))
 		}
 		else if (dragScheduleStore.isDragging) {
-			dragScheduleDispatch(moveScheduleDrag(date))
+			dragScheduleDispatch(moveScheduleDrag(cloneDate))
 		}
-		else if (!dragEnter) {
-			dragDateDispatch(updateDrag(date))
+		else if (!dragScheduleEnter) {
+			dragDateDispatch(updateDrag(cloneDate))
 		}
-		setDragEnter(true)
+		setDragScheduleEnter(true)
 	}
 
 	const handleDragLeave = (e) => {
-		setDragEnter(false)
+		setDragScheduleEnter(false)
 	}
 
 	const handleDrop = (e) => {
@@ -45,12 +46,14 @@ const DragDate = ({ className, openPopup, date, children }) => {
 		else {
 			const { firstPoint, secondPoint } = dragDateStore.dragInfo
 			firstPoint.isSameOrBefore(secondPoint) ?
-				openPopup(firstPoint.toDate(), secondPoint.add(30, 'm').toDate()) :
-				openPopup(secondPoint.toDate(), firstPoint.add(30, 'm').toDate())
+				openPopup(firstPoint, secondPoint.add(30, 'm')) :
+				openPopup(secondPoint, firstPoint.add(30, 'm'));
 
 			dragDateDispatch(drop())
+			console.log('첫번째 위치 : ', firstPoint)
+			console.log('두번째 위치 : ', secondPoint)
 		}
-		setDragEnter(false)
+		setDragScheduleEnter(false)
 	}
 
 	const handleDragEnd = () => {
@@ -64,10 +67,10 @@ const DragDate = ({ className, openPopup, date, children }) => {
 
 	const handleClick = () => {
 		const tempEndAt = date.clone().add(30, 'm')
-		openPopup(date.toDate(), tempEndAt.toDate())
+		openPopup(date, tempEndAt)
 	}
 
-	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragEnter && !dragScheduleStore.isResizing && dragScheduleStore.isDragging
+	const isScheduleMovingIn = dragScheduleStore.calendarType === calendarType.MONTH && dragScheduleEnter && !dragScheduleStore.isResizing && dragScheduleStore.isDragging
 
 	return (
 		<div

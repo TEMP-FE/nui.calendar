@@ -46,13 +46,14 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
 	const { year, month, date } = CalendarDate.getDateInfo(dateTime)
 	const currentDate = new Date(year, month, date)
+	const [popupInfo, setPopupInfo] = useState({ startAt: currentDate, endAt: currentDate, isPopupShown: false })
 
 	const openPopup = (start = currentDate, end = currentDate) => setPopupInfo({ startAt: start, endAt: end, isPopupShown: true })
+	const closePopup = () => setPopupInfo({ ...popupInfo, isPopupShown: false })
 
 	// 더보기 버튼 클릭 이벤트
 	const onMoreButtonClick = (e) => {
 		e.stopPropagation()
-		console.log('moreList : ', moreList)
 	}
 
 	const filterOverStackSchedule = () => scheduleList.filter((scheduleItem) => scheduleItem.stack > 3)
@@ -76,7 +77,7 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 						handleClose={closePopup}
 						startAt={popupInfo.startAt}
 						endAt={popupInfo.endAt}
-						isAllDay={!isSameDate(popupInfo.startAt, popupInfo.endAt)}
+						isAllDay={!popupInfo.startAt.isSame(popupInfo.endAt, 'day')}
 						isNew
 					/>
 				)}
@@ -104,7 +105,7 @@ const MonthlyCalendar = ({ year, month }) => {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
 		}
@@ -115,8 +116,8 @@ const MonthlyCalendar = ({ year, month }) => {
 			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			movedSchedule = {
 				...movedSchedule,
-				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				startAt: dragScheduleStore.dragInfo.startAt,
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -133,14 +134,11 @@ const MonthlyCalendar = ({ year, month }) => {
 
 	// 현재 선택된 '달' 달력 정보 만들기
 	const makeDateInfoList = () => {
-		console.log(weekCount)
-
 		const newDateInfoList = new Array(weekCount).fill(null).map((_) => [])
 		for (let i = 0; i < weekCount; i++) {
 			for (let j = 0; j < 7; j++) {
 				const date = 1 - currentMonthInfo.firstDayOfWeek + j + i * 7
-				const dateTime = new Date(year, month, date)
-
+				const dateTime = moment([year, month - 1, 1]).add(date, 'days')
 				const dateInfo = {
 					dateTime,
 					isHoliday: j === 0,
@@ -151,7 +149,6 @@ const MonthlyCalendar = ({ year, month }) => {
 				newDateInfoList[i].push(dateInfo)
 			}
 		}
-
 		return newDateInfoList
 	}
 
@@ -255,11 +252,11 @@ const MonthlyCalendar = ({ year, month }) => {
 
 	// 먼저 시작하는 일정 순서로 정렬
 	const ascendingScheduleList = (scheduleList) =>
-		scheduleList.sort((a, b) => a.startAt.getTime() - b.startAt.getTime())
+		scheduleList.sort((a, b) => a.startAt - b.startAt)
 
 	const makeDraggingRenderList = () => {
 		let tempList = []
-		const firstWeekOfMonth = moment().year(year).month(month).startOf('month').week()
+		const firstWeekOfMonth = moment().year(year).month(month - 1).startOf('month').week()
 		dragDateStore.renderList.forEach((duration) => {
 			let nthWeek = duration.startAt.week() - firstWeekOfMonth
 			if (nthWeek < 0) {
@@ -303,9 +300,9 @@ const MonthlyCalendar = ({ year, month }) => {
 							{dateInfoRow?.map((dateInfoItem, j) => {
 								return (
 									<CalendarCell
-										key={dateInfoItem.dateTime.getTime()}
+										key={dateInfoItem.dateTime}
 										dateTime={dateInfoItem.dateTime}
-										isDimmed={dateInfoItem.dateTime.getMonth() !== month}
+										isDimmed={dateInfoItem.dateTime.month() + 1 !== month}
 										isHoliday={dateInfoItem.isHoliday}
 										scheduleList={dateInfoItem.scheduleList}
 									/>

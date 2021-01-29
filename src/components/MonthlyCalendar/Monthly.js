@@ -20,7 +20,6 @@ const Monthly = ({ style }) => {
 
 	useEffect(() => {
 		const initialState = new CalendarDate(currentMonth.CURRENT_DATE)
-
 		setMonthlyData(initialState)
 	}, [])
 

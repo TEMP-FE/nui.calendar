@@ -25,7 +25,7 @@ const dayOfWeek = curDay.getDay()
 
 const WeeklyCell = ({ info, time }) => {
 	const date = moment(info).date()
-	const startAt = moment(info).hour(time)
+	const startAt = moment(info).hour(time).minute(0).second(0)
 	const endAt = startAt.clone().minute(30)
 	const [popupInfo, setPopupInfo] = useState({ startAt: startAt, endAt: endAt, isPopupShown: false })
 	const openPopup = (start = startAt, end = endAt) => setPopupInfo({ startAt: start, endAt: end, isPopupShown: true })
@@ -107,7 +107,7 @@ const WeeklyCalendar = () => {
 			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			resizingSchedule = {
 				...resizingSchedule,
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(resizingSchedule))
 		} else if (dragScheduleStore.isDragging) {
@@ -116,10 +116,10 @@ const WeeklyCalendar = () => {
 			let movingRenderList = []
 			while (start.date() !== end.date()) {
 				const tempEnd = start.clone().add(1, 'd').set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-				movingRenderList.push({ startAt: start.toDate(), endAt: tempEnd.toDate() })
+				movingRenderList.push({ startAt: start, endAt: tempEnd })
 				start = tempEnd
 			}
-			movingRenderList.push({ startAt: start.toDate(), endAt: end.toDate() })
+			movingRenderList.push({ startAt: start, endAt: end })
 			setMovingSchedule(movingRenderList)
 		}
 	}, [dragScheduleStore.dragInfo.endAt])
@@ -129,8 +129,8 @@ const WeeklyCalendar = () => {
 			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
 			movedSchedule = {
 				...movedSchedule,
-				startAt: dragScheduleStore.dragInfo.startAt.toDate(),
-				endAt: dragScheduleStore.dragInfo.endAt.toDate(),
+				startAt: dragScheduleStore.dragInfo.startAt,
+				endAt: dragScheduleStore.dragInfo.endAt,
 			}
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
@@ -265,16 +265,16 @@ const WeeklyCalendar = () => {
 									)}
 									{draggingRenderList?.map(
 										(item) =>
-											item.startAt.toDate().getDate() === info.getDate() && (
+											item.startAt.isSame(info, 'day') && (
 												<div
 													style={{
 														position: 'absolute',
-														top: calcStartPoint(item.startAt.toDate()),
+														top: calcStartPoint(item.startAt),
 														left: '0',
 														right: '5px',
 														height: calcCalendarItemHeight(
-															item.startAt.toDate(),
-															item.endAt.toDate(),
+															item.startAt,
+															item.endAt,
 														),
 														backgroundColor: 'rgba(255,0,0,0.1)',
 														zIndex: '-5',

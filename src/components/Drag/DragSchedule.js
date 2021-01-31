@@ -36,9 +36,7 @@ const DragSchedule = ({
 				ghost.setAttribute('id', 'dragging_ghost')
 				ghost.setAttribute(
 					'style',
-					`position:absolute; top:0;left:0;width:120px;height:26px;border-radius:4px;z-index:-1;background-color:${CATEGORY_COLOR(
-						category,
-					)}`,
+					`position:absolute; top:0;left:0;width:120px;height:26px;border-radius:4px;z-index:-1;background-color:${CATEGORY_COLOR[category]})}`,
 				)
 				ghost.textContent = title
 				e.currentTarget.appendChild(ghost)

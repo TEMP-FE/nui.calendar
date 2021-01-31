@@ -13,43 +13,45 @@ import styles from './CalendarItem.module.scss'
 
 const cx = classNames.bind(styles)
 
-const DayType = ({ handleIsShown, style, isLast, ...item }) => {
-	const { title, startAt, endAt, category, isBlocked, index } = item
-
+const DayType = ({ schedule, handleIsShown, style, isLast }) => {
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
 		<DragSchedule
 			className={cx('component')}
-			isBlocked={isBlocked}
+			isBlocked={schedule.isBlocked}
 			style={style}
-			index={index}
-			startAt={moment(startAt)}
-			endAt={moment(endAt)}
+			index={schedule.index}
+			startAt={moment(schedule.startAt)}
+			endAt={moment(schedule.endAt)}
 			isLast={isLast}
-			category={category}
-			title={title}
+			category={schedule.category}
+			title={schedule.title}
 			onClick={handleItemClick}
 		>
 			<button
 				type="button"
 				className={cx('item', 'type-day')}
-				style={{ backgroundColor: CATEGORY_COLOR[category] }}
+				style={{ backgroundColor: CATEGORY_COLOR[schedule.category] }}
 				onClick={handleIsShown}
 			>
-				<span className="blind">{category}</span>
+				<span className="blind">{schedule.category}</span>
 				<span className={cx('cell')}>
 					<span className={cx('fixed')}>
 						<span className={cx('cell', 'ellipsis')}>
 							<span className="blind">
-								<span className={cx('period')}>{CalendarDate.getDateString(startAt, 'MM-DD')}</span>
-								<span className={cx('period')}>{CalendarDate.getDateString(endAt, 'MM-DD')}</span>
+								<span className={cx('period')}>
+									{CalendarDate.getDateString(schedule.startAt, 'MM-DD')}
+								</span>
+								<span className={cx('period')}>
+									{CalendarDate.getDateString(schedule.endAt, 'MM-DD')}
+								</span>
 							</span>
-							<span className={cx('title')}>{title}</span>
+							<span className={cx('title')}>{schedule.title}</span>
 						</span>
 					</span>
 				</span>
-				{isBlocked && (
+				{schedule.isBlocked && (
 					<span className={cx('cell', 'type-icon')}>
 						<IconBlock width={10} height={10} />
 					</span>
@@ -59,44 +61,46 @@ const DayType = ({ handleIsShown, style, isLast, ...item }) => {
 	)
 }
 
-const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
-	const { id, title, startAt, endAt, category, isBlocked, index, scheduleStartAt, scheduleEndAt } = item
-
+const TimeType = ({ schedule, isShown, handleIsShown }) => {
 	const handleItemClick = (e) => e.stopPropagation()
 
 	return (
 		<DragSchedule
 			className={cx('component')}
-			isBlocked={isBlocked}
-			index={index}
+			isBlocked={schedule.isBlocked}
+			index={schedule.index}
 			isTimeType={true}
-			startAt={moment(scheduleStartAt)}
-			endAt={moment(scheduleEndAt)}
+			startAt={moment(schedule.startAt)}
+			endAt={moment(schedule.endAt)}
 			onClick={handleItemClick}
 		>
 			<button
 				type="button"
 				className={cx('item')}
 				aria-haspopup="dialog"
-				aria-controls={id}
+				aria-controls={schedule.scheduleId}
 				aria-expanded={isShown}
 				onClick={handleIsShown}
 			>
 				<span className={cx('cell', 'type-group')}>
-					<span className={cx('group')} style={{ backgroundColor: CATEGORY_COLOR[category] }}>
-						<span className="blind">{category}</span>
+					<span className={cx('group')} style={{ backgroundColor: CATEGORY_COLOR[schedule.category] }}>
+						<span className="blind">{schedule.category}</span>
 					</span>
 				</span>
 				<span className={cx('cell', 'type-period')}>
 					<span className={cx('fixed')}>
 						<span className={cx('cell', 'ellipsis')}>
-							<span className={cx('period')}>{CalendarDate.getDateTimeString(startAt, 'h:mm')}</span>
-							<span className={cx('period')}>{CalendarDate.getDateTimeString(endAt, 'h:mm')}</span>
-							<span className={cx('title')}>{title}</span>
+							<span className={cx('period')}>
+								{CalendarDate.getDateTimeString(schedule.startAt, 'hh:mm')}
+							</span>
+							<span className={cx('period')}>
+								{CalendarDate.getDateTimeString(schedule.endAt, 'hh:mm')}
+							</span>
+							<span className={cx('title')}>{schedule.title}</span>
 						</span>
 					</span>
 				</span>
-				{isBlocked && (
+				{schedule.isBlocked && (
 					<span className={cx('cell', 'type-icon')}>
 						<IconBlock width={10} height={10} />
 					</span>
@@ -106,4 +110,20 @@ const TimeType = ({ isShown, handleIsShown, handleEdit, ...item }) => {
 	)
 }
 
-export default (Item) => (Item.isAllDay ? <DayType {...Item} /> : <TimeType {...Item} />)
+export default (props) => {
+	const { style, schedule, isLast, isShown, handleIsShown } = props
+
+	const getComponent = (isAllDay) => {
+		if (isAllDay) {
+			return DayType
+		}
+
+		return TimeType
+	}
+
+	const Component = getComponent(schedule.isAllDay)
+
+	return (
+		<Component style={style} schedule={schedule} isLast={isLast} isShown={isShown} handleIsShown={handleIsShown} />
+	)
+}

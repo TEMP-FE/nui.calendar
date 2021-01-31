@@ -1,4 +1,3 @@
-import CalendarDate from '../utils/CalendarDate'
 /**
  * Ducks Patterns
  *
@@ -6,51 +5,55 @@ import CalendarDate from '../utils/CalendarDate'
  */
 
 const ACTIONS = {
-	CREATE: 'nui.calendar/calendar/CREATE',
-	READ: 'nui.calendar/calendar/READ',
-	UPDATE: 'nui.calendar/calendar/UPDATE',
-	DELETE: 'nui.calendar/calendar/DELETE',
+	CREATE: 'nui.calendar/schedule/CREATE',
+	READ: 'nui.calendar/schedule/READ',
+	UPDATE: 'nui.calendar/schedule/UPDATE',
+	DELETE: 'nui.calendar/schedule/DELETE',
 }
 
 const reducer = (state, actions) => {
-	const calendar = actions.calendar
+	const { schedule } = actions
 	const scheduleList = state.scheduleList || []
 
 	switch (actions.type) {
 		case ACTIONS.CREATE:
 			return {
 				...state,
-				scheduleList: [...scheduleList, calendar],
+				scheduleList: [...scheduleList, schedule],
 			}
 		case ACTIONS.READ:
 			return {
 				list: [...state],
 			}
 		case ACTIONS.UPDATE:
-			const updatedCalendarList = scheduleList.map((item) =>
-				item.calendarId === calendar.calendarId ? calendar : item,
-			)
+			const updatedCalendarList = scheduleList.map((item) => {
+				if (item.scheduleId === schedule.scheduleId) {
+					item.update(schedule)
+				}
+
+				return item
+			})
 
 			return {
 				...state,
 				scheduleList: [...updatedCalendarList],
 			}
 		case ACTIONS.DELETE:
-			const newCalendarList = scheduleList.filter((item) => item.calendarId !== calendar.calendarId)
+			const newScheduleList = scheduleList.filter((item) => item.scheduleId !== schedule.scheduleId)
 
 			return {
 				...state,
-				scheduleList: newCalendarList,
+				scheduleList: newScheduleList,
 			}
 		default:
 			return state
 	}
 }
 
-export const createCalendar = (calendar) => {
+export const createCalendar = (schedule) => {
 	return {
 		type: ACTIONS.CREATE,
-		calendar,
+		schedule,
 	}
 }
 
@@ -60,17 +63,17 @@ export const readCalendar = () => {
 	}
 }
 
-export const updateCalendar = (calendar) => {
+export const updateCalendar = (schedule) => {
 	return {
 		type: ACTIONS.UPDATE,
-		calendar,
+		schedule,
 	}
 }
 
-export const deleteCalendar = (calendarId) => {
+export const deleteCalendar = (scheduleId) => {
 	return {
 		type: ACTIONS.DELETE,
-		calendar: { calendarId },
+		schedule: { scheduleId },
 	}
 }
 

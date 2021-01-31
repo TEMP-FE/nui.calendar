@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import moment from 'moment'
 import classNames from 'classnames/bind'
 
@@ -42,9 +42,9 @@ const CalendarHeader = () => {
 // 달력 셀
 const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 	const [moreList, setMoreList] = useState()
-	// TODO: 날짜 형식 YYYY-MM-DD, YYYY-MM-DD-HH:SS 처럼 통일화 필요 (moment.js 활용가능)
 	const { year, month, date } = CalendarDate.getDateInfo(dateTime)
-	const currentDate = new Date(year, month, date)
+
+	const currentDate = moment(`${year}-${month}-${date}`)
 	const [popupInfo, setPopupInfo] = useState({ startAt: currentDate, endAt: currentDate, isPopupShown: false })
 
 	const openPopup = (start = currentDate, end = currentDate) =>
@@ -75,9 +75,10 @@ const CalendarCell = ({ dateTime, isHoliday, isDimmed, scheduleList }) => {
 					<CalendarItemPopupInfo
 						id={`cell-${month}-${date}`}
 						handleClose={closePopup}
-						startAt={popupInfo.startAt}
-						endAt={popupInfo.endAt}
-						isAllDay={!popupInfo.startAt.isSame(popupInfo.endAt, 'day')}
+						schedule={{
+							startAt: popupInfo.startAt,
+							endAt: popupInfo.endAt,
+						}}
 						isNew
 					/>
 				)}
@@ -106,6 +107,7 @@ const MonthlyCalendar = ({ year, month }) => {
 				...resizingSchedule,
 				endAt: dragScheduleStore.dragInfo.endAt,
 			}
+
 			calendarDispatch(updateCalendar(resizingSchedule))
 		}
 	}, [dragScheduleStore.dragInfo.endAt])
@@ -134,20 +136,14 @@ const MonthlyCalendar = ({ year, month }) => {
 	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
 	const getNewScheduleList = (scheduleList, dateInfoList) =>
 		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
-			scheduleItem = {
-				...scheduleItem,
-				index: scheduleIndex,
-			}
+			scheduleItem.setIndex(scheduleIndex)
+
 			let period = CalendarDate.calcScheduleTimeToUnix(scheduleItem)
 			let renderList = []
+
 			for (let i = 0; i < weekLength; i++) {
 				for (let j = 0; j < 7; j++) {
-					if (
-						CalendarDate.isDateTimeIncludeScheduleItem({
-							dateTime: dateInfoList[i][j].dateTime,
-							scheduleItem,
-						})
-					) {
+					if (scheduleItem.isIncluded(dateInfoList[i][j].dateTime)) {
 						// 전체 기간에서 이전달 달력에 그려지는 기간 빼기
 
 						// 일정을 넣을 수 있는 stack 값 찾기
@@ -269,6 +265,7 @@ const MonthlyCalendar = ({ year, month }) => {
 	useEffect(() => {
 		const newDateInfoList = CalendarDate.getMonthInfoList({ year, month }) // 달력정보 만들기
 		const newScheduleList = getNewScheduleList(scheduleList, newDateInfoList) // scheduleList 만들기
+
 		setDateInfoList(newDateInfoList)
 		setCalendarScheduleList(newScheduleList)
 	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
@@ -307,14 +304,14 @@ const MonthlyCalendar = ({ year, month }) => {
 							if (stack < 4) {
 								return (
 									<div
-										key={scheduleItem.id}
+										key={scheduleItem.scheduleId}
 										className={cx('schedule_item')}
 										style={{ top, left, width, opacity }}
 									>
 										<CalendarItemWithPopup
 											id={`cell-${month}-${date}`}
 											isLast={isLast}
-											{...scheduleItem}
+											schedule={scheduleItem}
 										/>
 									</div>
 								)

@@ -113,13 +113,6 @@ class CalendarDate {
 		return saturdayList
 	}
 
-	static isDateTimeIncludeScheduleItem({ dateTime, scheduleItem }) {
-		const scheduleStart = scheduleItem.startAt
-		const scheduleEnd = scheduleItem.endAt
-
-		return dateTime.isSameOrAfter(scheduleStart) && dateTime.isSameOrBefore(scheduleEnd) ? true : false
-	}
-
 	setDateInfo() {
 		this.YEAR = parseInt(this.CURRENT_DATE.format('YYYY'))
 		this.MONTH = parseInt(this.CURRENT_DATE.format('MM'))

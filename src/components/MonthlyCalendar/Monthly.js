@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import styles from './Monthly.module.scss'
-import classNames from 'classnames/bind'
 
 import CalendarDate from '../../utils/CalendarDate'
 
 import MonthlyCalendar from '../MonthlyCalendar/MonthlyCalendar'
 import ButtonArea from '../ButtonArea/ButtonArea'
-
-const cx = classNames.bind(styles)
 
 const Monthly = ({ style }) => {
 	const currentMonth = new CalendarDate()
@@ -20,6 +16,7 @@ const Monthly = ({ style }) => {
 
 	useEffect(() => {
 		const initialState = new CalendarDate(currentMonth.CURRENT_DATE)
+
 		setMonthlyData(initialState)
 	}, [])
 
@@ -31,6 +28,7 @@ const Monthly = ({ style }) => {
 		} else {
 			nextMonthlyData.setPrevMonth()
 		}
+
 		setMonthlyData(nextMonthlyData)
 	}
 

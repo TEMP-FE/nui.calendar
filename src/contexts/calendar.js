@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useReducer } from 'react'
+import moment from 'moment'
+
+import Schedule from '../utils/Schedule'
+
 import calendarReducer from '../reducers/calendar'
+import { CATEGORY_NAME } from '../constants/defaultCategory'
 
 const appContext = createContext(null)
 
@@ -7,28 +12,22 @@ const { Provider } = appContext
 
 const initialState = {
 	scheduleList: [
-		{
-			calendarId: 1,
-			title: '테스트',
-			startAt: new Date('2021-01-28 13:00'),
-			endAt: new Date('2021-01-28 17:30'),
-			location: '',
-			category: '',
+		new Schedule({
+			title: '테스트 A',
+			startAt: moment('2021-01-28 13:00'),
+			endAt: moment('2021-01-28 17:30'),
+			category: CATEGORY_NAME.PERSONAL,
 			isAllDay: true,
 			isBlocked: false,
-			isRepeatable: false,
-		},
-		{
-			calendarId: 2,
-			title: '테스트',
-			startAt: new Date('2021-01-29 14:30'),
-			endAt: new Date('2021-01-29 16:00'),
-			location: '',
-			category: '',
+		}),
+		new Schedule({
+			title: '테스트 B',
+			startAt: moment('2021-01-29 14:30'),
+			endAt: moment('2021-01-29 16:00'),
+			category: CATEGORY_NAME.PERSONAL,
 			isAllDay: true,
 			isBlocked: false,
-			isRepeatable: false,
-		},
+		}),
 	],
 }
 

@@ -26,7 +26,7 @@ const CalendarItemPopupPortal = ({ id, width, handleClose, children }) => {
 		}
 
 		setTarget(cellElement)
-	}, [])
+	}, [id])
 
 	const [isShow, setIsShow] = useState(false)
 

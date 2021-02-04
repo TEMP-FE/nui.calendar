@@ -54,6 +54,8 @@ const WeeklyCalendar = () => {
 	const [draggingRenderList, setDraggingRenderList] = useState()
 	const [movingSchedule, setMovingSchedule] = useState([])
 
+	const [calcDeps, setCalcDeps] = useState([])
+
 	for (var i = 0; i < timeLine.length; i++) {
 		timeLine[i] = i
 	}
@@ -135,6 +137,14 @@ const WeeklyCalendar = () => {
 		return Math.round(((moment(endDate).valueOf() - moment(startDate).valueOf()) / (1000 * 60)) * (26 / 30))
 	}
 
+	const calcWidth = (deps) => {
+		return 'calc(100% / ' + deps + ')'
+	}
+
+	const calcLeft = (deps, depsIdx) => {
+		return 'calc((100% / ' + deps + ') * ' + depsIdx + ')'
+	}
+
 	const checkItemDateEqual = (item) => {
 		const { startAt, endAt } = item
 
@@ -151,6 +161,61 @@ const WeeklyCalendar = () => {
 		return item.isAllDay() ? item : pushSeparatedItem(item, startAt, endAt)
 	}
 
+	const func = () => {
+		if (week.length > 0) {
+			let deps = new Array()
+
+			for (let i = 0; i < 7; i++) {
+				let date = week[i].format('D')
+				let arr = new Array()
+
+				calendarItemList.map((item) => date === item.startAt.format('D') && arr.push(item))
+
+				let idx = 0
+				let count = 1
+
+				while (arr.length > 0) {
+					let depsIdx = 0
+					let maxEnd = arr[idx].endAt.valueOf()
+
+					if (idx === arr.length - 1) {
+						deps.push({ id: arr[idx].scheduleId, deps: count, depsIdx: depsIdx++ })
+						idx++
+					} else {
+						let tempIdx = idx
+
+						while (true) {
+							if (tempIdx >= arr.length - 1) break
+							if (arr[tempIdx + 1].startAt.valueOf() < maxEnd) {
+								count++
+								maxEnd = Math.max(maxEnd, arr[tempIdx + 1].endAt.valueOf())
+								tempIdx++
+							} else {
+								break
+							}
+						}
+
+						for (let j = idx; j <= tempIdx; j++) {
+							deps.push({ id: arr[j].scheduleId, deps: count, depsIdx: depsIdx++ })
+						}
+
+						count = 1
+						idx = tempIdx + 1
+					}
+
+					if (idx >= arr.length) break
+				}
+			}
+			setCalcDeps(deps)
+		}
+	}
+
+	useEffect(() => {
+		func()
+	}, [calendarItemList])
+
+	console.log(calcDeps)
+
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
 			const itemWithIndex = {
@@ -162,8 +227,18 @@ const WeeklyCalendar = () => {
 				renderEndAt: moment(item.endAt),
 			}
 			const filteredItem = checkItemDateEqual(itemWithIndex)
-
 			return filteredItem
+		})
+
+		filteredList.sort(function (a, b) {
+			let as = a.startAt.valueOf()
+			let bs = b.startAt.valueOf()
+			let ae = a.endAt.valueOf()
+			let be = b.endAt.valueOf()
+			if (as === bs) {
+				return ae - be
+			}
+			return as - bs
 		})
 
 		setCalendarItemList(filteredList.flat())
@@ -223,24 +298,31 @@ const WeeklyCalendar = () => {
 										const itemHour = moment(calendarItem.renderStartAt).format('H')
 										const hasItem = currentDate === itemDate
 
-										return (
-											hasItem && (
-												<CalendarItemWithPopup
-													key={itemKey}
-													id={`time-${itemDate}-${itemHour}`}
-													style={{
-														top: calcStartPoint(calendarItem.renderStartAt),
-														left: '0',
-														right: '5px',
-														height: calcCalendarItemHeight(
-															calendarItem.renderStartAt,
-															calendarItem.renderEndAt,
-														),
-													}}
-													schedule={calendarItem}
-												/>
+										const calcValue = calcDeps.find(function (deps) {
+											return calendarItem.scheduleId === deps.id
+										})
+
+										if (calcValue) {
+											return (
+												hasItem && (
+													<CalendarItemWithPopup
+														key={itemKey}
+														id={`time-${itemDate}-${itemHour}`}
+														style={{
+															top: calcStartPoint(calendarItem.renderStartAt),
+															width: calcWidth(calcValue.deps),
+															left: calcLeft(calcValue.deps, calcValue.depsIdx),
+															right: '5px',
+															height: calcCalendarItemHeight(
+																calendarItem.renderStartAt,
+																calendarItem.renderEndAt,
+															),
+														}}
+														schedule={calendarItem}
+													/>
+												)
 											)
-										)
+										}
 									})}
 									{movingSchedule.map(
 										(item) =>

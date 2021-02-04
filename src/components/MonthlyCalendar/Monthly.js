@@ -4,8 +4,13 @@ import CalendarDate from '../../utils/CalendarDate'
 
 import MonthlyCalendar from '../MonthlyCalendar/MonthlyCalendar'
 import ButtonArea from '../ButtonArea/ButtonArea'
+import { useCalendarContext } from '../../contexts/calendar'
+import { setCalendar } from '../../reducers/calendar'
+import Schedule from '../../utils/Schedule'
 
-const Monthly = ({ style }) => {
+const Monthly = ({ style, scheduleList }) => {
+	const { calendarDispatch } = useCalendarContext()
+
 	const currentMonth = new CalendarDate()
 
 	const [monthlyData, setMonthlyData] = useState(null)
@@ -13,6 +18,13 @@ const Monthly = ({ style }) => {
 	const getThisMonth = () => {
 		setMonthlyData(currentMonth)
 	}
+
+	useEffect(() => {
+		if (scheduleList) {
+			const action = setCalendar(scheduleList.map((scheduleItem) => new Schedule(scheduleItem)))
+			calendarDispatch(action)
+		}
+	}, [scheduleList])
 
 	useEffect(() => {
 		const initialState = new CalendarDate(currentMonth.CURRENT_DATE)

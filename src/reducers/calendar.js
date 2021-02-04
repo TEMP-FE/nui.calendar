@@ -5,6 +5,7 @@
  */
 
 const ACTIONS = {
+	SET: 'nui.calendar/schedule/SET',
 	CREATE: 'nui.calendar/schedule/CREATE',
 	READ: 'nui.calendar/schedule/READ',
 	UPDATE: 'nui.calendar/schedule/UPDATE',
@@ -16,6 +17,13 @@ const reducer = (state, actions) => {
 	const scheduleList = state.scheduleList || []
 
 	switch (actions.type) {
+		case ACTIONS.SET: {
+			const { newScheduleList } = actions
+			return {
+				...state,
+				scheduleList: [...newScheduleList],
+			}
+		}
 		case ACTIONS.CREATE:
 			return {
 				...state,
@@ -47,6 +55,13 @@ const reducer = (state, actions) => {
 			}
 		default:
 			return state
+	}
+}
+
+export const setCalendar = (newScheduleList) => {
+	return {
+		type: ACTIONS.SET,
+		newScheduleList,
 	}
 }
 

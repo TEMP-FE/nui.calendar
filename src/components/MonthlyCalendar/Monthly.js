@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import styles from './Monthly.module.scss'
-import classNames from 'classnames/bind'
 
 import CalendarDate from '../../utils/CalendarDate'
 
 import MonthlyCalendar from '../MonthlyCalendar/MonthlyCalendar'
 import ButtonArea from '../ButtonArea/ButtonArea'
+import { useCalendarContext } from '../../contexts/calendar'
+import { setCalendar } from '../../reducers/calendar'
+import Schedule from '../../utils/Schedule'
 
-const cx = classNames.bind(styles)
+const Monthly = ({ style, scheduleList }) => {
+	const { calendarDispatch } = useCalendarContext()
 
-const Monthly = ({ style }) => {
 	const currentMonth = new CalendarDate()
 
 	const [monthlyData, setMonthlyData] = useState(null)
@@ -19,7 +20,15 @@ const Monthly = ({ style }) => {
 	}
 
 	useEffect(() => {
+		if (scheduleList) {
+			const action = setCalendar(scheduleList.map((scheduleItem) => new Schedule(scheduleItem)))
+			calendarDispatch(action)
+		}
+	}, [scheduleList])
+
+	useEffect(() => {
 		const initialState = new CalendarDate(currentMonth.CURRENT_DATE)
+
 		setMonthlyData(initialState)
 	}, [])
 
@@ -31,6 +40,7 @@ const Monthly = ({ style }) => {
 		} else {
 			nextMonthlyData.setPrevMonth()
 		}
+
 		setMonthlyData(nextMonthlyData)
 	}
 

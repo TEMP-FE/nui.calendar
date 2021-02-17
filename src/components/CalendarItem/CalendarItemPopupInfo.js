@@ -1,198 +1,163 @@
 import React, { useEffect, useState } from 'react'
-
 import classNames from 'classnames/bind'
-import { getCategoryList } from './commonState'
+
+import { CATEGORY_NAME } from '../../constants/defaultCategory'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../reducers/calendar'
-
-import CalendarDate from '../../utils/CalendarDate'
-
 import { useCalendarContext } from '../../contexts/calendar'
+
+import Schedule from '../../utils/Schedule'
 import CalendarItemPopupPortal from './CalendarItemPopupPortal'
+import { InputCategory, InputTitle, InputIsBlocked, InputDate, InputIsAllDay } from '../Input/Input'
 
 import styles from './CalendarItemPopupInfo.module.scss'
-import useInput from './useInput'
-import useToggle from './useToggle'
-import { InputCheckbox, InputDate, InputSelector, InputText } from './Input'
 
 const cx = classNames.bind(styles)
 
-const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, ...item }) => {
+const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, schedule }) => {
 	const { calendarDispatch } = useCalendarContext()
+	const [_schedule, setSchedule] = useState(null)
 
-	const {
-		calendarId,
-		title = '할 일',
-		startAt = new Date(),
-		endAt = new Date(),
-		category = 'A',
-		isAllDay = false,
-		isBlocked = false,
-	} = item
+	const [scheduleIdState, setScheduleIdState] = useState(null)
 
-	const handleInputDate = (e) => {
-		const { type, value } = e.target
-
-		if (type === 'time') {
-			const [hours, minutes] = value.split(':')
-			const formattedDate = new Date(startAtState)
-
-			formattedDate.setHours(hours)
-			formattedDate.setMinutes(minutes)
-
-			return formattedDate
-		}
-
-		return new Date(value)
-	}
-
-	const [calendarIdState, setCalendarIdState] = useState(calendarId)
-
-	const createNewCalendarItem = (newCalendarId) => {
-		const action = createCalendar({
-			calendarId: newCalendarId,
-			title: titleState,
-			startAt: startAtState,
-			endAt: endAtState,
-			category: categoryState,
-			isAllDay: isAllDayState,
-			isBlocked: isBlockedState,
-		})
+	const createNewCalendarItem = (newCalendar) => {
+		const action = createCalendar(newCalendar)
 
 		calendarDispatch(action)
 	}
 
 	useEffect(() => {
 		if (isNew) {
-			const newCalendarItemId = Math.random()
+			const newCalendarItem = new Schedule({
+				startAt: schedule.startAt,
+				endAt: schedule.endAt,
+			})
 
-			setCalendarIdState(newCalendarItemId)
-			createNewCalendarItem(newCalendarItemId)
+			setSchedule(newCalendarItem)
+			setScheduleIdState(newCalendarItem.scheduleId)
+
+			createNewCalendarItem(newCalendarItem)
+		} else {
+			setSchedule(schedule)
+			setScheduleIdState(schedule.scheduleId)
 		}
 	}, [])
 
-	const [titleState, handleTitleChange] = useInput({ initialValue: title })
-	const [startAtState, handleStartDateAtChange] = useInput({ initialValue: startAt, handleChange: handleInputDate })
-	const [endAtState, handleEndDateAtChange] = useInput({ initialValue: endAt, handleChange: handleInputDate })
-	const [categoryState, handleCategoryChange] = useInput({ initialValue: category })
-	const [isAllDayState, handleIsAllDayChange] = useToggle({ initialValue: isAllDay })
-	const [isBlockedState, handleIsBlockedChange] = useToggle({ initialValue: isBlocked })
-
 	const onDelete = (e) => {
-		calendarDispatch(deleteCalendar(calendarIdState))
+		calendarDispatch(deleteCalendar(scheduleIdState))
 
 		handleClose(e)
 	}
 
-	const onDone = (e) => {
+	const handleValueChange = ({ property, value }) => {
 		const action = updateCalendar({
-			calendarId: calendarIdState,
-			title: titleState,
-			startAt: startAtState,
-			endAt: endAtState,
-			category: categoryState,
-			isAllDay: isAllDayState,
-			isBlocked: isBlockedState,
+			scheduleId: scheduleIdState,
+			[property]: value,
+		})
+
+		const updatedSchedule = new Schedule({
+			..._schedule,
+			[property]: value,
 		})
 
 		calendarDispatch(action)
 
+		setSchedule(updatedSchedule)
+	}
+
+	const onDone = (e) => {
 		handleClose(e)
 	}
 
 	return (
 		<CalendarItemPopupPortal id={id} handleClose={handleClose}>
-			<div className={cx('component')}>
-				<div className={cx('area-flex')}>
-					<div className={cx('item', 'type-none')}>
-						<InputSelector
-							id="category"
-							value={categoryState}
-							list={getCategoryList()}
-							handler={handleCategoryChange}
-							readOnly={isBlockedState}
-						/>
+			{_schedule && (
+				<div className={cx('component')}>
+					<div className={cx('area-flex')}>
+						<div className={cx('item', 'type-none')}>
+							<InputCategory
+								category={_schedule.category}
+								readOnly={_schedule.isBlocked}
+								onChange={handleValueChange}
+							/>
+						</div>
+						<div className={cx('item')}>
+							<InputTitle
+								title={_schedule.title}
+								readOnly={_schedule.isBlocked}
+								onChange={handleValueChange}
+							/>
+						</div>
+
+						<div className={cx('item', 'type-none')}>
+							<InputIsBlocked isBlocked={_schedule.isBlocked} onChange={handleValueChange} />
+						</div>
 					</div>
-					<div className={cx('item')}>
-						<InputText
-							id="title"
-							placeholder="할 일"
-							value={titleState}
-							handler={handleTitleChange}
-							readOnly={isBlockedState}
-						/>
+					<div className={cx('area-flex')}>
+						{_schedule.isAllDay ? (
+							<>
+								<div className={cx('item', 'type-date')}>
+									<InputDate
+										property="startAt"
+										date={_schedule.startAt}
+										readOnly={_schedule.isBlocked}
+										onChange={handleValueChange}
+									/>
+								</div>
+								<div className={cx('item', 'type-date')}>
+									<InputDate
+										property="endAt"
+										date={_schedule.endAt}
+										readOnly={_schedule.isBlocked}
+										onChange={handleValueChange}
+									/>
+								</div>
+							</>
+						) : (
+							<>
+								<div className={cx('item', 'type-date')}>
+									<InputDate
+										property="startAt"
+										date={_schedule.startAt}
+										readOnly={_schedule.isBlocked}
+										onChange={handleValueChange}
+										typeTime
+									/>
+								</div>
+								<div className={cx('item', 'type-date')}>
+									<InputDate
+										property="endAt"
+										date={_schedule.endAt}
+										readOnly={_schedule.isBlocked}
+										onChange={handleValueChange}
+										typeTime
+									/>
+								</div>
+							</>
+						)}
 					</div>
-					<div className={cx('item', 'type-none')}>
-						<button type="button" className={cx('button')} onClick={handleIsBlockedChange}>
-							{isBlockedState ? <>잠금해제</> : <>잠금</>}
-						</button>
+					<div className={cx('area-flex')}>
+						<div className={cx('item')}>
+							<InputIsAllDay
+								isAllDay={_schedule.isAllDay}
+								readOnly={_schedule.isBlocked}
+								onChange={handleValueChange}
+							/>
+						</div>
 					</div>
-				</div>
-				<div className={cx('area-flex')}>
-					{isAllDayState ? (
-						<>
-							<div className={cx('item', 'type-date')}>
-								<InputDate
-									id="date-start"
-									value={CalendarDate.getDateString(startAtState)}
-									handler={handleStartDateAtChange}
-									readOnly={isBlockedState}
-								/>
-							</div>
-							<div className={cx('item', 'type-date')}>
-								<InputDate
-									id="date-end"
-									value={CalendarDate.getDateString(endAtState)}
-									handler={handleEndDateAtChange}
-									readOnly={isBlockedState}
-								/>
-							</div>
-						</>
-					) : (
-						<>
-							<div className={cx('item', 'type-date')}>
-								<InputDate
-									id="time-start"
-									value={CalendarDate.getDateTimeString(startAtState)}
-									handler={handleStartDateAtChange}
-									typeTime
-									readOnly={isBlockedState}
-								/>
-							</div>
-							<div className={cx('item', 'type-date')}>
-								<InputDate
-									id="time-end"
-									value={CalendarDate.getDateTimeString(endAtState)}
-									handler={handleEndDateAtChange}
-									typeTime
-									readOnly={isBlockedState}
-								/>
-							</div>
-						</>
-					)}
-				</div>
-				<div className={cx('area-flex')}>
-					<div className={cx('item')}>
-						<InputCheckbox
-							id="all-day"
-							label="하루 종일"
-							value={isAllDayState}
-							handler={handleIsAllDayChange}
-						/>
-					</div>
-				</div>
-				<div className={cx('area-button')}>
-					<div className={cx('cell')}>
-						<button type="button" className={cx('button')} onClick={onDelete}>
-							Delete
-						</button>
-					</div>
-					<div className={cx('cell')}>
-						<button type="button" className={cx('button')} onClick={onDone}>
-							Done
-						</button>
+					<div className={cx('area-button')}>
+						<div className={cx('cell')}>
+							<button type="button" className={cx('button')} onClick={onDelete}>
+								Delete
+							</button>
+						</div>
+						<div className={cx('cell')}>
+							<button type="button" className={cx('button')} onClick={onDone}>
+								Done
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</CalendarItemPopupPortal>
 	)
 }

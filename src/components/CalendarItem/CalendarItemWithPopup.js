@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import CalendarItem from './CalendarItem'
 import CalendarItemPopupInfo from './CalendarItemPopupInfo'
 
-const CalendarItemWithPopup = ({ id, ...item }) => {
+const CalendarItemWithPopup = ({ id, style, schedule, isLast, ...props }) => {
 	const [isPopupShown, setIsPopupShown] = useState(false)
 
 	const handleIsPopupShown = () => {
@@ -12,8 +12,16 @@ const CalendarItemWithPopup = ({ id, ...item }) => {
 
 	return (
 		<>
-			<CalendarItem handleIsShown={handleIsPopupShown} {...item} />
-			{isPopupShown && <CalendarItemPopupInfo id={id} handleClose={handleIsPopupShown} {...item} />}
+			<CalendarItem style={style} schedule={schedule} isLast={isLast} handleIsShown={handleIsPopupShown} />
+			{isPopupShown && (
+				<CalendarItemPopupInfo
+					id={id}
+					handleClose={handleIsPopupShown}
+					style={style}
+					schedule={schedule}
+					isLast={isLast}
+				/>
+			)}
 		</>
 	)
 }

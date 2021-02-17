@@ -1,11 +1,12 @@
 import React from 'react'
 import Monthly from '../MonthlyCalendar/Monthly'
 import { AppContext } from '../../contexts/calendar'
+import Calendar from '../Calendar'
 
-const MonthlyLib = () => {
+const MonthlyLib = ({ scheduleList }) => {
 	return (
 		<AppContext>
-			<Monthly></Monthly>
+			<Calendar calendar={<Monthly scheduleList={scheduleList} />} />
 		</AppContext>
 	)
 }

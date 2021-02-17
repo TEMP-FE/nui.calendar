@@ -7,7 +7,6 @@ import ButtonArea from '../ButtonArea/ButtonArea'
 import DragDate from '../Drag/DragDate'
 import { calendarType } from '../../const/drag'
 import { useCalendarContext } from '../../contexts/calendar'
-import useToggle from '../CalendarItem/useToggle'
 import { setCalendar } from '../../reducers/dragDate'
 import { resetScheduleDrag } from '../../reducers/dragSchedule'
 import { updateCalendar } from '../../reducers/calendar'
@@ -16,12 +15,6 @@ import CalendarItemPopupInfo from '../CalendarItem/CalendarItemPopupInfo'
 import { useDragDateContext, useDragScheduleContext } from '../../contexts/drag'
 
 const cx = classNames.bind(styles)
-
-const curDay = new Date()
-const year = curDay.getFullYear()
-const month = curDay.getMonth()
-const date = curDay.getDate()
-const dayOfWeek = curDay.getDay()
 
 const WeeklyCell = ({ info, time }) => {
 	const date = moment(info).date()
@@ -39,8 +32,10 @@ const WeeklyCell = ({ info, time }) => {
 				<CalendarItemPopupInfo
 					id={`time-${date}-${time}`}
 					handleClose={closePopup}
-					startAt={popupInfo.startAt}
-					endAt={popupInfo.endAt}
+					schedule={{
+						startAt: popupInfo.startAt,
+						endAt: popupInfo.endAt,
+					}}
 					isNew
 				/>
 			)}
@@ -77,19 +72,13 @@ const WeeklyCalendar = () => {
 		const tempWeek = []
 		const calcDay = state ? 7 : -7
 
-		week.map((day) => (
-			tempWeek.push(day.add(calcDay, 'day'))
-		))
+		week.map((day) => tempWeek.push(day.add(calcDay, 'day')))
 
 		setWeek(tempWeek)
 	}
 
 	const log = (info) => {
 		console.log(info)
-	}
-
-	const timelog = (time, value) => {
-		console.log(value === '0' ? time + ':00 ~ ' + time + ':30' : time + ':30 ~ ' + (time + 1) + ':00')
 	}
 
 	useEffect(() => {
@@ -163,7 +152,14 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = { ...item, index: index, startAt: item.startAt, endAt: item.endAt, renderStartAt: moment(item.startAt), renderEndAt: moment(item.endAt) }
+			const itemWithIndex = {
+				...item,
+				index: index,
+				startAt: item.startAt,
+				endAt: item.endAt,
+				renderStartAt: moment(item.startAt),
+				renderEndAt: moment(item.endAt),
+			}
 			const filteredItem = checkItemDateEqual(itemWithIndex)
 
 			return filteredItem
@@ -171,14 +167,6 @@ const WeeklyCalendar = () => {
 
 		setCalendarItemList(filteredList.flat())
 	}, [calendarStore.scheduleList])
-
-	const isAllday = (startAt, endAt) => {
-		return moment(endAt).valueOf() - moment(startAt).valueOf() > 86400000 ? true : false
-	}
-
-	const pushAlldayItem = (item) => {
-		return item
-	}
 
 	const pushSeparatedItem = (Item, startAt, endAt) => {
 		const endTime = '24:00'
@@ -228,7 +216,7 @@ const WeeklyCalendar = () => {
 									{timeLine.map((time, timeIndex) => (
 										<WeeklyCell key={`time-${timeIndex}`} info={info} time={time} />
 									))}
-									{calendarItemList.map((calendarItem) => {
+									{calendarItemList.map((calendarItem, itemKey) => {
 										const currentDate = info.format('D')
 										const itemDate = moment(calendarItem.renderStartAt).format('D')
 										const itemHour = moment(calendarItem.renderStartAt).format('H')
@@ -237,6 +225,7 @@ const WeeklyCalendar = () => {
 										return (
 											hasItem && (
 												<CalendarItemWithPopup
+													key={itemKey}
 													id={`time-${itemDate}-${itemHour}`}
 													style={{
 														top: calcStartPoint(calendarItem.renderStartAt),
@@ -247,7 +236,7 @@ const WeeklyCalendar = () => {
 															calendarItem.renderEndAt,
 														),
 													}}
-													{...calendarItem}
+													schedule={calendarItem}
 												/>
 											)
 										)
@@ -277,10 +266,7 @@ const WeeklyCalendar = () => {
 														top: calcStartPoint(item.startAt),
 														left: '0',
 														right: '5px',
-														height: calcCalendarItemHeight(
-															item.startAt,
-															item.endAt,
-														),
+														height: calcCalendarItemHeight(item.startAt, item.endAt),
 														backgroundColor: 'rgba(255,0,0,0.1)',
 														zIndex: '-5',
 													}}

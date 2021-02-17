@@ -47,7 +47,7 @@ const DragSchedule = ({ className, onClick, isBlocked, style, startAt, endAt, in
 	}
 
 	return (
-		<div className={className} style={style}>
+		<div className={className} style={{ ...style, pointerEvents: dragScheduleStore.isDragging && index !== dragScheduleStore.dragInfo.index && 'none' }}>
 			<div
 				style={{ height: '100%', width: '100%' }}
 				onClick={onClick}

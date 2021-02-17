@@ -55,6 +55,7 @@
 .cell_header {
 	display: flex;
 	justify-content: space-between;
+	pointer-events: none;
 }
 
 .date {

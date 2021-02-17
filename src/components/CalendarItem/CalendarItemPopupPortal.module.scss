@@ -12,6 +12,7 @@
 	left: 100%;
 	z-index: 2000;
 	transform: translateY(-50%);
+	pointer-events: all;
 	&.direction-left {
 		right: 100%;
 		left: auto;

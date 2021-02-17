@@ -32,7 +32,7 @@ const reducer = (state, actions) => {
 				...state,
 				isDragging: true,
 				dragInfo: {
-					index: actions.index,
+					scheduleId: actions.scheduleId,
 					startAt: actions.startAt,
 					endAt: actions.endAt,
 					diff: actions.endAt.diff(actions.startAt, diffUnit)
@@ -84,10 +84,10 @@ export const setCalendar = (calendarType) => {
 	}
 }
 
-export const startDrag = (index, startAt, endAt) => {
+export const startDrag = (scheduleId, startAt, endAt) => {
 	return {
 		type: ACTIONS.START,
-		index,
+		scheduleId,
 		startAt,
 		endAt
 	}

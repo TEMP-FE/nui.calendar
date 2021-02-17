@@ -13,7 +13,7 @@ const DragSchedule = ({
 	style,
 	startAt,
 	endAt,
-	index,
+	scheduleId,
 	isLast,
 	children,
 	isTimeType,
@@ -45,7 +45,7 @@ const DragSchedule = ({
 		} else {
 			e.dataTransfer.setDragImage(dragImg, 0, 0)
 		}
-		dragScheduleDispatch(startDrag(index, startAt, endAt))
+		dragScheduleDispatch(startDrag(scheduleId, startAt, endAt))
 	}
 	const handleDragEnd = (e) => {
 		if (!isTimeType && dragScheduleStore.calendarType === calendarType.MONTH) {
@@ -56,12 +56,12 @@ const DragSchedule = ({
 	}
 	const handleResizeDragStart = (e) => {
 		e.dataTransfer.setDragImage(dragImg, 0, 0)
-		dragScheduleDispatch(startDrag(index, startAt, endAt))
+		dragScheduleDispatch(startDrag(scheduleId, startAt, endAt))
 		dragScheduleDispatch(startResize())
 	}
 
 	return (
-		<div className={className} style={{ ...style, pointerEvents: dragScheduleStore.isDragging && index !== dragScheduleStore.dragInfo.index && 'none' }}>
+		<div className={className} style={{ ...style, pointerEvents: dragScheduleStore.isDragging && scheduleId !== dragScheduleStore.dragInfo.scheduleId && 'none' }}>
 			<div
 				style={{ height: '100%', width: '100%' }}
 				onClick={onClick}

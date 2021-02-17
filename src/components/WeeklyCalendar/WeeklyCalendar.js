@@ -93,7 +93,7 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		if (dragScheduleStore.isResizing) {
-			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			let resizingSchedule = calendarStore.scheduleList.find(schedule => schedule.scheduleId === dragScheduleStore.dragInfo.scheduleId)
 			resizingSchedule = {
 				...resizingSchedule,
 				endAt: dragScheduleStore.dragInfo.endAt,
@@ -115,7 +115,7 @@ const WeeklyCalendar = () => {
 
 	useEffect(() => {
 		if (dragScheduleStore.isDropped) {
-			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			let movedSchedule = calendarStore.scheduleList.find(schedule => schedule.scheduleId === dragScheduleStore.dragInfo.scheduleId)
 			movedSchedule = {
 				...movedSchedule,
 				startAt: dragScheduleStore.dragInfo.startAt,
@@ -151,16 +151,15 @@ const WeeklyCalendar = () => {
 	}
 
 	useEffect(() => {
-		const filteredList = calendarStore.scheduleList.map((item, index) => {
-			const itemWithIndex = {
+		const filteredList = calendarStore.scheduleList.map((item) => {
+			const itemWithRenderDate = {
 				...item,
-				index: index,
 				startAt: item.startAt,
 				endAt: item.endAt,
 				renderStartAt: moment(item.startAt),
 				renderEndAt: moment(item.endAt),
 			}
-			const filteredItem = checkItemDateEqual(itemWithIndex)
+			const filteredItem = checkItemDateEqual(itemWithRenderDate)
 
 			return filteredItem
 		})

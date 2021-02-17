@@ -158,8 +158,7 @@ const WeeklyCalendar = () => {
 		if (renderEnd.hour() + renderEnd.minute() === 0 && renderEnd.subtract(1, 'day').day() === renderStart.day()) {
 			return { ...item, renderEndAt: renderStart.clone().set({ hour: 24, minute: 0 }), isLast: true }
 		}
-
-		return isAllday(startAt, endAt) ? pushAlldayItem(item) : pushSeparatedItem(item, startAt, endAt)
+		return item.isAllDay ? item : pushSeparatedItem(item, startAt, endAt)
 	}
 
 	useEffect(() => {

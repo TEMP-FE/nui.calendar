@@ -19,3 +19,13 @@
     height: 15px;
     background-color: black;
 }
+
+#dragging_ghost {
+    position:absolute; 
+    top:0;
+    left:0;
+    width:120px;
+    height:26px;
+    border-radius:4px;
+    z-index:-1;
+}

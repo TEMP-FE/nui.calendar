@@ -36,7 +36,7 @@ class CalendarDate {
 		return moment(date).format(format)
 	}
 
-	static getDateTimeString(date, format = 'HH:MM:SS') {
+	static getDateTimeString(date, format = 'HH:mm:ss') {
 		return moment(date).format(format)
 	}
 

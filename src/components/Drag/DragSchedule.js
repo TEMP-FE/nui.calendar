@@ -36,7 +36,7 @@ const DragSchedule = ({
 				ghost.setAttribute('id', 'dragging_ghost')
 				ghost.setAttribute(
 					'style',
-					`position:absolute; top:0;left:0;width:120px;height:26px;border-radius:4px;z-index:-1;background-color:${CATEGORY_COLOR[category]})}`,
+					`background-color:${CATEGORY_COLOR[category]}`,
 				)
 				ghost.textContent = title
 				e.currentTarget.appendChild(ghost)
@@ -61,7 +61,7 @@ const DragSchedule = ({
 	}
 
 	return (
-		<div className={className} style={style}>
+		<div className={className} style={{ ...style, pointerEvents: dragScheduleStore.isDragging && index !== dragScheduleStore.dragInfo.index && 'none' }}>
 			<div
 				style={{ height: '100%', width: '100%' }}
 				onClick={onClick}

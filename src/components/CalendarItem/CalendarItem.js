@@ -21,7 +21,7 @@ const DayType = ({ schedule, handleIsShown, style, isLast }) => {
 			className={cx('component')}
 			isBlocked={schedule.isBlocked}
 			style={style}
-			index={schedule.index}
+			scheduleId={schedule.scheduleId}
 			startAt={moment(schedule.startAt)}
 			endAt={moment(schedule.endAt)}
 			isLast={isLast}
@@ -68,7 +68,7 @@ const TimeType = ({ schedule, isShown, handleIsShown }) => {
 		<DragSchedule
 			className={cx('component')}
 			isBlocked={schedule.isBlocked}
-			index={schedule.index}
+			scheduleId={schedule.scheduleId}
 			isTimeType={true}
 			startAt={moment(schedule.startAt)}
 			endAt={moment(schedule.endAt)}

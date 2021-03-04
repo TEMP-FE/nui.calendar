@@ -102,24 +102,25 @@ const MonthlyCalendar = ({ year, month }) => {
 
 	useEffect(() => {
 		if (dragScheduleStore.isResizing) {
-			let resizingSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			let resizingSchedule = calendarStore.scheduleList.find(schedule => schedule.scheduleId === dragScheduleStore.dragInfo.scheduleId)
 			resizingSchedule = {
 				...resizingSchedule,
 				endAt: dragScheduleStore.dragInfo.endAt,
 			}
-
+			console.log(resizingSchedule)
 			calendarDispatch(updateCalendar(resizingSchedule))
 		}
 	}, [dragScheduleStore.dragInfo.endAt])
 
 	useEffect(() => {
 		if (dragScheduleStore.isDropped) {
-			let movedSchedule = calendarStore.scheduleList[dragScheduleStore.dragInfo.index]
+			let movedSchedule = calendarStore.scheduleList.find(schedule => schedule.scheduleId === dragScheduleStore.dragInfo.scheduleId)
 			movedSchedule = {
 				...movedSchedule,
 				startAt: dragScheduleStore.dragInfo.startAt,
 				endAt: dragScheduleStore.dragInfo.endAt,
 			}
+			console.log(movedSchedule)
 			calendarDispatch(updateCalendar(movedSchedule))
 			dragScheduleDispatch(resetScheduleDrag())
 		}
@@ -135,8 +136,7 @@ const MonthlyCalendar = ({ year, month }) => {
 
 	// 현재 선택된 '달'의 달력에 맞는 scheduleList 를 만드는 함수
 	const getNewScheduleList = (scheduleList, dateInfoList) =>
-		ascendingScheduleList(scheduleList).map((scheduleItem, scheduleIndex) => {
-			scheduleItem.setIndex(scheduleIndex)
+		ascendingScheduleList(scheduleList).map((scheduleItem) => {
 
 			let period = CalendarDate.calcScheduleTimeToUnix(scheduleItem)
 			let renderList = []
@@ -193,7 +193,7 @@ const MonthlyCalendar = ({ year, month }) => {
 									renderList.push(
 										Object.assign(
 											{ top, left, width, stack },
-											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
+											scheduleItem.scheduleId === dragScheduleStore.dragInfo.scheduleId && { opacity: 0.5 },
 										),
 									)
 									period = period - (7 - j)
@@ -209,7 +209,7 @@ const MonthlyCalendar = ({ year, month }) => {
 									renderList.push(
 										Object.assign(
 											{ top, left, width, stack },
-											scheduleIndex === dragScheduleStore.dragInfo.index && { opacity: 0.5 },
+											scheduleItem.scheduleId === dragScheduleStore.dragInfo.scheduleId && { opacity: 0.5 },
 										),
 									)
 									period = 0
@@ -268,7 +268,7 @@ const MonthlyCalendar = ({ year, month }) => {
 
 		setDateInfoList(newDateInfoList)
 		setCalendarScheduleList(newScheduleList)
-	}, [scheduleList, year, month, dragScheduleStore.dragInfo.index])
+	}, [scheduleList, year, month, dragScheduleStore.dragInfo.scheduleId])
 
 	return (
 		<div className={cx('calendar_wrap')}>

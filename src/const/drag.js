@@ -17,7 +17,7 @@ export const dateInitialState = {
 
 export const scheduleInitialState = {
     dragInfo: {
-        index: -1,
+        scheduleId: -1,
         startAt: undefined,
         endAt: undefined,
         diff: undefined,

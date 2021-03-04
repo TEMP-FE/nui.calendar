@@ -113,27 +113,27 @@ const CalendarItemPopupInfo = ({ id, handleClose, isNew = false, schedule }) => 
 								</div>
 							</>
 						) : (
-							<>
-								<div className={cx('item', 'type-date')}>
-									<InputDate
-										property="startAt"
-										date={_schedule.startAt}
-										readOnly={_schedule.isBlocked}
-										onChange={handleValueChange}
-										typeTime
-									/>
-								</div>
-								<div className={cx('item', 'type-date')}>
-									<InputDate
-										property="endAt"
-										date={_schedule.endAt}
-										readOnly={_schedule.isBlocked}
-										onChange={handleValueChange}
-										typeTime
-									/>
-								</div>
-							</>
-						)}
+								<>
+									<div className={cx('item', 'type-date')}>
+										<InputDate
+											property="startAt"
+											date={_schedule.startAt}
+											readOnly={_schedule.isBlocked}
+											onChange={handleValueChange}
+											typeTime
+										/>
+									</div>
+									<div className={cx('item', 'type-date')}>
+										<InputDate
+											property="endAt"
+											date={_schedule.endAt}
+											readOnly={_schedule.isBlocked}
+											onChange={handleValueChange}
+											typeTime
+										/>
+									</div>
+								</>
+							)}
 					</div>
 					<div className={cx('area-flex')}>
 						<div className={cx('item')}>

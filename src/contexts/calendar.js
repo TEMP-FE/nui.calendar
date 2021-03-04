@@ -13,6 +13,7 @@ const { Provider } = appContext
 const initialState = {
 	scheduleList: [
 		new Schedule({
+			id: new Date(),
 			title: '테스트 A',
 			startAt: moment('2021-01-28 13:00'),
 			endAt: moment('2021-01-28 17:30'),
@@ -21,6 +22,7 @@ const initialState = {
 			isBlocked: false,
 		}),
 		new Schedule({
+			id: new Date(),
 			title: '테스트 B',
 			startAt: moment('2021-01-29 14:30'),
 			endAt: moment('2021-01-29 16:00'),
